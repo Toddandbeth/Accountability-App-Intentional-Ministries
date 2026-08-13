@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { JoinGroupForm } from "@/components/JoinGroupForm";
@@ -61,9 +62,14 @@ export default async function CheckInPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <p className="text-sm text-neutral-500">{group?.name}</p>
-        <h1 className="text-xl font-semibold">This week&apos;s check-in</h1>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm text-neutral-500">{group?.name}</p>
+          <h1 className="text-xl font-semibold">This week&apos;s check-in</h1>
+        </div>
+        <Link href="/history" className="mt-1 text-sm text-neutral-500 underline">
+          Your history
+        </Link>
       </div>
 
       <CheckInForm

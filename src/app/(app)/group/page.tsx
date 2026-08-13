@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { MembershipRequestRow } from "@/components/MembershipRequestRow";
+import { GroupSettingsForm } from "@/components/GroupSettingsForm";
+import { QuestionsEditor } from "@/components/QuestionsEditor";
 import { weekdayName } from "@/lib/weekdays";
 
 export default async function GroupPage() {
@@ -83,6 +85,14 @@ export default async function GroupPage() {
     });
   }
 
+  const { data: questions } = isAdmin
+    ? await supabase
+        .from("group_questions")
+        .select("*")
+        .eq("group_id", groupId)
+        .order("slot_number")
+    : { data: null };
+
   return (
     <div className="space-y-4">
       <div>
@@ -91,6 +101,20 @@ export default async function GroupPage() {
           Meets {group ? weekdayName(group.meeting_day) : ""}
         </p>
       </div>
+
+      {group?.resource_link_url && (
+        <a
+          href={group.resource_link_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-xl border border-neutral-200 bg-white p-4"
+        >
+          <p className="text-xs font-semibold text-neutral-500">Resource</p>
+          <p className="mt-1 text-sm font-medium underline">
+            {group.resource_link_label || group.resource_link_url}
+          </p>
+        </a>
+      )}
 
       {isAdmin && group && (
         <div className="rounded-xl border border-neutral-200 bg-white p-4">
@@ -135,6 +159,17 @@ export default async function GroupPage() {
           );
         })}
       </div>
+
+      {isAdmin && group && (
+        <>
+          <GroupSettingsForm group={group} />
+          <QuestionsEditor
+            key={(questions ?? []).map((q) => q.id).join("-")}
+            groupId={group.id}
+            questions={questions ?? []}
+          />
+        </>
+      )}
     </div>
   );
 }

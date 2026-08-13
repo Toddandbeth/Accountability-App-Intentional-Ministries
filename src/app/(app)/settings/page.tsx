@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ActiveGroupSwitcher } from "@/components/ActiveGroupSwitcher";
 import { JoinGroupForm } from "@/components/JoinGroupForm";
+import { ProfileForm } from "@/components/ProfileForm";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -31,12 +32,9 @@ export default async function SettingsPage() {
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Settings</h1>
 
-      <div className="rounded-xl border border-neutral-200 bg-white p-4 text-sm">
-        <p className="font-medium">
-          {profile?.first_name} {profile?.last_name}
-        </p>
-        <p className="text-neutral-500">{profile?.email}</p>
-      </div>
+      <p className="text-sm text-neutral-500">{profile?.email}</p>
+
+      {profile && <ProfileForm profile={profile} />}
 
       <div className="space-y-2">
         <h2 className="text-sm font-semibold text-neutral-700">Your groups</h2>
@@ -48,10 +46,6 @@ export default async function SettingsPage() {
       </div>
 
       <JoinGroupForm />
-
-      <p className="text-sm text-neutral-600">
-        Profile editing and per-group settings are coming in the next milestone.
-      </p>
 
       <LogoutButton />
     </div>
