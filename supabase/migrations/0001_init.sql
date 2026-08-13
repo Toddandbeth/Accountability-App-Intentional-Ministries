@@ -415,6 +415,30 @@ create trigger profiles_validate_active_group
   before update on public.profiles
   for each row execute function public.validate_active_group();
 
+-- 6) auto-select a newly-approved membership's group as the user's active
+-- group, but only if they don't already have one — an admin approving a
+-- join request shouldn't silently switch a member away from a group
+-- they're already actively using.
+create or replace function public.set_active_group_on_first_approval()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.status = 'active' and old.status is distinct from 'active' then
+    update public.profiles
+      set active_group_id = new.group_id
+      where id = new.user_id and active_group_id is null;
+  end if;
+  return new;
+end;
+$$;
+
+create trigger memberships_set_active_group
+  after update on public.memberships
+  for each row execute function public.set_active_group_on_first_approval();
+
 -- ============================================================
 -- RPCs — bundle multi-step / privileged operations that RLS
 -- alone can't safely express as plain table writes
