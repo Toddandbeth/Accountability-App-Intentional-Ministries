@@ -357,7 +357,12 @@ create trigger groups_after_insert_seed_questions
 -- the reset_group_questions RPC below — not called directly by clients.
 revoke all on function public.seed_default_questions(uuid) from public;
 
--- 4) enforce the deadline/lock server-side on every check-in write
+-- 4) enforce the deadline/lock server-side on every check-in write, and
+-- (on UPDATE) that the row's identity columns never change — otherwise a
+-- user could "move" their own row into another group/week via UPDATE
+-- instead of INSERT. This is done here via a trigger, not column-level
+-- GRANTs, because upsert's INSERT ... ON CONFLICT DO UPDATE requires
+-- table-level UPDATE privilege in Postgres regardless of column grants.
 create or replace function public.enforce_week_editable()
 returns trigger
 language plpgsql
@@ -365,6 +370,14 @@ security definer
 set search_path = public
 as $$
 begin
+  if tg_op = 'UPDATE' then
+    if new.user_id is distinct from old.user_id
+      or new.group_id is distinct from old.group_id
+      or new.week_start_date is distinct from old.week_start_date then
+      raise exception 'user_id, group_id, and week_start_date cannot be changed after the row is created.';
+    end if;
+  end if;
+
   if not public.is_week_editable(new.group_id, new.week_start_date) then
     raise exception 'This week is locked and can no longer be edited.';
   end if;
@@ -611,10 +624,9 @@ revoke insert, delete on public.memberships from authenticated;
 revoke insert, update, delete on public.profiles from authenticated;
 grant update (first_name, last_name, cell_phone, profile_image_url, active_group_id) on public.profiles to authenticated;
 
--- weekly_check_ins: UPDATE must never be able to touch group_id /
--- week_start_date / user_id — otherwise a user could "move" their own
--- row into another group's current week via UPDATE instead of INSERT,
--- which the RLS policy alone (user_id = auth.uid()) would not catch.
-revoke update on public.weekly_check_ins from authenticated;
-grant update (rating_1, rating_2, rating_3, rating_4, rating_5, prayer_request)
-  on public.weekly_check_ins to authenticated;
+-- weekly_check_ins keeps the full table-level UPDATE grant from above
+-- (unlike groups/profiles) because the app upserts check-ins, and
+-- Postgres requires table-level UPDATE privilege for the
+-- INSERT ... ON CONFLICT DO UPDATE path regardless of column grants.
+-- Identity-column immutability is enforced by the trigger instead
+-- (see enforce_week_editable / weekly_check_ins_enforce_lock above).
