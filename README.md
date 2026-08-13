@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Intentional Ministries Accountability
 
-## Getting Started
+A group-based weekly accountability PWA. See `Intentional Ministries Accountability App - Blueprint.md` in the repo root for the full product spec this was built from.
 
-First, run the development server:
+Stack: Next.js (App Router, TypeScript) + Tailwind CSS + Supabase (Postgres, Auth, RLS). Deployed on Vercel.
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You'll need a `.env.local` (copy `.env.local.example`) with your Supabase project's URL and anon/publishable key.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Database
 
-## Learn More
+The full schema — tables, RLS policies, week/deadline logic, triggers, and RPCs — lives in `supabase/migrations/0001_init.sql`. It's meant to be run once, in full, against a fresh Supabase project via the SQL Editor (Supabase dashboard → SQL Editor → New query → paste the file → Run).
 
-To learn more about Next.js, take a look at the following resources:
+## Deploying for the first time
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Create the Supabase project** at [supabase.com](https://supabase.com) → New project. Once it's provisioned, go to **Project Settings → API** and copy the **Project URL** and **anon/publishable key**.
+2. **Apply the schema**: paste `supabase/migrations/0001_init.sql` into the Supabase SQL Editor and run it.
+3. **Set local env vars**: copy `.env.local.example` to `.env.local` and fill in the two values from step 1. Confirm `npm run dev` works end-to-end (sign up, create a group, submit a check-in).
+4. **Push to GitHub**: create a new repo on GitHub, then from this directory:
+   ```bash
+   git remote add origin <your-repo-url>
+   git push -u origin main
+   ```
+5. **Import into Vercel**: [vercel.com/new](https://vercel.com/new) → import the GitHub repo. Under **Environment Variables**, add the same two Supabase values from step 1 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`). Deploy.
+6. **Domain**: by default you'll get a free `*.vercel.app` URL. To use a custom subdomain off intentionalministries.com, add it under the Vercel project's **Domains** tab and follow the DNS instructions it gives you.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Future schema changes
 
-## Deploy on Vercel
+Add new files as `supabase/migrations/0002_*.sql`, `0003_*.sql`, etc., and run each one in the SQL Editor when you're ready to apply it — same as the first one.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Known placeholders worth revisiting
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The app icon (`public/icons/`, `src/app/icon.png`, `src/app/apple-icon.png`) is a generic placeholder — swap in real Intentional Ministries branding before a public launch.
+- "Confirm email" is currently **off** in Supabase Auth settings (Authentication → Sign In / Providers → Email) to make testing easier. Turn it back on before real users sign up, or leave it off if you'd rather keep signup frictionless — either is a reasonable call.
