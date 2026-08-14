@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardRow } from "@/components/DashboardRow";
+import { DashboardColumnHeaders } from "@/components/DashboardColumnHeaders";
+import { shortColumnLabel } from "@/lib/questions";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -35,6 +37,11 @@ export default async function DashboardPage() {
 
   const { data: group } = await supabase.from("groups").select("*").eq("id", groupId).single();
   const { data: weekStart } = await supabase.rpc("current_week_start", { p_group_id: groupId });
+  const { data: questions } = await supabase
+    .from("group_questions")
+    .select("slot_number, label_short")
+    .eq("group_id", groupId)
+    .order("slot_number");
 
   const { data: memberships } = await supabase
     .from("memberships")
@@ -58,6 +65,11 @@ export default async function DashboardPage() {
   const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
   const checkInByUserId = new Map((checkIns ?? []).map((c) => [c.user_id, c]));
 
+  const columnLabels = [1, 2, 3, 4, 5].map((slot) => {
+    const q = questions?.find((q) => q.slot_number === slot);
+    return q ? shortColumnLabel(q.label_short) : "";
+  });
+
   return (
     <div className="space-y-4">
       <div>
@@ -65,6 +77,8 @@ export default async function DashboardPage() {
         <h1 className="text-xl font-semibold">Dashboard</h1>
         <p className="text-xs text-neutral-500">Week of {weekStart}</p>
       </div>
+
+      <DashboardColumnHeaders labels={columnLabels} />
 
       <div className="space-y-2">
         {(memberships ?? []).map((m) => {
