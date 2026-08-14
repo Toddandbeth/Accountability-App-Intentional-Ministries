@@ -41,7 +41,7 @@ export function WeekHistoryRow({
       </div>
       {prayerRequest?.trim() && (
         <p className="mt-2 text-xs text-neutral-600">
-          <span className="font-semibold text-neutral-500">Prayer request: </span>
+          <span className="font-semibold text-neutral-500">Prayer &amp; Life Update: </span>
           {prayerRequest}
         </p>
       )}

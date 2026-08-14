@@ -20,9 +20,17 @@ export function DashboardRow({ name, ratings, prayerRequest, isYou }: DashboardR
         onClick={() => setExpanded((v) => !v)}
         className="flex w-full items-center gap-3 p-3 text-left"
       >
-        <span className="min-w-0 flex-1 truncate text-sm font-medium">
-          {name}
-          {isYou && <span className="ml-1 text-xs text-neutral-400">(you)</span>}
+        <span className="flex min-w-0 flex-1 items-center gap-1.5">
+          <span className="truncate text-sm font-medium">
+            {name}
+            {isYou && <span className="ml-1 text-xs text-neutral-400">(you)</span>}
+          </span>
+          {prayerRequest?.trim() && (
+            <span
+              className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"
+              title="Submitted a Prayer & Life Update"
+            />
+          )}
         </span>
         <span className="flex gap-1">
           {ratings.map((value, i) => {
@@ -46,9 +54,9 @@ export function DashboardRow({ name, ratings, prayerRequest, isYou }: DashboardR
 
       {expanded && (
         <div className="border-t border-neutral-100 p-3 text-sm">
-          <p className="mb-1 text-xs font-semibold text-neutral-500">Prayer request</p>
+          <p className="mb-1 text-xs font-semibold text-neutral-500">Prayer &amp; Life Update</p>
           <p className="text-neutral-700">
-            {prayerRequest?.trim() ? prayerRequest : "No prayer request submitted this week."}
+            {prayerRequest?.trim() ? prayerRequest : "No update submitted this week."}
           </p>
         </div>
       )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { RatingButtonRow } from "@/components/RatingButtonRow";
 import type { GroupQuestion } from "@/lib/supabase/types";
@@ -16,6 +16,8 @@ interface CheckInFormProps {
 }
 
 const RATING_COLUMNS = ["rating_1", "rating_2", "rating_3", "rating_4", "rating_5"] as const;
+const PRAYER_REQUEST_MAX_LENGTH = 500;
+const SHOW_DESCRIPTIONS_KEY = "showQuestionDescriptions";
 
 export function CheckInForm({
   userId,
@@ -35,6 +37,23 @@ export function CheckInForm({
   const [savingPrayer, setSavingPrayer] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [prayerJustSaved, setPrayerJustSaved] = useState(false);
+  const [showDescriptions, setShowDescriptions] = useState(true);
+
+  useEffect(() => {
+    // Reads localStorage (unavailable during SSR) after mount, so this
+    // can't be lazy initial state without a server/client render mismatch.
+    const stored = localStorage.getItem(SHOW_DESCRIPTIONS_KEY);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (stored !== null) setShowDescriptions(stored === "true");
+  }, []);
+
+  function toggleDescriptions() {
+    setShowDescriptions((prev) => {
+      const next = !prev;
+      localStorage.setItem(SHOW_DESCRIPTIONS_KEY, String(next));
+      return next;
+    });
+  }
 
   async function saveRating(slot: number, value: number) {
     setSaveError(null);
@@ -92,10 +111,22 @@ export function CheckInForm({
         </div>
       )}
 
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={toggleDescriptions}
+          className="text-xs text-neutral-500 underline"
+        >
+          {showDescriptions ? "Hide descriptions" : "Show descriptions"}
+        </button>
+      </div>
+
       {questions.map((q) => (
         <div key={q.id} className="rounded-xl border border-neutral-200 bg-white p-4">
           <h3 className="text-sm font-semibold">{q.label_short}</h3>
-          <p className="mt-1 text-xs text-neutral-500">{q.label_description}</p>
+          {showDescriptions && (
+            <p className="mt-1 text-xs text-neutral-500">{q.label_description}</p>
+          )}
           <div className="mt-3">
             <RatingButtonRow
               value={ratings[q.slot_number] ?? null}
@@ -107,19 +138,23 @@ export function CheckInForm({
       ))}
 
       <div className="rounded-xl border border-neutral-200 bg-white p-4">
-        <h3 className="text-sm font-semibold">Prayer request (optional)</h3>
+        <h3 className="text-sm font-semibold">Prayer &amp; Life Update (optional)</h3>
         <textarea
           value={prayerRequest}
           onChange={(e) => {
-            setPrayerRequest(e.target.value);
+            setPrayerRequest(e.target.value.slice(0, PRAYER_REQUEST_MAX_LENGTH));
             setPrayerJustSaved(false);
           }}
           disabled={!editable}
           rows={3}
-          placeholder="Anything the group can be praying for you this week?"
+          maxLength={PRAYER_REQUEST_MAX_LENGTH}
+          placeholder="A prayer request, a praise, or a quick update on one of the categories above."
           className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm disabled:opacity-50"
         />
-        <div className="mt-2 flex items-center gap-3">
+        <div className="mt-1 text-right text-xs text-neutral-400">
+          {prayerRequest.length}/{PRAYER_REQUEST_MAX_LENGTH}
+        </div>
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={submitPrayerRequest}
