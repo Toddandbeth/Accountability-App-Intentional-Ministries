@@ -1,16 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { ratingByValue } from "@/lib/ratings";
 
 interface DashboardRowProps {
+  userId: string;
   name: string;
   ratings: (number | null)[]; // slot 1..5 in order
   prayerRequest: string | null;
   isYou: boolean;
+  isAdmin: boolean;
 }
 
-export function DashboardRow({ name, ratings, prayerRequest, isYou }: DashboardRowProps) {
+export function DashboardRow({
+  userId,
+  name,
+  ratings,
+  prayerRequest,
+  isYou,
+  isAdmin,
+}: DashboardRowProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -58,6 +68,14 @@ export function DashboardRow({ name, ratings, prayerRequest, isYou }: DashboardR
           <p className="text-neutral-700">
             {prayerRequest?.trim() ? prayerRequest : "No update submitted this week."}
           </p>
+          {isAdmin && !isYou && (
+            <Link
+              href={`/dashboard/member/${userId}`}
+              className="mt-2 inline-block text-xs font-medium text-neutral-500 underline"
+            >
+              View last 6 weeks →
+            </Link>
+          )}
         </div>
       )}
     </div>

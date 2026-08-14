@@ -622,12 +622,19 @@ create policy group_questions_select on public.group_questions
 create policy group_questions_write_admin on public.group_questions
   for all using (public.is_group_admin(group_id)) with check (public.is_group_admin(group_id));
 
--- weekly_check_ins: any active member can read the whole group's rows
--- (needed for the dashboard + tap-through prayer requests); a user can
--- only write their own row, and only while the week is still editable
--- (enforced again, authoritatively, by the trigger above)
+-- weekly_check_ins: you can always read your own rows (any week — this is
+-- what powers personal history). For other members' rows: admins can read
+-- any week (the leader-only member history view), but a regular member can
+-- only read the group's *current* week (the dashboard) — past weeks of
+-- someone else's check-ins are leader-only, not general group browsing.
+-- Writes: a user can only write their own row, and only while the week is
+-- still editable (enforced again, authoritatively, by the trigger above).
 create policy weekly_check_ins_select on public.weekly_check_ins
-  for select using (public.is_group_member(group_id));
+  for select using (
+    user_id = auth.uid()
+    or public.is_group_admin(group_id)
+    or (public.is_group_member(group_id) and week_start_date = public.current_week_start(group_id))
+  );
 
 create policy weekly_check_ins_insert_own on public.weekly_check_ins
   for insert with check (user_id = auth.uid() and public.is_group_member(group_id));

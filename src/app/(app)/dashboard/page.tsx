@@ -43,6 +43,14 @@ export default async function DashboardPage() {
     .eq("group_id", groupId)
     .order("slot_number");
 
+  const { data: myMembership } = await supabase
+    .from("memberships")
+    .select("role")
+    .eq("group_id", groupId)
+    .eq("user_id", user.id)
+    .single();
+  const isAdmin = myMembership?.role === "admin";
+
   const { data: memberships } = await supabase
     .from("memberships")
     .select("user_id, role, joined_at")
@@ -89,10 +97,12 @@ export default async function DashboardPage() {
           return (
             <DashboardRow
               key={m.user_id}
+              userId={m.user_id}
               name={name}
               ratings={c ? [c.rating_1, c.rating_2, c.rating_3, c.rating_4, c.rating_5] : [null, null, null, null, null]}
               prayerRequest={c?.prayer_request ?? null}
               isYou={m.user_id === user.id}
+              isAdmin={isAdmin}
             />
           );
         })}
