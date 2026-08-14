@@ -34,6 +34,24 @@ export default async function CheckInPage() {
   const groupId = profile.active_group_id;
 
   const { data: group } = await supabase.from("groups").select("*").eq("id", groupId).single();
+
+  if (!group) {
+    // active_group_id points at a group RLS no longer lets us read —
+    // the membership was removed. Not the "no group at all" empty state.
+    return (
+      <div className="space-y-2">
+        <h1 className="text-xl font-semibold">No longer a member</h1>
+        <p className="text-sm text-neutral-600">
+          You&apos;re no longer an active member of that group.{" "}
+          <Link href="/settings" className="underline">
+            Switch groups or join another
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
+
   const { data: questions } = await supabase
     .from("group_questions")
     .select("*")

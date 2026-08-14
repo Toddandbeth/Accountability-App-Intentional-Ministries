@@ -36,6 +36,22 @@ export default async function DashboardPage() {
   const groupId = profile.active_group_id;
 
   const { data: group } = await supabase.from("groups").select("*").eq("id", groupId).single();
+
+  if (!group) {
+    return (
+      <div className="space-y-2">
+        <h1 className="text-xl font-semibold">No longer a member</h1>
+        <p className="text-sm text-neutral-600">
+          You&apos;re no longer an active member of that group.{" "}
+          <Link href="/settings" className="underline">
+            Switch groups or join another
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
+
   const { data: weekStart } = await supabase.rpc("current_week_start", { p_group_id: groupId });
   const { data: questions } = await supabase
     .from("group_questions")

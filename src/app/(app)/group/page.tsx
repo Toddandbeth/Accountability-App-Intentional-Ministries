@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { MembershipRequestRow } from "@/components/MembershipRequestRow";
+import { RemoveMemberButton } from "@/components/RemoveMemberButton";
 import { GroupSettingsForm } from "@/components/GroupSettingsForm";
 import { QuestionsEditor } from "@/components/QuestionsEditor";
 import { weekdayName } from "@/lib/weekdays";
@@ -45,6 +46,21 @@ export default async function GroupPage() {
   const groupId = profile.active_group_id;
 
   const { data: group } = await supabase.from("groups").select("*").eq("id", groupId).single();
+
+  if (!group) {
+    return (
+      <div className="space-y-2">
+        <h1 className="text-xl font-semibold">No longer a member</h1>
+        <p className="text-sm text-neutral-600">
+          You&apos;re no longer an active member of that group.{" "}
+          <Link href="/settings" className="underline">
+            Switch groups or join another
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
 
   const { data: myMembership } = await supabase
     .from("memberships")
@@ -158,7 +174,7 @@ export default async function GroupPage() {
             className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-3"
           >
             <span className="text-sm">{nameFor(m.user_id)}</span>
-            <span className="flex gap-1">
+            <span className="flex items-center gap-1">
               {m.role === "admin" && (
                 <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
                   Admin
@@ -169,6 +185,7 @@ export default async function GroupPage() {
                   {STATUS_LABELS[m.status as MembershipStatus]}
                 </span>
               )}
+              {isAdmin && m.user_id !== user.id && <RemoveMemberButton membershipId={m.id} />}
             </span>
           </div>
         ))}
