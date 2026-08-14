@@ -115,6 +115,7 @@ export default async function DashboardPage() {
               key={m.user_id}
               userId={m.user_id}
               name={name}
+              imageUrl={p?.profile_image_url ?? null}
               ratings={c ? [c.rating_1, c.rating_2, c.rating_3, c.rating_4, c.rating_5] : [null, null, null, null, null]}
               prayerRequest={c?.prayer_request ?? null}
               isYou={m.user_id === user.id}

@@ -665,3 +665,26 @@ grant update (first_name, last_name, cell_phone, profile_image_url, active_group
 -- INSERT ... ON CONFLICT DO UPDATE path regardless of column grants.
 -- Identity-column immutability is enforced by the trigger instead
 -- (see enforce_week_editable / weekly_check_ins_enforce_lock above).
+
+-- ============================================================
+-- STORAGE — profile photo uploads
+-- Public bucket (photos are non-sensitive and shown to the whole
+-- group), but writes are restricted to each user's own folder
+-- (objects are stored as "<user_id>/avatar.jpg").
+-- ============================================================
+
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do nothing;
+
+create policy avatars_insert_own on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy avatars_update_own on storage.objects
+  for update to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy avatars_delete_own on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);

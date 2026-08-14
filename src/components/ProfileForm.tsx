@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { AvatarUpload } from "@/components/AvatarUpload";
 import type { Profile } from "@/lib/supabase/types";
 
 interface ProfileFormProps {
@@ -16,7 +17,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   const [firstName, setFirstName] = useState(profile.first_name ?? "");
   const [lastName, setLastName] = useState(profile.last_name ?? "");
   const [cellPhone, setCellPhone] = useState(profile.cell_phone ?? "");
-  const [profileImageUrl, setProfileImageUrl] = useState(profile.profile_image_url ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -33,7 +33,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         first_name: firstName,
         last_name: lastName,
         cell_phone: cellPhone || null,
-        profile_image_url: profileImageUrl || null,
       })
       .eq("id", profile.id);
 
@@ -48,58 +47,57 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     router.refresh();
   }
 
+  const displayName = `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim();
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4"
-    >
+    <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4">
       <h2 className="text-sm font-semibold">Your profile</h2>
 
-      <div className="grid grid-cols-2 gap-2">
-        <input
-          type="text"
-          placeholder="First name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
-        />
-        <input
-          type="text"
-          placeholder="Last name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
-        />
-      </div>
-
-      <input
-        type="tel"
-        placeholder="Cell phone (optional)"
-        value={cellPhone}
-        onChange={(e) => setCellPhone(e.target.value)}
-        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+      <AvatarUpload
+        userId={profile.id}
+        name={displayName}
+        currentImageUrl={profile.profile_image_url}
       />
 
-      <input
-        type="url"
-        placeholder="Profile photo URL (optional)"
-        value={profileImageUrl}
-        onChange={(e) => setProfileImageUrl(e.target.value)}
-        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-      />
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="text"
+            placeholder="First name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+            className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+          <input
+            type="text"
+            placeholder="Last name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+            className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+        </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {saved && !error && <p className="text-sm text-neutral-500">Saved.</p>}
+        <input
+          type="tel"
+          placeholder="Cell phone (optional)"
+          value={cellPhone}
+          onChange={(e) => setCellPhone(e.target.value)}
+          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        />
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-full rounded-md bg-neutral-900 py-2 text-sm font-semibold text-white disabled:opacity-50"
-      >
-        {saving ? "Saving…" : "Save profile"}
-      </button>
-    </form>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        {saved && !error && <p className="text-sm text-neutral-500">Saved.</p>}
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full rounded-md bg-neutral-900 py-2 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          {saving ? "Saving…" : "Save profile"}
+        </button>
+      </form>
+    </div>
   );
 }

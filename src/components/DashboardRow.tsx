@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ratingByValue } from "@/lib/ratings";
+import { Avatar } from "@/components/Avatar";
 
 interface DashboardRowProps {
   userId: string;
   name: string;
+  imageUrl: string | null;
   ratings: (number | null)[]; // slot 1..5 in order
   prayerRequest: string | null;
   isYou: boolean;
@@ -16,6 +18,7 @@ interface DashboardRowProps {
 export function DashboardRow({
   userId,
   name,
+  imageUrl,
   ratings,
   prayerRequest,
   isYou,
@@ -30,7 +33,8 @@ export function DashboardRow({
         onClick={() => setExpanded((v) => !v)}
         className="flex w-full items-center gap-3 p-3 text-left"
       >
-        <span className="flex min-w-0 flex-1 items-center gap-1.5">
+        <span className="flex min-w-0 flex-1 items-center gap-2">
+          <Avatar name={name} imageUrl={imageUrl} />
           <span className="truncate text-sm font-medium">
             {name}
             {isYou && <span className="ml-1 text-xs text-neutral-400">(you)</span>}
