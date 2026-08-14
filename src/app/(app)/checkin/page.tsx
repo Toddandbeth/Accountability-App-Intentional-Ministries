@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { JoinGroupForm } from "@/components/JoinGroupForm";
 import { CheckInForm } from "@/components/CheckInForm";
+import { OnboardingExplainer } from "@/components/OnboardingExplainer";
 
 export default async function CheckInPage() {
   const supabase = await createClient();
@@ -25,6 +26,7 @@ export default async function CheckInPage() {
         <p className="text-sm text-neutral-600">
           You&apos;re not part of a group yet. Create one, or join one with a code.
         </p>
+        <OnboardingExplainer />
         <CreateGroupForm />
         <JoinGroupForm />
       </div>
