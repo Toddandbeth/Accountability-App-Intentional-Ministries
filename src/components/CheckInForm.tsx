@@ -30,9 +30,11 @@ export function CheckInForm({
 
   const [ratings, setRatings] = useState(initialRatings);
   const [prayerRequest, setPrayerRequest] = useState(initialPrayerRequest);
+  const [savedPrayerRequest, setSavedPrayerRequest] = useState(initialPrayerRequest);
   const [savingSlot, setSavingSlot] = useState<number | null>(null);
   const [savingPrayer, setSavingPrayer] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [prayerJustSaved, setPrayerJustSaved] = useState(false);
 
   async function saveRating(slot: number, value: number) {
     setSaveError(null);
@@ -54,9 +56,10 @@ export function CheckInForm({
     if (error) setSaveError(error.message);
   }
 
-  async function savePrayerRequest() {
+  async function submitPrayerRequest() {
     setSaveError(null);
     setSavingPrayer(true);
+    setPrayerJustSaved(false);
 
     const { error } = await supabase.from("weekly_check_ins").upsert(
       {
@@ -69,8 +72,17 @@ export function CheckInForm({
     );
 
     setSavingPrayer(false);
-    if (error) setSaveError(error.message);
+
+    if (error) {
+      setSaveError(error.message);
+      return;
+    }
+
+    setSavedPrayerRequest(prayerRequest);
+    setPrayerJustSaved(true);
   }
+
+  const prayerRequestDirty = prayerRequest !== savedPrayerRequest;
 
   return (
     <div className="space-y-4">
@@ -98,14 +110,28 @@ export function CheckInForm({
         <h3 className="text-sm font-semibold">Prayer request (optional)</h3>
         <textarea
           value={prayerRequest}
-          onChange={(e) => setPrayerRequest(e.target.value)}
-          onBlur={savePrayerRequest}
+          onChange={(e) => {
+            setPrayerRequest(e.target.value);
+            setPrayerJustSaved(false);
+          }}
           disabled={!editable}
           rows={3}
           placeholder="Anything the group can be praying for you this week?"
           className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm disabled:opacity-50"
         />
-        {savingPrayer && <p className="mt-1 text-xs text-neutral-400">Saving…</p>}
+        <div className="mt-2 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={submitPrayerRequest}
+            disabled={!editable || savingPrayer || !prayerRequestDirty}
+            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          >
+            {savingPrayer ? "Submitting…" : "Submit"}
+          </button>
+          {prayerJustSaved && !prayerRequestDirty && (
+            <span className="text-xs text-neutral-500">Saved.</span>
+          )}
+        </div>
       </div>
 
       {saveError && <p className="text-sm text-red-600">{saveError}</p>}

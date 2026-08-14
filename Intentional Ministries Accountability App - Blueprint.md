@@ -218,6 +218,42 @@ These were the open questions from earlier drafts, now settled:
 - Prayer requests: submitted weekly alongside the check-in, viewed by tapping a member's name on the dashboard rather than shown in the main grid.
 - Resources link: one external URL per group, set and changed by the admin at any time — not fixed content built into the app.
 
+## Round 2: Fixes and Additions from Real Testing
+
+The core app (auth, groups, check-in, dashboard, join-by-code, history, settings) is built and working. This section covers what came out of actually using it with test accounts. Treat the bugs as bugs — something already built is not working correctly — not as new features to design from scratch.
+
+### Bugs to fix
+
+- Sign-in link did not work on mobile browser — a new user could not log in from their phone at all. This needs to be reproduced and fixed as a priority, since phone use is the primary way this app will be used.
+- A member joined by group code, was approved by the admin, and the admin can see them as a member — but the member himself cannot see the group name or dashboard. Something in what a newly-approved member can see is broken.
+- A prayer request submitted by a member did not reach the admin's view the first time, but showed correctly on the member's own screen. Submitting a second time worked. This points to a save or sync bug, not a display bug — add a visible Submit button for the prayer request field so saves are explicit and confirmed, rather than relying on an implicit save (like losing focus or pressing enter) that may be firing inconsistently.
+- Member status (pending, active, removed) exists in the data model but is not visible anywhere in the app yet, for admins or members. This needs to be exposed in the UI — an admin should be able to see who is pending approval and who is active or removed, from Group Settings.
+
+### Rules to confirm are correctly enforced
+
+- If a member does not submit a check-in for the current week, the dashboard must show them as blank or not-yet-submitted — never carrying over the previous week's colors or prayer request as a stand-in. Every week is its own record; nothing should visually persist across weeks unless it was actually submitted that week.
+- Prayer requests reset each week along with the ratings, as part of the same weekly check-in record — not a separate ongoing list.
+
+### New features for this round
+
+- Prayer request field gets a character limit (a reasonable cap — something like 250–500 characters is enough for a short update, not an essay) and a visible Submit button.
+- Rename "Prayer Request" to "Prayer & Life Update" — it should also welcome a short praise, win, or general update about one of the 5 categories, not just requests.
+- Each of the 5 categories has its title always visible, with a short description underneath that can be toggled show/hide per user preference. Default: description shown.
+- Dashboard gets a small icon or dot next to any member who submitted a Prayer & Life Update that week, so the group can see who has one without tapping into every member individually.
+- Profile photo upload, shown on the dashboard in place of initials. Resize and compress to roughly 200x200 pixels before saving, regardless of original upload size, to keep storage costs negligible at scale. Optional — default to first and last initial if no photo is uploaded.
+- Leader-only member history view: from the dashboard, a leader can tap a member's name and see that member's own check-ins (ratings and Prayer & Life Updates) for roughly the last 6 weeks. This is leader-only, not visible to other regular members — it supports pastoral follow-up, not general group browsing of each other's history. Do not build a separate whole-group historical dashboard snapshot feature for v1 — this one member-level view covers the real need.
+- Member removal: leader can remove a member from a group, which sets their Membership status to removed and immediately cuts off their access. Do not auto-regenerate the group code when someone is removed — that would also lock out every other current member for no reason. If a removed person re-enters the group code later, it should simply create a new pending join request like any other join attempt, which the leader can ignore or deny — no separate "block" feature needed.
+- A short onboarding explainer at the signup/join step — a screen or slide-through that briefly explains what to expect (the weekly rhythm, when things reset, what the group code is for, what happens once approved). Sequence this after the current bug-fix round, not before.
+
+### Usability fix bundled into this round (not a styling pass)
+
+- Add a small label above each of the 5 columns on the dashboard (God, Family, Work, Personal, Purity, or whatever short form fits) so members don't have to memorize question order to read the grid. This is functional, not decorative — bundle it with the bug fixes above rather than waiting for a dedicated styling round.
+
+### Held for a later, dedicated styling round
+
+- Bottom navigation icons instead of text labels
+- Overall color palette and visual polish once brand colors and an app icon are finalized
+
 ## Handoff Note for Claude Code
 
-This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Start with one working group end-to-end (create group → answer check-in → see it on the dashboard) before generalizing to support many independent groups.
+This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Start with one working group end-to-end (create group → answer check-in → see it on the dashboard) before generalizing to support many independent groups. The Round 2 section above reflects the current priority: fix what's broken and add the confirmed small features first, hold cosmetic styling for a dedicated later pass.

@@ -4,6 +4,14 @@ import { MembershipRequestRow } from "@/components/MembershipRequestRow";
 import { GroupSettingsForm } from "@/components/GroupSettingsForm";
 import { QuestionsEditor } from "@/components/QuestionsEditor";
 import { weekdayName } from "@/lib/weekdays";
+import type { MembershipStatus } from "@/lib/supabase/types";
+
+const STATUS_LABELS: Record<MembershipStatus, string> = {
+  active: "Active",
+  pending: "Pending",
+  removed: "Removed",
+  inactive: "Inactive",
+};
 
 export default async function GroupPage() {
   const supabase = await createClient();
@@ -47,43 +55,46 @@ export default async function GroupPage() {
 
   const isAdmin = myMembership?.role === "admin";
 
-  const { data: activeMemberships } = await supabase
-    .from("memberships")
-    .select("user_id, role, joined_at")
-    .eq("group_id", groupId)
-    .eq("status", "active")
-    .order("joined_at");
+  // Admins can see every membership row (any status) for this group — RLS
+  // only allows this for admins; a regular member's query would just come
+  // back scoped to their own row plus whatever "active" rows pass the
+  // shared-group visibility policy, so we ask for "active" explicitly for
+  // the plain member list everyone sees.
+  const { data: allMemberships } = isAdmin
+    ? await supabase
+        .from("memberships")
+        .select("id, user_id, role, status, joined_at")
+        .eq("group_id", groupId)
+        .order("joined_at")
+    : { data: null };
 
-  const activeUserIds = activeMemberships?.map((m) => m.user_id) ?? [];
-  const { data: activeProfiles } = activeUserIds.length
-    ? await supabase.from("profiles").select("id, first_name, last_name").in("id", activeUserIds)
+  const { data: activeMembershipsOnly } = !isAdmin
+    ? await supabase
+        .from("memberships")
+        .select("id, user_id, role, status, joined_at")
+        .eq("group_id", groupId)
+        .eq("status", "active")
+        .order("joined_at")
+    : { data: null };
+
+  const memberships = allMemberships ?? activeMembershipsOnly ?? [];
+
+  const userIds = memberships.map((m) => m.user_id);
+  const { data: profiles } = userIds.length
+    ? await supabase.from("profiles").select("id, first_name, last_name").in("id", userIds)
     : { data: [] };
-  const activeProfileById = new Map((activeProfiles ?? []).map((p) => [p.id, p]));
+  const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
 
-  let pendingRows: { id: string; name: string }[] = [];
-  if (isAdmin) {
-    const { data: pendingMemberships } = await supabase
-      .from("memberships")
-      .select("id, user_id")
-      .eq("group_id", groupId)
-      .eq("status", "pending")
-      .order("joined_at");
-
-    const pendingUserIds = pendingMemberships?.map((m) => m.user_id) ?? [];
-    const { data: pendingProfiles } = pendingUserIds.length
-      ? await supabase
-          .from("profiles")
-          .select("id, first_name, last_name")
-          .in("id", pendingUserIds)
-      : { data: [] };
-    const pendingProfileById = new Map((pendingProfiles ?? []).map((p) => [p.id, p]));
-
-    pendingRows = (pendingMemberships ?? []).map((m) => {
-      const p = pendingProfileById.get(m.user_id);
-      const name = p ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unnamed" : "Unnamed";
-      return { id: m.id, name };
-    });
+  function nameFor(userId: string) {
+    const p = profileById.get(userId);
+    return p ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unnamed" : "Unnamed";
   }
+
+  const activeMembers = memberships.filter((m) => m.status === "active");
+  const pendingMembers = memberships.filter((m) => m.status === "pending");
+  const otherMembers = memberships.filter(
+    (m) => m.status !== "active" && m.status !== "pending"
+  );
 
   const { data: questions } = isAdmin
     ? await supabase
@@ -126,39 +137,59 @@ export default async function GroupPage() {
         </div>
       )}
 
-      {isAdmin && pendingRows.length > 0 && (
+      {isAdmin && pendingMembers.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-sm font-semibold text-neutral-700">
-            Join requests ({pendingRows.length})
+            Join requests ({pendingMembers.length})
           </h2>
-          {pendingRows.map((row) => (
-            <MembershipRequestRow key={row.id} membershipId={row.id} name={row.name} />
+          {pendingMembers.map((m) => (
+            <MembershipRequestRow key={m.id} membershipId={m.id} name={nameFor(m.user_id)} />
           ))}
         </div>
       )}
 
       <div className="space-y-2">
         <h2 className="text-sm font-semibold text-neutral-700">
-          Members ({activeMemberships?.length ?? 0})
+          Members ({activeMembers.length})
         </h2>
-        {(activeMemberships ?? []).map((m) => {
-          const p = activeProfileById.get(m.user_id);
-          const name = p ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unnamed" : "Unnamed";
-          return (
-            <div
-              key={m.user_id}
-              className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-3"
-            >
-              <span className="text-sm">{name}</span>
+        {activeMembers.map((m) => (
+          <div
+            key={m.user_id}
+            className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-3"
+          >
+            <span className="text-sm">{nameFor(m.user_id)}</span>
+            <span className="flex gap-1">
               {m.role === "admin" && (
                 <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
                   Admin
                 </span>
               )}
-            </div>
-          );
-        })}
+              {isAdmin && (
+                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">
+                  {STATUS_LABELS[m.status as MembershipStatus]}
+                </span>
+              )}
+            </span>
+          </div>
+        ))}
       </div>
+
+      {isAdmin && otherMembers.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold text-neutral-700">Former members</h2>
+          {otherMembers.map((m) => (
+            <div
+              key={m.id}
+              className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-3"
+            >
+              <span className="text-sm text-neutral-500">{nameFor(m.user_id)}</span>
+              <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
+                {STATUS_LABELS[m.status as MembershipStatus]}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {isAdmin && group && (
         <>
