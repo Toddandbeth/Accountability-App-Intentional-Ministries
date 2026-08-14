@@ -603,9 +603,13 @@ create policy groups_select on public.groups
 create policy groups_update_admin on public.groups
   for update using (public.is_group_admin(id)) with check (public.is_group_admin(id));
 
--- memberships: see your own rows, or all rows for a group you admin
+-- memberships: see your own row (any status), or the full roster of a
+-- group you're an active member of (is_group_admin implies is_group_member,
+-- since admin also requires status = 'active', so this alone covers both
+-- regular members and admins needing to see the other active members —
+-- e.g. for the dashboard roster)
 create policy memberships_select on public.memberships
-  for select using (user_id = auth.uid() or public.is_group_admin(group_id));
+  for select using (user_id = auth.uid() or public.is_group_member(group_id));
 
 -- approve/deny/promote — admins may update role/status of memberships in their group
 create policy memberships_update_admin on public.memberships
