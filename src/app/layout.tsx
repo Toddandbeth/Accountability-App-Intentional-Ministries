@@ -29,6 +29,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  // Required for env(safe-area-inset-*) to resolve to real values instead
+  // of 0 — otherwise the bottom nav can sit under the iPhone home
+  // indicator's gesture area.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -71,6 +71,7 @@ User
 - email, cell phone (optional)
 - profile image
 - active_group (which group they're currently viewing)
+- platform_admin (true/false — marks the app-wide admin; not tied to any single group)
 
 Note: group membership is not stored on the User record — Membership is the source of truth for that.
 
@@ -82,8 +83,11 @@ Group
 - Creator
 - Active/inactive flag
 - Slug (for a clean URL)
-- resource_link_url (text, optional)
-- resource_link_label (text, optional)
+- group_update_link_url (text, optional — the leader-editable link inside Group Update)
+- group_update_text (text, optional, length-capped — the leader-editable message inside Group Update)
+- group_update_flag (true/false — set to true when the leader posts an update, cleared to false the first time anyone on the group opens the Group Update box)
+
+Note: the resource_link_url/resource_link_label fields from earlier are superseded by group_update_link_url and group_update_text above — folded into the single Group Update block rather than living separately in Group Settings.
 
 Membership (connects a User to a Group)
 - user, group
@@ -107,9 +111,13 @@ WeeklyCheckIn (one record per person per group per week)
 - week_start_date
 - rating_1 through rating_5 (one per question slot)
 - prayer_request (text, optional)
+- reaction_heart_count (integer, default 0)
+- reaction_pray_count (integer, default 0)
+- reaction_thumbsup_count (integer, default 0)
+- reaction_praise_count (integer, default 0)
 - updated_at
 
-One record holds all five ratings together, plus that week's prayer request. week_start_date never changes once written. Locked weeks are immutable.
+One record holds all five ratings together, plus that week's prayer request and its reaction counts. week_start_date never changes once written. Locked weeks are immutable — but see the reactions note below for how this interacts with locking.
 
 ## How Default Questions Work
 
@@ -153,26 +161,42 @@ Check-in screen (member view)
 - Each of the 5 questions listed as its own card: title, then the row of 5 rating buttons underneath
 - Takes roughly 20 seconds to complete — tap through all 5, done
 
-Dashboard screen (visible to the whole group, not just the admin)
+Dashboard screen (visible to the whole group, not just the admin) — collapsed row, per member
 - One row per group member, current week only
-- Name (or initials, or profile photo) on the left
-- That member's 5 answers shown as colored, labeled buttons across the row, in question order — the question text itself is not restated on this screen, just the answers, since the order alone tells you which category is which
-- Tapping a member's name opens that member's detail — including their prayer request for the week, if they submitted one
-- The entire group should be readable in one glance — this is the main design goal
+- Left side, fixed and compact: profile photo or initials icon, then first name only (not last name) — kept short and on a single line, never wrapping, so it doesn't crowd or resize the row
+- A small dot or indicator next to the name if that member submitted a Prayer & Life Update this week
+- The rest of the row, given as much space as possible: that member's 5 answers shown as colored, labeled buttons, in question order — the question text itself is not restated on this row, just the answers, since column headers above the grid (see below) already establish the order
+- This row must stay visually clean and consistent at any name length — no wrapping, no squeezing the icons or rating buttons to make room for a name. First-name-only is deliberately chosen to keep this guaranteed.
+- The entire group should be readable in one glance — this is the main design goal, and nothing above should compromise it
+
+Column headers above the dashboard grid
+- Small labels above each of the 5 columns (God, Family, Work, Personal, Purity) so members don't have to memorize question order
+- Must have enough width to display each label in full — "Personal" must not truncate to "Pers…" the way it currently does. Adjust column spacing/sizing so all 5 labels fit cleanly, even if that means the columns are slightly wider than they are today.
+
+Dashboard row, expanded (tap to open)
+- Tapping a member's row expands it, pushing the rest of the dashboard down — same interaction pattern as the Group Update box
+- Always shows, whether or not a Prayer & Life Update was submitted that week: the member's full first and last name, and their phone number if they've provided one, formatted so tapping the phone number offers to call or text it directly (a standard tap-to-call/text link, not custom-built calling functionality)
+- This name-and-phone header can wrap to a second line if the name is long — unlike the collapsed dashboard row above, there's enough room here that wrapping is fine and expected
+- Below that header, a visually distinct divider or band, separating the contact info from the content below it
+- Below the divider: "Prayer & Life Update" as a bolded label, then the actual text the member submitted that week, or empty space if they didn't submit one
+- Below the update text: the 4 reaction icons (heart, prayer hands, thumbs up, raised hands), each tappable, each showing its current count
 
 Personal history screen (each member's own view, private to them)
 - A scrollable list of past weeks, most recent first
 - Each week shows that week's date and the same 5 colored, labeled buttons the member chose that week
 - Purpose: let a member spot his own patterns over time — for example, noticing the same category has been weak for six weeks running, even if the other four have been consistently strong
 
-Prayer requests
-- Part of the weekly check-in — each week, a member can optionally add a short prayer request alongside his 5 ratings
-- Visible to the rest of the group by tapping that member's name on the dashboard, not shown inline in the main grid
+Prayer & Life Update
+- Part of the weekly check-in — each week, a member can optionally add a short update alongside his 5 ratings
+- Visible to the rest of the group only through the expanded dashboard row described above, not shown inline in the main grid
+- Reactions: 4 tap-to-react icons available on any Prayer & Life Update — heart, prayer hands, thumbs up, and raised hands (celebration/praise). Each is a simple counter that increments by 1 on tap. Deliberately not attributed to who reacted — no record of which member tapped which icon, no limit preventing someone from tapping more than once, no "who reacted" list ever shown. This keeps it genuinely simple (a few counters per check-in, nothing more) rather than building a full reactions system. Note on locking: since reactions are a way for the group to respond after seeing an update, reaction counts should stay editable even after a week's ratings and prayer request lock at the deadline — only the ratings and prayer_request text itself are frozen at lock time, not the reaction counts.
+- A group chat deep-link (opening the group's existing iMessage or similar thread directly from the app) was discussed and held out of this round — not being built now.
 
 Settings screen
 - User Profile
-- Group Settings (per group, since a user can be in more than one) — includes the group's resource link, editable by the admin
-- Bottom navigation: Home, Dashboard, Group, Settings
+- Your Groups — list of groups the user belongs to, with the ability to switch active group, join a new one by code, or start a new one (see Round 3 below)
+- Group Settings (per group, since a user can be in more than one) — includes Members (status and approval management) and the group's Group Update fields, editable by the admin
+- Bottom navigation: Home, Dashboard, Settings (Group tab removed — see Round 3 below)
 
 ## Feature Scope for Version 1
 
@@ -247,13 +271,68 @@ The core app (auth, groups, check-in, dashboard, join-by-code, history, settings
 
 ### Usability fix bundled into this round (not a styling pass)
 
-- Add a small label above each of the 5 columns on the dashboard (God, Family, Work, Personal, Purity, or whatever short form fits) so members don't have to memorize question order to read the grid. This is functional, not decorative — bundle it with the bug fixes above rather than waiting for a dedicated styling round.
+- Column headers above the dashboard grid — see the full spec in the Screens section above (all 5 labels must display in full, including "Personal," with column sizing adjusted as needed).
 
 ### Held for a later, dedicated styling round
 
 - Bottom navigation icons instead of text labels
 - Overall color palette and visual polish once brand colors and an app icon are finalized
 
+## Round 3: Bottom Nav Fix, Platform Admin, and Group Update
+
+### Bottom navigation — priority fix, non-negotiable
+
+The current bottom nav uses text labels only, and they sit low enough on the screen to interfere with the phone's own system gesture area (making some buttons hard or impossible to tap reliably). This is a functional bug, not a style preference, and takes priority over the "held for later" styling items listed in Round 2. Fix: icon over label for each of the 4 items (Home, Dashboard, Group, Settings), with proper spacing that respects the phone's safe-area so it doesn't conflict with system gestures.
+
+### Platform admin — a new role, separate from group leader and member
+
+Everything built so far has two roles, both scoped to a single group: leader and member. This adds a third role that sits above all groups — the ministry-wide admin (the pastor running Intentional Ministries, i.e. the person building this app). Marked with the platform_admin flag on the User record, not tied to membership in any particular group.
+
+No separate login or account is needed. The admin signs in exactly like everyone else, with their normal email and password — the app simply recognizes their account has platform_admin set to true and reveals an extra section that no other user sees at all, likely as its own tab or a section inside Settings that only renders when this flag is present.
+
+What the platform admin can do:
+- View general, non-identifying statistics inside a collapsible "System-Wide Stats" box: number of active groups, total participants, and recent check-in activity rate. Confirmed rule: absolutely no visibility into individual answers, ratings, or Prayer & Life Update content at the platform admin level — the boundary is aggregate counts only, never individual content, no exceptions.
+- Set and update one permanent ministry-wide resource link, visible to every user across every group, pointing to a page the admin fully controls outside the app (their own website). The app only stores and displays this one URL — it does not manage or render any content behind that link. Changing what's behind the link happens entirely outside the app, so the admin never needs to touch the app itself to update what people see when they click it.
+
+### Group Update — replaces the earlier standalone "resource link" idea
+
+Sits as a collapsible bar at the top of the group dashboard, using the same expand/collapse interaction already built for prayer requests. Tapping it pushes the dashboard down and reveals:
+
+1. The platform admin's permanent ministry-wide link (always present, not editable by the group leader)
+2. A group-specific link, editable by that group's leader at any time (this replaces the earlier separate "Group Resource" field from Group Settings — one place to manage it now, not two)
+3. A short text update, editable by the leader, with a length cap (roughly 250–500 characters, matching the cap already set for Prayer & Life Updates)
+
+Indicator behavior: when the leader edits and posts to the Group Update box, they manually trigger a flag (something like a "Post Update" button) that lights up an indicator on the collapsed bar. The flag is a single shared true/false value for the whole group, not tracked per individual member — it clears automatically the first time anyone in the group opens the Group Update box. This deliberately avoids building per-member "seen/unseen" tracking, which would require a record per member per update and checking it on every dashboard load — the simpler shared flag gets most of the value (an obvious "something's new" signal) for a fraction of the complexity.
+
+### Password rules and account recovery
+
+No strict password complexity rules needed — a reasonable minimum length (roughly 6–8 characters) is enough for this app's security needs. What matters more is that a forgotten-password flow actually exists: a "Forgot password?" link on the sign-in screen that emails the user a reset link. This is standard functionality Supabase Auth already supports — it needs to be wired into the sign-in screen, not built from scratch.
+
+### Member status visibility — reconfirming this from Round 2
+
+The bug flagged in Round 2 (member status — pending, active, removed — not visible anywhere in the app) has not yet been fixed, since Round 3 hasn't been sent to Claude Code yet. Reconfirming it here with more shape: this should live as its own "Members" section inside Group Settings, showing every group member's current status, with the ability for the leader to approve a pending request or remove an active member directly from that same list — not scattered across different screens.
+
+### Multi-group switching — design and where it lives
+
+Multi-group support (a user belonging to more than one group) was included in the original build summary, but the actual switching flow hasn't been seen or confirmed working yet. Confirmed design, to build or verify against:
+
+- Lives inside Settings, under "Your Groups" — a list of every group the user belongs to
+- Tapping a group in that list sets it as the user's active_group; the dashboard, check-in, and everything else immediately reflects that group
+- Two actions alongside the list: "Join a group" (enter a code, same flow as a first-time join) and "Start a new group" (become leader of a brand new one)
+- Known limitation, accepted for v1: there is no single combined view across a person's multiple groups. A leader of more than one group must switch into each one individually to check on it — approve pending members, see that group's own Group Update, etc. No cross-group notification badge exists yet. This is a reasonable v1 tradeoff since most users are in exactly one group; worth revisiting later only as a small badge on the group switcher itself, not full cross-group notifications, if it becomes a real pain point.
+
+### Bottom navigation — consolidate to 3 tabs
+
+The Group tab, once the Group Update content moves to the dashboard (Round 3 above) and the resource link is folded in, has little distinct content left for a regular member — mostly duplicating what's already visible on the dashboard. Decision: remove the Group tab entirely and consolidate to 3 tabs — Home, Dashboard, Settings.
+
+What moves where:
+- The member list, and leader-only member status/approval management (from the "Member status visibility" fix above), lives inside Settings → Group Settings
+- Everything else previously under the Group tab folds into either the Dashboard (Group Update) or Settings (group management)
+
+This also leaves room for a genuine 4th tab later, if a real need for one emerges, without first having to remove a Group tab that wasn't earning its place. This decision applies on top of the bottom nav icon fix listed earlier in this round — build the 3-tab version with icons from the start, not the icon fix on the old 4-tab layout.
+
+
+
 ## Handoff Note for Claude Code
 
-This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Start with one working group end-to-end (create group → answer check-in → see it on the dashboard) before generalizing to support many independent groups. The Round 2 section above reflects the current priority: fix what's broken and add the confirmed small features first, hold cosmetic styling for a dedicated later pass.
+This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Start with one working group end-to-end (create group → answer check-in → see it on the dashboard) before generalizing to support many independent groups. Round 2 and Round 3 reflect ongoing priorities: the bottom nav fix in Round 3 comes first since it's a functional bug, then the rest of Round 3, with cosmetic styling (icons, color palette) still held for a dedicated later pass.
