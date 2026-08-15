@@ -1,5 +1,6 @@
-// Hand-written types matching supabase/migrations/0001_init.sql.
-// Once a live Supabase project exists, these can be regenerated with:
+// Hand-written types matching supabase/migrations/0001_init.sql and
+// 0002_round3.sql. Once a live Supabase project exists, these can be
+// regenerated with:
 //   npx supabase gen types typescript --project-id <ref> > src/lib/supabase/types.ts
 
 export type MembershipRole = "admin" | "member";
@@ -13,6 +14,7 @@ export interface Profile {
   cell_phone: string | null;
   profile_image_url: string | null;
   active_group_id: string | null;
+  platform_admin: boolean;
   created_at: string;
 }
 
@@ -25,11 +27,18 @@ export interface Group {
   timezone: string;
   creator_id: string;
   is_active: boolean;
-  resource_link_url: string | null;
-  resource_link_label: string | null;
+  group_update_link_url: string | null;
+  group_update_text: string | null;
+  group_update_flag: boolean;
   pending_meeting_day: number | null;
   pending_meeting_day_effective_after: string | null;
   created_at: string;
+}
+
+export interface PlatformSettings {
+  id: true;
+  resource_link_url: string | null;
+  resource_link_label: string | null;
 }
 
 export interface Membership {
@@ -74,4 +83,7 @@ export const RPC = {
   currentWeekStart: "current_week_start",
   isWeekEditable: "is_week_editable",
   weekDeadline: "week_deadline",
+  postGroupUpdate: "post_group_update",
+  markGroupUpdateSeen: "mark_group_update_seen",
+  getPlatformStats: "get_platform_stats",
 } as const;

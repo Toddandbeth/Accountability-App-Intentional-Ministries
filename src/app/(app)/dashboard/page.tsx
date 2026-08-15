@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardRow } from "@/components/DashboardRow";
 import { DashboardColumnHeaders } from "@/components/DashboardColumnHeaders";
+import { GroupUpdateBar } from "@/components/GroupUpdateBar";
 import { shortColumnLabel } from "@/lib/questions";
 
 export default async function DashboardPage() {
@@ -58,6 +59,10 @@ export default async function DashboardPage() {
     .select("slot_number, label_short")
     .eq("group_id", groupId)
     .order("slot_number");
+  const { data: platformSettings } = await supabase
+    .from("platform_settings")
+    .select("resource_link_url, resource_link_label")
+    .single();
 
   const { data: myMembership } = await supabase
     .from("memberships")
@@ -97,10 +102,20 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-sm text-neutral-500">{group?.name}</p>
+        <p className="text-sm text-neutral-500">{group.name}</p>
         <h1 className="text-xl font-semibold">Dashboard</h1>
         <p className="text-xs text-neutral-500">Week of {weekStart}</p>
       </div>
+
+      <GroupUpdateBar
+        groupId={groupId}
+        isAdmin={isAdmin}
+        initialFlag={group.group_update_flag}
+        groupLinkUrl={group.group_update_link_url}
+        groupText={group.group_update_text}
+        platformLinkUrl={platformSettings?.resource_link_url ?? null}
+        platformLinkLabel={platformSettings?.resource_link_label ?? null}
+      />
 
       <DashboardColumnHeaders labels={columnLabels} />
 
@@ -108,15 +123,24 @@ export default async function DashboardPage() {
         {(memberships ?? []).map((m) => {
           const p = profileById.get(m.user_id);
           const c = checkInByUserId.get(m.user_id);
-          const name = p ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unnamed" : "Unnamed";
+          const firstName = p?.first_name?.trim() || "Unnamed";
+          const fullName = p
+            ? `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || "Unnamed"
+            : "Unnamed";
 
           return (
             <DashboardRow
               key={m.user_id}
               userId={m.user_id}
-              name={name}
+              firstName={firstName}
+              fullName={fullName}
               imageUrl={p?.profile_image_url ?? null}
-              ratings={c ? [c.rating_1, c.rating_2, c.rating_3, c.rating_4, c.rating_5] : [null, null, null, null, null]}
+              cellPhone={p?.cell_phone ?? null}
+              ratings={
+                c
+                  ? [c.rating_1, c.rating_2, c.rating_3, c.rating_4, c.rating_5]
+                  : [null, null, null, null, null]
+              }
               prayerRequest={c?.prayer_request ?? null}
               isYou={m.user_id === user.id}
               isAdmin={isAdmin}

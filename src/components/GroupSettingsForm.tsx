@@ -17,8 +17,6 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
 
   const [name, setName] = useState(group.name);
   const [timezone, setTimezone] = useState(group.timezone);
-  const [resourceUrl, setResourceUrl] = useState(group.resource_link_url ?? "");
-  const [resourceLabel, setResourceLabel] = useState(group.resource_link_label ?? "");
   const [savingInfo, setSavingInfo] = useState(false);
   const [infoError, setInfoError] = useState<string | null>(null);
 
@@ -33,12 +31,7 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
 
     const { error } = await supabase
       .from("groups")
-      .update({
-        name,
-        timezone,
-        resource_link_url: resourceUrl || null,
-        resource_link_label: resourceLabel || null,
-      })
+      .update({ name, timezone })
       .eq("id", group.id);
 
     setSavingInfo(false);
@@ -92,26 +85,6 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
               </option>
             ))}
           </select>
-        </div>
-
-        <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-600">
-            Resource link (shown to the group)
-          </label>
-          <input
-            type="text"
-            placeholder="Label, e.g. This month's challenge"
-            value={resourceLabel}
-            onChange={(e) => setResourceLabel(e.target.value)}
-            className="mb-2 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-          />
-          <input
-            type="url"
-            placeholder="https://..."
-            value={resourceUrl}
-            onChange={(e) => setResourceUrl(e.target.value)}
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-          />
         </div>
 
         {infoError && <p className="text-sm text-red-600">{infoError}</p>}
