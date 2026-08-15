@@ -132,6 +132,7 @@ export default async function DashboardPage() {
             <DashboardRow
               key={m.user_id}
               userId={m.user_id}
+              checkInId={c?.id ?? null}
               firstName={firstName}
               fullName={fullName}
               imageUrl={p?.profile_image_url ?? null}
@@ -142,6 +143,12 @@ export default async function DashboardPage() {
                   : [null, null, null, null, null]
               }
               prayerRequest={c?.prayer_request ?? null}
+              reactionCounts={{
+                heart: c?.reaction_heart_count ?? 0,
+                pray: c?.reaction_pray_count ?? 0,
+                thumbsup: c?.reaction_thumbsup_count ?? 0,
+                praise: c?.reaction_praise_count ?? 0,
+              }}
               isYou={m.user_id === user.id}
               isAdmin={isAdmin}
             />

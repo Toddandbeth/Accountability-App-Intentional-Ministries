@@ -70,6 +70,10 @@ export interface WeeklyCheckIn {
   rating_4: number | null;
   rating_5: number | null;
   prayer_request: string | null;
+  reaction_heart_count: number;
+  reaction_pray_count: number;
+  reaction_thumbsup_count: number;
+  reaction_praise_count: number;
   updated_at: string;
 }
 
@@ -86,4 +90,5 @@ export const RPC = {
   postGroupUpdate: "post_group_update",
   markGroupUpdateSeen: "mark_group_update_seen",
   getPlatformStats: "get_platform_stats",
+  incrementReaction: "increment_reaction",
 } as const;

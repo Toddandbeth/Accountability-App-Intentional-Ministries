@@ -4,27 +4,37 @@ import { useState } from "react";
 import Link from "next/link";
 import { ratingByValue } from "@/lib/ratings";
 import { Avatar } from "@/components/Avatar";
+import { ReactionButtons } from "@/components/ReactionButtons";
 
 interface DashboardRowProps {
   userId: string;
+  checkInId: string | null;
   firstName: string;
   fullName: string;
   imageUrl: string | null;
   cellPhone: string | null;
   ratings: (number | null)[]; // slot 1..5 in order
   prayerRequest: string | null;
+  reactionCounts: {
+    heart: number;
+    pray: number;
+    thumbsup: number;
+    praise: number;
+  };
   isYou: boolean;
   isAdmin: boolean;
 }
 
 export function DashboardRow({
   userId,
+  checkInId,
   firstName,
   fullName,
   imageUrl,
   cellPhone,
   ratings,
   prayerRequest,
+  reactionCounts,
   isYou,
   isAdmin,
 }: DashboardRowProps) {
@@ -94,6 +104,7 @@ export function DashboardRow({
             <p className="text-neutral-700">
               {prayerRequest?.trim() ? prayerRequest : "No update submitted this week."}
             </p>
+            <ReactionButtons checkInId={checkInId} counts={reactionCounts} />
             {isAdmin && !isYou && (
               <Link
                 href={`/dashboard/member/${userId}`}
