@@ -2,6 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = ["/login", "/signup"];
+// Never force-redirected either direction: /forgot-password is fine to see
+// whether or not you're logged in, and /reset-password's whole point is a
+// user who is (via the recovery link) authenticated but needs to set a new
+// password before doing anything else — bouncing them to /checkin first
+// would break the flow. The recovery session itself is also often only
+// established client-side (PKCE code exchange) after this middleware has
+// already run, so there's no reliable server-side auth state to gate on
+// here anyway.
+const ALWAYS_ACCESSIBLE_PATHS = ["/forgot-password", "/reset-password"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -39,6 +48,11 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isPublicPath = PUBLIC_PATHS.some((p) => path.startsWith(p));
+  const isAlwaysAccessible = ALWAYS_ACCESSIBLE_PATHS.some((p) => path.startsWith(p));
+
+  if (isAlwaysAccessible) {
+    return response;
+  }
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ActiveGroupSwitcher } from "@/components/ActiveGroupSwitcher";
 import { JoinGroupForm } from "@/components/JoinGroupForm";
+import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { ProfileForm } from "@/components/ProfileForm";
 
 export default async function SettingsPage() {
@@ -46,6 +47,7 @@ export default async function SettingsPage() {
       </div>
 
       <JoinGroupForm />
+      <CreateGroupForm />
 
       <LogoutButton />
     </div>
