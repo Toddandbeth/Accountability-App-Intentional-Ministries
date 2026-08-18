@@ -265,10 +265,10 @@ Completed and sent to Claude Code:
 - Initial build — core app: auth, groups, check-in, dashboard, join-by-code, personal history, settings
 - Round 2 — bug fixes and small features from first real testing
 - Round 3 — bottom nav fix, platform admin role, Group Update, dashboard redesign, reactions, 3-tab consolidation
-
-Pending, not yet sent — in the order they should be sent:
 - Round 4 (urgent) — deadline timing fix, correcting logic that's already live and causing a real problem
 - Round 5 — history access and data retention: opening 6-week history to all members, protecting removed members' access to their own data, deactivated-group roster, hiding old groups from your list
+
+Pending, not yet sent — in the order they should be sent:
 - Round 6 — welcome email, persistent goals feature, and where in-app instructions live
 
 ## Round 2: Fixes and Additions from Real Testing
