@@ -1,10 +1,18 @@
 import { ratingByValue } from "@/lib/ratings";
+import { ReactionButtons } from "@/components/ReactionButtons";
 
 interface WeekHistoryRowProps {
   weekStartDate: string;
   ratings: (number | null)[]; // slot 1..5 in order
   prayerRequest: string | null;
   isCurrentWeek: boolean;
+  checkInId?: string | null;
+  reactionCounts?: {
+    heart: number;
+    pray: number;
+    thumbsup: number;
+    praise: number;
+  };
 }
 
 export function WeekHistoryRow({
@@ -12,6 +20,8 @@ export function WeekHistoryRow({
   ratings,
   prayerRequest,
   isCurrentWeek,
+  checkInId,
+  reactionCounts,
 }: WeekHistoryRowProps) {
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-3">
@@ -45,6 +55,7 @@ export function WeekHistoryRow({
           {prayerRequest}
         </p>
       )}
+      {reactionCounts && <ReactionButtons checkInId={checkInId ?? null} counts={reactionCounts} />}
     </div>
   );
 }

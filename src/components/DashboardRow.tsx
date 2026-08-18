@@ -22,7 +22,6 @@ interface DashboardRowProps {
     praise: number;
   };
   isYou: boolean;
-  isAdmin: boolean;
 }
 
 export function DashboardRow({
@@ -36,7 +35,6 @@ export function DashboardRow({
   prayerRequest,
   reactionCounts,
   isYou,
-  isAdmin,
 }: DashboardRowProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -105,7 +103,7 @@ export function DashboardRow({
               {prayerRequest?.trim() ? prayerRequest : "No update submitted this week."}
             </p>
             <ReactionButtons checkInId={checkInId} counts={reactionCounts} />
-            {isAdmin && !isYou && (
+            {!isYou && (
               <Link
                 href={`/dashboard/member/${userId}`}
                 className="mt-2 inline-block text-xs font-medium text-neutral-500 underline"

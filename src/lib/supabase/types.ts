@@ -91,4 +91,21 @@ export const RPC = {
   markGroupUpdateSeen: "mark_group_update_seen",
   getPlatformStats: "get_platform_stats",
   incrementReaction: "increment_reaction",
+  getGroupBasicInfo: "get_group_basic_info",
+  getGroupRoster: "get_group_roster",
+  setGroupActive: "set_group_active",
+  setMembershipHidden: "set_membership_hidden",
 } as const;
+
+export interface GroupBasicInfo {
+  id: string;
+  name: string;
+  is_active: boolean;
+}
+
+export interface GroupRosterMember {
+  user_id: string;
+  first_name: string | null;
+  last_name: string | null;
+  profile_image_url: string | null;
+}

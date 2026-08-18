@@ -150,7 +150,6 @@ export default async function DashboardPage() {
                 praise: c?.reaction_praise_count ?? 0,
               }}
               isYou={m.user_id === user.id}
-              isAdmin={isAdmin}
             />
           );
         })}

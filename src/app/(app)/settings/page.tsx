@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ActiveGroupSwitcher } from "@/components/ActiveGroupSwitcher";
+import { HiddenGroupsSection } from "@/components/HiddenGroupsSection";
 import { JoinGroupForm } from "@/components/JoinGroupForm";
 import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { ProfileForm } from "@/components/ProfileForm";
@@ -8,6 +10,7 @@ import { GroupSettingsForm } from "@/components/GroupSettingsForm";
 import { QuestionsEditor } from "@/components/QuestionsEditor";
 import { GroupMembersSection } from "@/components/GroupMembersSection";
 import { PlatformAdminSection } from "@/components/PlatformAdminSection";
+import type { GroupBasicInfo } from "@/lib/supabase/types";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -22,16 +25,54 @@ export default async function SettingsPage() {
     .eq("id", user.id)
     .single();
 
-  const { data: memberships } = await supabase
+  // Any status, not just active — this drives the visible/hidden active
+  // list below plus the "past groups" section for removed/inactive
+  // memberships, which retain access to their own history but not the
+  // live group.
+  const { data: myMemberships } = await supabase
     .from("memberships")
-    .select("group_id")
-    .eq("user_id", user.id)
-    .eq("status", "active");
+    .select("id, group_id, status, hidden_by_user")
+    .eq("user_id", user.id);
 
-  const groupIds = memberships?.map((m) => m.group_id) ?? [];
-  const { data: groups } = groupIds.length
-    ? await supabase.from("groups").select("id, name").in("id", groupIds)
-    : { data: [] };
+  const myMembershipList = myMemberships ?? [];
+
+  // groups RLS only allows reading active-membership groups directly, so
+  // basic info (name, is_active) for every group — including past ones —
+  // comes from this narrow RPC instead.
+  const groupInfoById = new Map<string, GroupBasicInfo>();
+  await Promise.all(
+    myMembershipList.map(async (m) => {
+      const { data: info } = await supabase
+        .rpc("get_group_basic_info", { p_group_id: m.group_id })
+        .single();
+      if (info) groupInfoById.set(m.group_id, info as GroupBasicInfo);
+    })
+  );
+
+  const visibleActiveGroups = myMembershipList
+    .filter((m) => m.status === "active" && !m.hidden_by_user)
+    .map((m) => ({
+      id: m.group_id,
+      membershipId: m.id,
+      name: groupInfoById.get(m.group_id)?.name ?? "Unnamed group",
+      isDeactivated: groupInfoById.get(m.group_id)?.is_active === false,
+    }));
+
+  const hiddenActiveGroups = myMembershipList
+    .filter((m) => m.status === "active" && m.hidden_by_user)
+    .map((m) => ({
+      id: m.group_id,
+      membershipId: m.id,
+      name: groupInfoById.get(m.group_id)?.name ?? "Unnamed group",
+    }));
+
+  const pastGroups = myMembershipList
+    .filter((m) => m.status !== "active" && m.status !== "pending")
+    .map((m) => ({
+      id: m.group_id,
+      name: groupInfoById.get(m.group_id)?.name ?? "Unnamed group",
+      isDeactivated: groupInfoById.get(m.group_id)?.is_active === false,
+    }));
 
   const activeGroupId = profile?.active_group_id ?? null;
 
@@ -110,10 +151,43 @@ export default async function SettingsPage() {
         <h2 className="text-sm font-semibold text-neutral-700">Your groups</h2>
         <ActiveGroupSwitcher
           userId={user.id}
-          groups={groups ?? []}
+          groups={visibleActiveGroups}
           activeGroupId={activeGroupId}
         />
+        <HiddenGroupsSection groups={hiddenActiveGroups} />
       </div>
+
+      {pastGroups.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold text-neutral-700">Past groups</h2>
+          <div className="space-y-2">
+            {pastGroups.map((g) => (
+              <div
+                key={g.id}
+                className="flex items-center justify-between gap-2 rounded-lg border border-neutral-200 bg-white p-3 text-sm"
+              >
+                <span className="text-neutral-600">{g.name}</span>
+                <span className="flex shrink-0 gap-3">
+                  <Link
+                    href={`/history?group=${g.id}`}
+                    className="text-xs font-medium text-neutral-500 underline"
+                  >
+                    Your history
+                  </Link>
+                  {g.isDeactivated && (
+                    <Link
+                      href={`/roster/${g.id}`}
+                      className="text-xs font-medium text-neutral-500 underline"
+                    >
+                      Roster
+                    </Link>
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <JoinGroupForm />
       <CreateGroupForm />

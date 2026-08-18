@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { COMMON_TIMEZONES, MEETING_DAYS } from "@/lib/timezones";
 import { weekdayName } from "@/lib/weekdays";
+import { DeactivateGroupButton } from "@/components/DeactivateGroupButton";
 import type { Group } from "@/lib/supabase/types";
 
 interface GroupSettingsFormProps {
@@ -135,6 +136,11 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
           </button>
         </div>
         {dayError && <p className="text-sm text-red-600">{dayError}</p>}
+      </div>
+
+      <div className="space-y-2 rounded-xl border border-neutral-200 bg-white p-4">
+        <h2 className="text-sm font-semibold">Group status</h2>
+        <DeactivateGroupButton groupId={group.id} isActive={group.is_active} />
       </div>
     </div>
   );

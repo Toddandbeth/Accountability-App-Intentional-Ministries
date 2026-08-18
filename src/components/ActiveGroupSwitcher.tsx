@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { HideGroupToggle } from "@/components/HideGroupToggle";
 
 interface ActiveGroupSwitcherProps {
   userId: string;
-  groups: { id: string; name: string }[];
+  groups: { id: string; name: string; membershipId: string; isDeactivated?: boolean }[];
   activeGroupId: string | null;
 }
 
@@ -45,18 +47,31 @@ export function ActiveGroupSwitcher({ userId, groups, activeGroupId }: ActiveGro
       {groups.map((g) => {
         const isActive = g.id === activeGroupId;
         return (
-          <button
+          <div
             key={g.id}
-            type="button"
-            onClick={() => switchTo(g.id)}
-            disabled={switching === g.id}
-            className={`flex w-full items-center justify-between rounded-lg border p-3 text-left text-sm disabled:opacity-50 ${
+            className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
               isActive ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 bg-white"
             }`}
           >
-            <span>{g.name}</span>
-            {isActive && <span className="text-xs font-semibold text-neutral-500">Active</span>}
-          </button>
+            <button
+              type="button"
+              onClick={() => switchTo(g.id)}
+              disabled={switching === g.id}
+              className="flex flex-1 items-center justify-between text-left disabled:opacity-50"
+            >
+              <span>{g.name}</span>
+              {isActive && <span className="text-xs font-semibold text-neutral-500">Active</span>}
+            </button>
+            {g.isDeactivated && (
+              <Link
+                href={`/roster/${g.id}`}
+                className="shrink-0 text-xs font-medium text-neutral-500 underline"
+              >
+                Roster
+              </Link>
+            )}
+            <HideGroupToggle membershipId={g.membershipId} hidden={false} />
+          </div>
         );
       })}
       {error && <p className="text-sm text-red-600">{error}</p>}

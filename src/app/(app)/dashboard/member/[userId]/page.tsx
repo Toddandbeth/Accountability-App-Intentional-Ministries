@@ -29,19 +29,19 @@ export default async function MemberHistoryPage({
 
   const { data: myMembership } = await supabase
     .from("memberships")
-    .select("role")
+    .select("status")
     .eq("group_id", groupId)
     .eq("user_id", user.id)
     .single();
 
-  if (myMembership?.role !== "admin") {
+  if (myMembership?.status !== "active") {
     return (
       <div className="space-y-2">
         <Link href="/dashboard" className="text-sm text-neutral-500 underline">
           ← Back to dashboard
         </Link>
         <p className="text-sm text-neutral-600">
-          Only group admins can view another member&apos;s history.
+          Only active group members can view another member&apos;s history.
         </p>
       </div>
     );
@@ -73,9 +73,7 @@ export default async function MemberHistoryPage({
           ← Back to dashboard
         </Link>
         <h1 className="text-xl font-semibold">{name}&apos;s history</h1>
-        <p className="text-xs text-neutral-500">
-          Last {HISTORY_WEEKS} weeks — visible to admins only.
-        </p>
+        <p className="text-xs text-neutral-500">Last {HISTORY_WEEKS} weeks.</p>
       </div>
 
       {(!checkIns || checkIns.length === 0) && (
@@ -90,6 +88,13 @@ export default async function MemberHistoryPage({
             ratings={[c.rating_1, c.rating_2, c.rating_3, c.rating_4, c.rating_5]}
             prayerRequest={c.prayer_request}
             isCurrentWeek={c.week_start_date === weekStart}
+            checkInId={c.id}
+            reactionCounts={{
+              heart: c.reaction_heart_count ?? 0,
+              pray: c.reaction_pray_count ?? 0,
+              thumbsup: c.reaction_thumbsup_count ?? 0,
+              praise: c.reaction_praise_count ?? 0,
+            }}
           />
         ))}
       </div>

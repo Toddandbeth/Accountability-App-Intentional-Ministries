@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { WeekHistoryRow } from "@/components/WeekHistoryRow";
+import type { GroupBasicInfo } from "@/lib/supabase/types";
 
 const HISTORY_WEEKS = 10;
 
-export default async function HistoryPage() {
+export default async function HistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ group?: string }>;
+}) {
+  const { group: groupParam } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -18,7 +24,9 @@ export default async function HistoryPage() {
     .eq("id", user.id)
     .single();
 
-  if (!profile?.active_group_id) {
+  const groupId = groupParam || profile?.active_group_id;
+
+  if (!groupId) {
     return (
       <div className="space-y-2">
         <h1 className="text-xl font-semibold">Your history</h1>
@@ -33,7 +41,26 @@ export default async function HistoryPage() {
     );
   }
 
-  const groupId = profile.active_group_id;
+  // Own historical check-ins remain readable regardless of current
+  // membership status in this group, so past/removed groups are looked up
+  // via this narrow RPC rather than a direct groups-table read.
+  const { data: groupInfoData } = await supabase
+    .rpc("get_group_basic_info", { p_group_id: groupId })
+    .single();
+  const groupInfo = groupInfoData as GroupBasicInfo | null;
+
+  if (!groupInfo) {
+    return (
+      <div className="space-y-2">
+        <Link href="/settings" className="text-sm text-neutral-500 underline">
+          ← Back to settings
+        </Link>
+        <p className="text-sm text-neutral-600">You don&apos;t have history for that group.</p>
+      </div>
+    );
+  }
+
+  const isCurrentlyActiveGroup = groupId === profile?.active_group_id;
 
   const { data: weekStart } = await supabase.rpc("current_week_start", { p_group_id: groupId });
 
@@ -48,10 +75,14 @@ export default async function HistoryPage() {
   return (
     <div className="space-y-4">
       <div>
-        <Link href="/checkin" className="text-sm text-neutral-500 underline">
-          ← Back to check-in
+        <Link
+          href={isCurrentlyActiveGroup ? "/checkin" : "/settings"}
+          className="text-sm text-neutral-500 underline"
+        >
+          {isCurrentlyActiveGroup ? "← Back to check-in" : "← Back to settings"}
         </Link>
         <h1 className="text-xl font-semibold">Your history</h1>
+        <p className="text-xs text-neutral-500">{groupInfo.name}</p>
       </div>
 
       {(!checkIns || checkIns.length === 0) && (
@@ -68,6 +99,13 @@ export default async function HistoryPage() {
             ratings={[c.rating_1, c.rating_2, c.rating_3, c.rating_4, c.rating_5]}
             prayerRequest={c.prayer_request}
             isCurrentWeek={c.week_start_date === weekStart}
+            checkInId={c.id}
+            reactionCounts={{
+              heart: c.reaction_heart_count ?? 0,
+              pray: c.reaction_pray_count ?? 0,
+              thumbsup: c.reaction_thumbsup_count ?? 0,
+              praise: c.reaction_praise_count ?? 0,
+            }}
           />
         ))}
       </div>
