@@ -91,8 +91,23 @@ export default async function DashboardPage() {
     .eq("group_id", groupId)
     .eq("week_start_date", weekStart!);
 
+  const { data: goals } = userIds.length
+    ? await supabase
+        .from("goals")
+        .select("user_id, question_slot, goal_text")
+        .eq("group_id", groupId)
+        .in("user_id", userIds)
+    : { data: [] };
+
   const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
   const checkInByUserId = new Map((checkIns ?? []).map((c) => [c.user_id, c]));
+
+  const goalsByUserId = new Map<string, Record<number, string>>();
+  for (const g of goals ?? []) {
+    const forUser = goalsByUserId.get(g.user_id) ?? {};
+    forUser[g.question_slot] = g.goal_text ?? "";
+    goalsByUserId.set(g.user_id, forUser);
+  }
 
   const columnLabels = [1, 2, 3, 4, 5].map((slot) => {
     const q = questions?.find((q) => q.slot_number === slot);
@@ -149,6 +164,8 @@ export default async function DashboardPage() {
                 thumbsup: c?.reaction_thumbsup_count ?? 0,
                 praise: c?.reaction_praise_count ?? 0,
               }}
+              goalsBySlot={goalsByUserId.get(m.user_id) ?? {}}
+              columnLabels={columnLabels}
               isYou={m.user_id === user.id}
             />
           );

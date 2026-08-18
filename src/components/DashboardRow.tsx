@@ -21,6 +21,8 @@ interface DashboardRowProps {
     thumbsup: number;
     praise: number;
   };
+  goalsBySlot: Record<number, string>;
+  columnLabels: string[]; // slot 1..5 in order
   isYou: boolean;
 }
 
@@ -34,9 +36,12 @@ export function DashboardRow({
   ratings,
   prayerRequest,
   reactionCounts,
+  goalsBySlot,
+  columnLabels,
   isYou,
 }: DashboardRowProps) {
   const [expanded, setExpanded] = useState(false);
+  const [goalsExpanded, setGoalsExpanded] = useState(false);
 
   return (
     <div className="rounded-xl border border-neutral-200 bg-white">
@@ -110,6 +115,32 @@ export function DashboardRow({
               >
                 View last 6 weeks →
               </Link>
+            )}
+          </div>
+
+          <div className="h-px bg-neutral-200" />
+
+          <div className="p-3 text-sm">
+            <button
+              type="button"
+              onClick={() => setGoalsExpanded((v) => !v)}
+              className="text-xs font-medium text-neutral-500 underline"
+            >
+              {goalsExpanded ? "Hide" : "See"} {firstName}&apos;s Goals
+            </button>
+            {goalsExpanded && (
+              <div className="mt-2 space-y-2">
+                {columnLabels.map((label, i) => {
+                  const slot = i + 1;
+                  const text = goalsBySlot[slot]?.trim();
+                  return (
+                    <div key={slot}>
+                      <p className="text-xs font-semibold text-neutral-500">{label}</p>
+                      <p className="text-neutral-700">{text || "No goal set."}</p>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         </div>

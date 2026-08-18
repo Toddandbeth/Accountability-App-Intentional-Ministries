@@ -7,6 +7,8 @@ import { JoinGroupForm } from "@/components/JoinGroupForm";
 import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { ProfileForm } from "@/components/ProfileForm";
 import { GroupSettingsForm } from "@/components/GroupSettingsForm";
+import { GoalsForm } from "@/components/GoalsForm";
+import { HowThisWorksSection } from "@/components/HowThisWorksSection";
 import { QuestionsEditor } from "@/components/QuestionsEditor";
 import { GroupMembersSection } from "@/components/GroupMembersSection";
 import { PlatformAdminSection } from "@/components/PlatformAdminSection";
@@ -81,9 +83,12 @@ export default async function SettingsPage() {
   // the user administers that group.
   let activeGroup = null;
   let isAdminOfActiveGroup = false;
+  let isActiveMemberOfActiveGroup = false;
   let questions: { id: string; group_id: string; label_short: string; label_description: string; slot_number: number; goal_enabled: boolean }[] = [];
   let allMemberships: { id: string; user_id: string; role: string; status: string; joined_at: string }[] = [];
   let profileById = new Map<string, { first_name: string | null; last_name: string | null }>();
+  let myGoalQuestions: { slot_number: number; label_short: string }[] = [];
+  let myGoalsBySlot: Record<number, string> = {};
 
   if (activeGroupId) {
     const { data: g } = await supabase.from("groups").select("*").eq("id", activeGroupId).single();
@@ -91,11 +96,31 @@ export default async function SettingsPage() {
 
     const { data: myMembership } = await supabase
       .from("memberships")
-      .select("role")
+      .select("role, status")
       .eq("group_id", activeGroupId)
       .eq("user_id", user.id)
       .single();
     isAdminOfActiveGroup = myMembership?.role === "admin";
+    isActiveMemberOfActiveGroup = myMembership?.status === "active";
+
+    if (isActiveMemberOfActiveGroup) {
+      const [{ data: qs }, { data: myGoals }] = await Promise.all([
+        supabase
+          .from("group_questions")
+          .select("slot_number, label_short")
+          .eq("group_id", activeGroupId)
+          .order("slot_number"),
+        supabase
+          .from("goals")
+          .select("question_slot, goal_text")
+          .eq("group_id", activeGroupId)
+          .eq("user_id", user.id),
+      ]);
+      myGoalQuestions = qs ?? [];
+      myGoalsBySlot = Object.fromEntries(
+        (myGoals ?? []).map((goal) => [goal.question_slot, goal.goal_text ?? ""])
+      );
+    }
 
     if (isAdminOfActiveGroup) {
       const [{ data: qs }, { data: ms }] = await Promise.all([
@@ -147,6 +172,8 @@ export default async function SettingsPage() {
 
       {profile && <ProfileForm profile={profile} />}
 
+      <HowThisWorksSection />
+
       <div className="space-y-2">
         <h2 className="text-sm font-semibold text-neutral-700">Your groups</h2>
         <ActiveGroupSwitcher
@@ -187,6 +214,15 @@ export default async function SettingsPage() {
             ))}
           </div>
         </div>
+      )}
+
+      {isActiveMemberOfActiveGroup && activeGroup && myGoalQuestions.length > 0 && (
+        <GoalsForm
+          userId={user.id}
+          groupId={activeGroup.id}
+          questions={myGoalQuestions}
+          initialGoals={myGoalsBySlot}
+        />
       )}
 
       <JoinGroupForm />

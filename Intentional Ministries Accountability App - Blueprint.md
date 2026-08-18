@@ -267,9 +267,9 @@ Completed and sent to Claude Code:
 - Round 3 — bottom nav fix, platform admin role, Group Update, dashboard redesign, reactions, 3-tab consolidation
 - Round 4 (urgent) — deadline timing fix, correcting logic that's already live and causing a real problem
 - Round 5 — history access and data retention: opening 6-week history to all members, protecting removed members' access to their own data, deactivated-group roster, hiding old groups from your list
+- Round 6 (partial) — persistent goals feature and in-app instructions (Settings "How this works"). Welcome email deliberately skipped for now — sending arbitrary transactional email needs a third-party provider (Resend, etc.) with its own account and API key, which is a setup step for the ministry admin, not something to wire up silently. Revisit once a provider is chosen.
 
-Pending, not yet sent — in the order they should be sent:
-- Round 6 — welcome email, persistent goals feature, and where in-app instructions live
+Pending, not yet sent:
 
 ## Round 2: Fixes and Additions from Real Testing
 
