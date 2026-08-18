@@ -38,11 +38,15 @@ Weekly structure
 - Each group has a meeting day (default Monday, changeable by an admin to any day)
 - A week starts on the group's meeting day and ends at the deadline
 
-Deadline
-- Deadline is 11:59 PM local group time, the day before the meeting day
+Deadline (revised — see note below)
+- Deadline is 11:59 PM local group time, on the meeting day itself — not the day before
 - No grace period
 - The week stays editable — members can change their answers as many times as they want — until the deadline. Last saved value wins.
 - After the deadline, the week locks permanently. No edits, no exceptions.
+
+Why this changed from the original plan: the deadline originally was set to the night before the meeting day, so results would be ready in advance. In real use, this backfired — since a new week begins the moment the meeting day starts, the dashboard was wiping clean and showing a blank new week right as the meeting day began, before the leader ever got to use it. Moving the deadline to the end of the meeting day itself fixes this: the current week's real results stay live and visible on the dashboard through the entire meeting day, members can still check in that morning or even during the meeting if they forgot, and the dashboard only resets to a new blank week the day after. Group cultures can still informally encourage checking in the night before — the app itself no longer forces that timing.
+
+Deliberately not adding a "linger" or grace period after the deadline passes, beyond the deadline shift above. Reasoning: nothing is actually lost once a week locks and the dashboard shows the new blank week — the data stays fully accessible through History (each member's personal history) and through the 6-week trend view available to any group member (see Round 2 and Round 5). Adding a separate lingering-but-locked state on the main dashboard would be a third state to design and explain, without solving a problem the existing history features don't already cover.
 
 Changing the meeting day
 - An admin can change the meeting day at any time in Group Settings
@@ -94,6 +98,7 @@ Membership (connects a User to a Group)
 - role: admin or member
 - status: active, inactive, pending, removed
 - joined date
+- hidden_by_user (true/false, default false — a personal declutter preference, see Round 5)
 
 Exactly one Membership per user per group. This table is the only source of truth for who belongs to a group and who its admins are.
 
@@ -118,6 +123,14 @@ WeeklyCheckIn (one record per person per group per week)
 - updated_at
 
 One record holds all five ratings together, plus that week's prayer request and its reaction counts. week_start_date never changes once written. Locked weeks are immutable — but see the reactions note below for how this interacts with locking.
+
+Goal (one record per person per group per category, persistent — not tied to any week)
+- user, group
+- question_slot (1–5, matches the group's category order)
+- goal_text
+- updated_at
+
+Deliberately separate from WeeklyCheckIn. A goal is something a member sets once and updates whenever he wants — it does not reset weekly, does not lock, and is not part of the weekly deadline rules at all. Editing a goal has no relationship to whether the current week is open or locked.
 
 ## How Default Questions Work
 
@@ -180,8 +193,12 @@ Dashboard row, expanded (tap to open)
 - Below that header, a visually distinct divider or band, separating the contact info from the content below it
 - Below the divider: "Prayer & Life Update" as a bolded label, then the actual text the member submitted that week, or empty space if they didn't submit one
 - Below the update text: the 4 reaction icons (heart, prayer hands, thumbs up, raised hands), each tappable, each showing its current count
+- Below the reactions, two buttons, both available to any group member (not leader-restricted — see Round 5):
+  - "6-Week History" — opens that member's ratings and Prayer & Life Updates for roughly the last 6 weeks. Reactions are not shown in this history view, only in the current week's live expanded row.
+  - "See [Name]'s Goals" — opens a further drop-down showing all 5 categories with that member's current goal text under each (blank if he hasn't set one for that category). Separate from the history button above, since goals are persistent and not tied to any specific week.
 
 Personal history screen (each member's own view, private to them)
+- Scoped to whichever group is currently active — not combined across a user's multiple groups. Since every group is treated as fully separate (see Round 5's related note on multi-group separation), this keeps the personal history screen consistent with how everything else in the app already works.
 - A scrollable list of past weeks, most recent first
 - Each week shows that week's date and the same 5 colored, labeled buttons the member chose that week
 - Purpose: let a member spot his own patterns over time — for example, noticing the same category has been weak for six weeks running, even if the other four have been consistently strong
@@ -242,6 +259,18 @@ These were the open questions from earlier drafts, now settled:
 - Prayer requests: submitted weekly alongside the check-in, viewed by tapping a member's name on the dashboard rather than shown in the main grid.
 - Resources link: one external URL per group, set and changed by the admin at any time — not fixed content built into the app.
 
+## Build Status
+
+Completed and sent to Claude Code:
+- Initial build — core app: auth, groups, check-in, dashboard, join-by-code, personal history, settings
+- Round 2 — bug fixes and small features from first real testing
+- Round 3 — bottom nav fix, platform admin role, Group Update, dashboard redesign, reactions, 3-tab consolidation
+
+Pending, not yet sent — in the order they should be sent:
+- Round 4 (urgent) — deadline timing fix, correcting logic that's already live and causing a real problem
+- Round 5 — history access and data retention: opening 6-week history to all members, protecting removed members' access to their own data, deactivated-group roster, hiding old groups from your list
+- Round 6 — welcome email, persistent goals feature, and where in-app instructions live
+
 ## Round 2: Fixes and Additions from Real Testing
 
 The core app (auth, groups, check-in, dashboard, join-by-code, history, settings) is built and working. This section covers what came out of actually using it with test accounts. Treat the bugs as bugs — something already built is not working correctly — not as new features to design from scratch.
@@ -265,7 +294,7 @@ The core app (auth, groups, check-in, dashboard, join-by-code, history, settings
 - Each of the 5 categories has its title always visible, with a short description underneath that can be toggled show/hide per user preference. Default: description shown.
 - Dashboard gets a small icon or dot next to any member who submitted a Prayer & Life Update that week, so the group can see who has one without tapping into every member individually.
 - Profile photo upload, shown on the dashboard in place of initials. Resize and compress to roughly 200x200 pixels before saving, regardless of original upload size, to keep storage costs negligible at scale. Optional — default to first and last initial if no photo is uploaded.
-- Leader-only member history view: from the dashboard, a leader can tap a member's name and see that member's own check-ins (ratings and Prayer & Life Updates) for roughly the last 6 weeks. This is leader-only, not visible to other regular members — it supports pastoral follow-up, not general group browsing of each other's history. Do not build a separate whole-group historical dashboard snapshot feature for v1 — this one member-level view covers the real need.
+- Member history view: from the dashboard, any group member can tap another member's name and see that member's own check-ins (ratings and Prayer & Life Updates) for roughly the last 6 weeks. Originally scoped as leader-only — see Round 5 below, which opens this to every group member. Do not build a separate whole-group historical dashboard snapshot feature for v1 — this one member-level view covers the real need.
 - Member removal: leader can remove a member from a group, which sets their Membership status to removed and immediately cuts off their access. Do not auto-regenerate the group code when someone is removed — that would also lock out every other current member for no reason. If a removed person re-enters the group code later, it should simply create a new pending join request like any other join attempt, which the leader can ignore or deny — no separate "block" feature needed.
 - A short onboarding explainer at the signup/join step — a screen or slide-through that briefly explains what to expect (the weekly rhythm, when things reset, what the group code is for, what happens once approved). Sequence this after the current bug-fix round, not before.
 
@@ -308,9 +337,9 @@ Indicator behavior: when the leader edits and posts to the Group Update box, the
 
 No strict password complexity rules needed — a reasonable minimum length (roughly 6–8 characters) is enough for this app's security needs. What matters more is that a forgotten-password flow actually exists: a "Forgot password?" link on the sign-in screen that emails the user a reset link. This is standard functionality Supabase Auth already supports — it needs to be wired into the sign-in screen, not built from scratch.
 
-### Member status visibility — reconfirming this from Round 2
+### Member status visibility — fixed in this round
 
-The bug flagged in Round 2 (member status — pending, active, removed — not visible anywhere in the app) has not yet been fixed, since Round 3 hasn't been sent to Claude Code yet. Reconfirming it here with more shape: this should live as its own "Members" section inside Group Settings, showing every group member's current status, with the ability for the leader to approve a pending request or remove an active member directly from that same list — not scattered across different screens.
+The bug flagged in Round 2 (member status — pending, active, removed — not visible anywhere in the app) is fixed here. Shape: this lives as its own "Members" section inside Group Settings, showing every group member's current status, with the ability for the leader to approve a pending request or remove an active member directly from that same list — not scattered across different screens.
 
 ### Multi-group switching — design and where it lives
 
@@ -333,6 +362,81 @@ This also leaves room for a genuine 4th tab later, if a real need for one emerge
 
 
 
+## Round 4: Deadline Timing Fix (Urgent — Changes Already-Built Logic)
+
+This is a fix to the core deadline rule in Weekly Cycle Rules above, found through real Monday-meeting use. Flagging separately and clearly because this changes logic that's already built and running, not a new addition.
+
+The problem observed: with the deadline set to the night before the meeting day, the dashboard reset to a blank new week right as the meeting day began — before the leader could use the group's actual results during the meeting itself, since the meeting is held on that same day.
+
+The fix: change the deadline calculation from "11:59 PM the day before the meeting day" to "11:59 PM on the meeting day itself." This is a change to the underlying week/deadline calculation logic (the same logic referenced in the original migration and week-lock functions), not just a display change — it needs to be updated wherever the deadline is calculated or enforced, including any database functions handling the lock.
+
+No changes needed to history, personal history, or the leader's 6-week trend view — those already work correctly and don't need touching as part of this fix.
+
+## Round 5: History Access and Data Retention
+
+Four related decisions, all about who can see historical data and how long access lasts — grouped together since they touch the same part of the app.
+
+### Open 6-week history to all group members
+
+Originally, the 6-week history view (ratings and Prayer & Life Updates for a specific member, going back roughly 6 weeks) was scoped as leader-only, to avoid it feeling like surveillance if every member could browse every other member's past weeks.
+
+Revisited after real use: a group member (not the leader) wanted to look back at what another member shared in a prior meeting, to follow up and pray for him specifically, and had no way to do so once that week rolled into history. Given the group's current week is already fully shared and visible to every member in real time — there is no privacy between members on their current answers — restricting that same information's recent past to leader-only was an inconsistent, unnecessary restriction rather than a meaningful privacy boundary.
+
+The fix: any group member can tap any other member's name and access their 6-week history, exactly as the leader currently can. No change to the 6-week window itself — the reasoning for that length (enough to spot a real pattern, not just react to one off week) applies just as much to a peer as to a leader.
+
+One thing this does change, and needs fixing: reactions were previously described as staying editable even after a week locks, but the current design gives no place to actually do that — once a week locks, it immediately leaves the dashboard and is only reachable through this history view, and the history view was built without reactions on it. That gap only appeared once Round 4 made the lock and the dashboard rollover happen at the same instant, closing the window the original "stays editable after lock" rule assumed would exist.
+
+The fix: add the same 4 reaction icons and counts to each week shown in the 6-week history view, not just the current week's live row. This directly serves the original reason reactions were built — someone wanting to react to a request the morning after a meeting, once that week has already locked and rolled into history.
+
+### Personal data retention — removed members and inactive groups
+
+Raised as a "what if" before it became a real problem: if someone is a member of a group for years, then is later removed (or a leader effectively replaces the group with a new one and removes everyone), does that person lose access to their own years of history?
+
+The underlying data was never at risk — every WeeklyCheckIn record is permanent regardless of what happens to Membership status later. The real risk is a permissions gap: access control tied only to current active membership could accidentally block someone from their own historical data, even though that data still physically exists.
+
+Two explicit rules to prevent this:
+
+- A user can always view their own historical check-ins (ratings, Prayer & Life Updates, reactions received) for a group, regardless of their current Membership status in that group — active, removed, or otherwise. This is treated as the individual's own personal data, not something access to is controlled by ongoing group membership. This does not extend to seeing other members' data or the group's current dashboard — only their own past submissions.
+- Groups are never hard-deleted, only ever marked inactive via the existing Active/inactive flag. If a leader wants to "end" a group, that's a deactivation, not a deletion — this guarantees every member's historical records stay permanently reachable and never become orphaned by a missing group record.
+
+### Deactivated groups become shared memory, not a dead end
+
+A group that's deliberately deactivated (as opposed to one just left open and going stale with no activity) is different from a group someone was individually removed from. Removal is about protecting a currently-active group's privacy from someone no longer part of it — that stays exactly as defined above (own history only, no roster, no dashboard). Deactivation means the group itself is over, equally, for everyone who was ever part of it.
+
+Rule: once a group is deactivated, anyone who was ever a member of it — currently active, previously removed, doesn't matter — can view a simple roster: the names and photos of everyone who was part of that group. This does not include anyone's private weekly content (ratings, Prayer & Life Updates, goals) beyond the viewer's own — the roster is "who was here," not "what everyone said." Each person's own historical data remains visible to them per the retention rules above, same as always.
+
+This is meaningfully different from just leaving a group open and inactive without deactivating it — a group that's simply gone stale (no deliberate deactivation) does not unlock the roster view; normal active-group access rules still apply. Worth encouraging leaders to actually deactivate a group once it's genuinely done, specifically to unlock this shared-memory view for everyone who was part of it.
+
+### Hiding old groups from your own group list
+
+Over years, especially for someone leading a new group every year, a person's "Your Groups" list in Settings could grow long with groups that are done and not worth seeing regularly. This is purely a personal display preference, unrelated to access or deactivation status.
+
+Rule: each Membership record has a personal hidden_by_user flag. A user can hide any group from their own "Your Groups" list at any time, and unhide it later if they want it back. This only affects what that one user sees on their own screen — it doesn't affect the group itself, other members, or anyone's access to anything. A hidden group's data (including that user's own history, and the roster if the group is also deactivated) is unaffected and still reachable if the user chooses to unhide it.
+
+UI specifics:
+- The main "Your Groups" list shows only visible (not hidden) groups by default
+- Below that list, a link showing a count, e.g. "Hidden Groups (8)" — the count makes it clear at a glance how many are tucked away without needing to open the list
+- Tapping that link opens the hidden groups list, where each group has a way to unhide it, moving it back into the main visible list immediately
+- Symmetric in both directions: any group in the main list has a way to hide it; any group in the hidden list has a way to unhide it
+
+## Round 6: Welcome Email, Goals, and Instructions Placement
+
+### Welcome email
+
+Fires once, automatically, after a person's first successful signup — same content for a leader and a participant (a participant benefits from knowing what's available to leaders, for future reference, in case he leads a group himself later). Short and scannable, not a full manual. Covers the basics of how the weekly rhythm works, then closes by introducing Intentional Ministries and linking to the platform admin's ministry-wide link (the same field described under Platform Admin above) — so if that link's destination ever changes, the email automatically stays current without needing its own separate update.
+
+### Goals — persistent, not weekly
+
+See the Goal entity in the Data Model section above. A member can optionally set a goal for each of his group's 5 categories (e.g. "consistent quiet times," "memorize 10 scriptures"). Unlike ratings and Prayer & Life Updates, a goal is not tied to any single week — it stays exactly as set until the member changes it himself, with no reset, no lock, no deadline.
+
+Displayed on the group dashboard as a second, separate drop-down beneath the Prayer & Life Update drop-down (see the expanded dashboard row spec above) — a member can browse the group's current answers without ever seeing goals unless he specifically taps in to look.
+
+### Where "how this works" content lives — avoid duplicating instructions in three places
+
+- Settings tab inside the app is the source of truth. This is where the actual explanation of how each feature works belongs (goals, prayer requests, the group code, etc.) — it's always current since it sits next to the features it explains, and doesn't require separately maintaining the same explanation elsewhere.
+- The welcome email is a short first-touch intro, not the full manual — enough to get someone oriented, pointing back to Settings for anything deeper.
+- A separate, unlisted Squarespace resource page (discussed outside this app's build, not part of this technical spec) serves a different purpose — a broader ministry hub with tools, self-evaluations, and book recommendations, not a duplicate of in-app instructions. It may include a brief one- or two-line pointer back to the in-app Settings tab for app-specific how-to content, rather than re-explaining app features itself.
+
 ## Handoff Note for Claude Code
 
-This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Start with one working group end-to-end (create group → answer check-in → see it on the dashboard) before generalizing to support many independent groups. Round 2 and Round 3 reflect ongoing priorities: the bottom nav fix in Round 3 comes first since it's a functional bug, then the rest of Round 3, with cosmetic styling (icons, color palette) still held for a dedicated later pass.
+This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Round 4 is urgent and should be sent and completed first. Round 5 and Round 6 can follow in either order, but Round 5 is the smaller, more self-contained of the two.

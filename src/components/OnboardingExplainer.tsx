@@ -5,7 +5,7 @@ const POINTS = [
   },
   {
     title: "When things reset",
-    body: "Answers lock at 11:59pm the night before your group meets. After that, no edits — a brand new week starts on meeting day.",
+    body: "Answers lock at 11:59pm on meeting day itself, so results stay visible through the whole meeting. A brand new week starts the day after.",
   },
   {
     title: "What the group code is for",
