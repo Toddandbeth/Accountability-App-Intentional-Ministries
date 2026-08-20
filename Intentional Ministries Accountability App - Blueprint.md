@@ -48,12 +48,13 @@ Why this changed from the original plan: the deadline originally was set to the 
 
 Deliberately not adding a "linger" or grace period after the deadline passes, beyond the deadline shift above. Reasoning: nothing is actually lost once a week locks and the dashboard shows the new blank week — the data stays fully accessible through History (each member's personal history) and through the 6-week trend view available to any group member (see Round 2 and Round 5). Adding a separate lingering-but-locked state on the main dashboard would be a third state to design and explain, without solving a problem the existing history features don't already cover.
 
-Changing the meeting day (revised — see Round 7)
+Changing the meeting day (revised — see Round 8, supersedes Round 7's short-week version)
 - An admin can change the meeting day at any time in Group Settings, to any day, with no restrictions on which days are selectable
 - The change takes effect immediately on the currently open week, not deferred to a future week
-- Rule: the deadline for the current week is always recalculated as the next occurrence of the (possibly newly changed) meeting day that comes strictly after today — never today itself. This means changing the meeting day can shorten or lengthen the week currently in progress, depending on which day is chosen and how far away it is.
+- Rule: the new lock date is always at least a full 7 days from the day the current week originally started — never shorter, occasionally a little longer depending on which day is chosen. Concretely: take the current week's original start date, add 7 days to get a floor, then find the next occurrence of the newly chosen meeting day on or after that floor.
+- Short weeks are explicitly not allowed under any circumstance. Reasoning, confirmed through real use: a short notice period (a meeting suddenly 2–3 days away) makes it more likely the group simply won't gather in time, even if the leader announced the change — guys waiting a full week for the new schedule to take effect is a better outcome than a rushed, easily-missed short week.
 - In-app messaging should show the leader the actual resulting date the current week will now lock on, so there's no ambiguity about the effect of the change
-- Because this can genuinely shift a currently open week's deadline for the whole group, the Settings screen should include a clear note reminding leaders this is meant for permanent schedule changes, not for skipping or moving a single week's meeting (see wording in Round 7)
+- Because this still shifts a currently open week's deadline for the whole group, the Settings screen should include a clear note reminding leaders this is meant for permanent schedule changes, not for skipping or moving a single week's meeting (see wording in Round 7, still accurate)
 
 Week identity and history
 - Every week is identified by a week_start_date, stored permanently on each check-in
@@ -270,7 +271,8 @@ Completed and sent to Claude Code:
 - Round 4 — deadline timing fix
 - Round 5 — history access and data retention
 - Round 6 — goals feature and in-app instructions reference (welcome email itself on hold pending an email provider)
-- Round 7 — three bugs from live testing: reactions no longer show in history for weeks with no Prayer & Life Update, the meeting-day-change crash is fixed, and the meeting-day-change logic is reworked to apply immediately (live-recalculated deadline, never today itself) instead of deferring to the following week
+- Round 7 — reactions-in-history fix, meeting-day-change crash fix, and the (now superseded by Round 8) short-week transition formula
+- Round 8 — revises Round 7's meeting day change formula: no short weeks are allowed anymore, the new lock date is always at least 7 full days from the current week's original start
 
 Pending, not yet sent:
 - None
@@ -309,7 +311,14 @@ The core app (auth, groups, check-in, dashboard, join-by-code, history, settings
 ### Held for a later, dedicated styling round
 
 - Bottom navigation icons instead of text labels
-- Overall color palette and visual polish once brand colors and an app icon are finalized
+- Overall color palette and visual polish — brand assets are finalized and ready (see below), this round is just not scheduled yet
+
+Brand assets — finalized, ready whenever this round is scheduled:
+- Primary color: #253551 (main navy blue) — use for headers, primary buttons, the app icon background
+- Accent color: #7993c2 (periwinkle blue) — use for highlights and accents, distinct enough from the primary to stand out without clashing
+- Secondary/neutral color: #ccd0d6 (light grey-blue) — use for backgrounds, dividers, and secondary or inactive states
+- App icon: a rounded-square navy background with a white serif "I" mark — already sized and shaped correctly for use as a PWA home screen icon with minimal adjustment
+- Also available: a square (non-rounded) version of the same mark, a reversed version (white background, navy mark), and a horizontal lockup with "INTENTIONAL MINISTRIES" wordmark for use in places needing the full name, not just the icon mark
 
 ## Round 3: Bottom Nav Fix, Platform Admin, and Group Update
 
@@ -455,6 +464,8 @@ Changing a group's meeting day in Group Settings currently forces the user compl
 
 ### Meeting day change logic — revised, not just a bug fix
 
+SUPERSEDED — see Round 8 below. This section's short-week behavior was built and tested, but real use of it prompted a further change: short weeks are no longer wanted at all. Kept here for history rather than deleted, but Round 8's rule is the current, correct one.
+
 This supersedes what was originally written above and earlier in this section. Real use showed the original rule (a meeting day change only takes effect after the current week locks, always deferred to the following week) was more restrictive than actually wanted — it meant even a Tuesday-decided "let's meet Thursday this week instead" change couldn't take effect until an entire extra stale week had passed.
 
 The revised rule, worked through with real examples: the deadline for the currently open week is always recalculated live, as the next occurrence of the (possibly just-changed) meeting day that comes strictly after today. Never today itself, which is what prevents the broken same-day or next-day lock bug entirely. Two concrete examples that define the intended behavior:
@@ -471,6 +482,26 @@ Messaging: whenever a leader changes the meeting day, show the actual resulting 
 ### Add a settings reminder about permanent vs. one-time changes
 
 Because this rule can genuinely reshape the currently open week for the whole group, add a short, clear note near the meeting day setting in Group Settings — something like: "Changing this updates your group's regular schedule going forward, and may shorten or lengthen the week currently in progress. Only use this for a lasting change to your meeting day — not to move or skip a single week's meeting."
+
+## Round 8: No Short Weeks — Revised Meeting Day Change Formula
+
+This changes what Round 7 actually shipped and you tested live. Worth being direct about that: this isn't a refinement, it's a reversal, based on what real use showed — a short notice period (a meeting suddenly 2–3 days away) makes it more likely the group simply won't gather in time, even with the leader announcing the change. Confirmed conclusion: it's better for guys to wait a full week for a schedule change to take effect than to risk a rushed, easily-missed short week.
+
+### The new rule — no short weeks, ever
+
+Whenever a leader changes the meeting day, the new lock date must always be at least 7 full days from the day the current week originally started — never shorter. Formula: take the current week's original start date, add 7 days to get a floor, then find the next occurrence of the newly chosen meeting day on or after that floor.
+
+Worked examples, confirmed against real testing:
+
+- Week started Monday. Leader changes meeting day to Tuesday. Floor is 7 days after Monday (next Monday). Next Tuesday on or after that floor is 8 days from the original start. Current week runs 8 days instead of locking early.
+- Week started Monday. Leader changes meeting day to Saturday. Floor is 7 days after Monday (next Monday). Next Saturday on or after that floor is 12 days from the original start.
+- Week started Monday. Leader changes meeting day to Monday itself (no actual day-of-week change, or re-confirming the same day). Floor is 7 days after Monday. That is itself the next Monday — exactly 7 days, the shortest a week is ever allowed to be.
+
+No day of the week is ever restricted or unselectable — every day remains a valid choice regardless of today's date. The restriction is entirely on the resulting lock date, never on which day a leader is allowed to pick.
+
+### On requiring changes to only happen after the current week closes
+
+Explicitly not building this as an additional restriction. The 7-day-minimum formula above already guarantees no short week regardless of when during the current week a leader makes the change — requiring changes to only happen after close would add friction without preventing anything the formula doesn't already handle.
 
 ## Handoff Note for Claude Code
 

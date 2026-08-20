@@ -114,13 +114,13 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
         <h2 className="text-sm font-semibold">Meeting day</h2>
         <p className="text-xs text-neutral-500">
           Currently {weekdayName(group.meeting_day)}. Changing this applies immediately to the
-          week already in progress — it may shorten or lengthen it, depending on how far away the
-          new day is.
+          week already in progress, extending it to land on the new day — always at least 7 full
+          days out, never shorter.
         </p>
         <p className="rounded-md bg-neutral-100 px-3 py-2 text-xs text-neutral-600">
-          Changing this updates your group&apos;s regular schedule going forward, and may shorten
-          or lengthen the week currently in progress. Only use this for a lasting change to your
-          meeting day — not to move or skip a single week&apos;s meeting.
+          Changing this updates your group&apos;s regular schedule going forward, and may lengthen
+          the week currently in progress (it will never shorten it). Only use this for a lasting
+          change to your meeting day — not to move or skip a single week&apos;s meeting.
         </p>
         <div className="flex gap-2">
           <select
