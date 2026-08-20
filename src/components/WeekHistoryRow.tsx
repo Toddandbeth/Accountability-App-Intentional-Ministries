@@ -50,12 +50,16 @@ export function WeekHistoryRow({
         })}
       </div>
       {prayerRequest?.trim() && (
-        <p className="mt-2 text-xs text-neutral-600">
-          <span className="font-semibold text-neutral-500">Prayer &amp; Life Update: </span>
-          {prayerRequest}
-        </p>
+        <>
+          <p className="mt-2 text-xs text-neutral-600">
+            <span className="font-semibold text-neutral-500">Prayer &amp; Life Update: </span>
+            {prayerRequest}
+          </p>
+          {reactionCounts && (
+            <ReactionButtons checkInId={checkInId ?? null} counts={reactionCounts} />
+          )}
+        </>
       )}
-      {reactionCounts && <ReactionButtons checkInId={checkInId ?? null} counts={reactionCounts} />}
     </div>
   );
 }

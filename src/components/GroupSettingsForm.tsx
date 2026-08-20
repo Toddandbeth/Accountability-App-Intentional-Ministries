@@ -24,6 +24,7 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
   const [meetingDay, setMeetingDay] = useState(group.meeting_day);
   const [savingDay, setSavingDay] = useState(false);
   const [dayError, setDayError] = useState<string | null>(null);
+  const [lockDateMessage, setLockDateMessage] = useState<string | null>(null);
 
   async function saveInfo(e: React.FormEvent) {
     e.preventDefault();
@@ -46,8 +47,9 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
   async function saveMeetingDay() {
     setSavingDay(true);
     setDayError(null);
+    setLockDateMessage(null);
 
-    const { error } = await supabase.rpc("set_group_meeting_day", {
+    const { data: lockDate, error } = await supabase.rpc("set_group_meeting_day", {
       p_group_id: group.id,
       p_new_day: meetingDay,
     });
@@ -56,6 +58,15 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
     if (error) {
       setDayError(error.message);
       return;
+    }
+
+    if (lockDate) {
+      const formatted = new Date(`${lockDate}T00:00:00`).toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+      });
+      setLockDateMessage(`Your current week will now lock on ${formatted}.`);
     }
     router.refresh();
   }
@@ -102,19 +113,22 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
       <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4">
         <h2 className="text-sm font-semibold">Meeting day</h2>
         <p className="text-xs text-neutral-500">
-          Currently {weekdayName(group.meeting_day)}. Changing this never affects the
-          in-progress week — it takes effect starting the week after this one locks.
+          Currently {weekdayName(group.meeting_day)}. Changing this applies immediately to the
+          week already in progress — it may shorten or lengthen it, depending on how far away the
+          new day is.
         </p>
-        {group.pending_meeting_day !== null && (
-          <p className="rounded-md bg-neutral-100 px-3 py-2 text-xs text-neutral-600">
-            A change to {weekdayName(group.pending_meeting_day)} is scheduled to take effect
-            after this week locks.
-          </p>
-        )}
+        <p className="rounded-md bg-neutral-100 px-3 py-2 text-xs text-neutral-600">
+          Changing this updates your group&apos;s regular schedule going forward, and may shorten
+          or lengthen the week currently in progress. Only use this for a lasting change to your
+          meeting day — not to move or skip a single week&apos;s meeting.
+        </p>
         <div className="flex gap-2">
           <select
             value={meetingDay}
-            onChange={(e) => setMeetingDay(Number(e.target.value))}
+            onChange={(e) => {
+              setMeetingDay(Number(e.target.value));
+              setLockDateMessage(null);
+            }}
             className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
           >
             {MEETING_DAYS.map((d) => (
@@ -126,16 +140,14 @@ export function GroupSettingsForm({ group }: GroupSettingsFormProps) {
           <button
             type="button"
             onClick={saveMeetingDay}
-            disabled={
-              savingDay ||
-              (meetingDay === group.meeting_day && group.pending_meeting_day === null)
-            }
+            disabled={savingDay || meetingDay === group.meeting_day}
             className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
             {savingDay ? "…" : "Change"}
           </button>
         </div>
         {dayError && <p className="text-sm text-red-600">{dayError}</p>}
+        {lockDateMessage && <p className="text-sm text-neutral-700">{lockDateMessage}</p>}
       </div>
 
       <div className="space-y-2 rounded-xl border border-neutral-200 bg-white p-4">

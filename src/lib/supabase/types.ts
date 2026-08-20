@@ -30,8 +30,6 @@ export interface Group {
   group_update_link_url: string | null;
   group_update_text: string | null;
   group_update_flag: boolean;
-  pending_meeting_day: number | null;
-  pending_meeting_day_effective_after: string | null;
   created_at: string;
 }
 

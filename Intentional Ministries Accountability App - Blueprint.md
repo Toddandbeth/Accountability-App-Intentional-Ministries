@@ -48,10 +48,12 @@ Why this changed from the original plan: the deadline originally was set to the 
 
 Deliberately not adding a "linger" or grace period after the deadline passes, beyond the deadline shift above. Reasoning: nothing is actually lost once a week locks and the dashboard shows the new blank week — the data stays fully accessible through History (each member's personal history) and through the 6-week trend view available to any group member (see Round 2 and Round 5). Adding a separate lingering-but-locked state on the main dashboard would be a third state to design and explain, without solving a problem the existing history features don't already cover.
 
-Changing the meeting day
-- An admin can change the meeting day at any time in Group Settings
-- The change never affects the current, already-in-progress week
-- Rule: the new meeting day takes effect starting with the next week, after the current week has locked
+Changing the meeting day (revised — see Round 7)
+- An admin can change the meeting day at any time in Group Settings, to any day, with no restrictions on which days are selectable
+- The change takes effect immediately on the currently open week, not deferred to a future week
+- Rule: the deadline for the current week is always recalculated as the next occurrence of the (possibly newly changed) meeting day that comes strictly after today — never today itself. This means changing the meeting day can shorten or lengthen the week currently in progress, depending on which day is chosen and how far away it is.
+- In-app messaging should show the leader the actual resulting date the current week will now lock on, so there's no ambiguity about the effect of the change
+- Because this can genuinely shift a currently open week's deadline for the whole group, the Settings screen should include a clear note reminding leaders this is meant for permanent schedule changes, not for skipping or moving a single week's meeting (see wording in Round 7)
 
 Week identity and history
 - Every week is identified by a week_start_date, stored permanently on each check-in
@@ -265,11 +267,13 @@ Completed and sent to Claude Code:
 - Initial build — core app: auth, groups, check-in, dashboard, join-by-code, personal history, settings
 - Round 2 — bug fixes and small features from first real testing
 - Round 3 — bottom nav fix, platform admin role, Group Update, dashboard redesign, reactions, 3-tab consolidation
-- Round 4 (urgent) — deadline timing fix, correcting logic that's already live and causing a real problem
-- Round 5 — history access and data retention: opening 6-week history to all members, protecting removed members' access to their own data, deactivated-group roster, hiding old groups from your list
-- Round 6 (partial) — persistent goals feature and in-app instructions (Settings "How this works"). Welcome email deliberately skipped for now — sending arbitrary transactional email needs a third-party provider (Resend, etc.) with its own account and API key, which is a setup step for the ministry admin, not something to wire up silently. Revisit once a provider is chosen.
+- Round 4 — deadline timing fix
+- Round 5 — history access and data retention
+- Round 6 — goals feature and in-app instructions reference (welcome email itself on hold pending an email provider)
+- Round 7 — three bugs from live testing: reactions no longer show in history for weeks with no Prayer & Life Update, the meeting-day-change crash is fixed, and the meeting-day-change logic is reworked to apply immediately (live-recalculated deadline, never today itself) instead of deferring to the following week
 
 Pending, not yet sent:
+- None
 
 ## Round 2: Fixes and Additions from Real Testing
 
@@ -436,6 +440,37 @@ Displayed on the group dashboard as a second, separate drop-down beneath the Pra
 - Settings tab inside the app is the source of truth. This is where the actual explanation of how each feature works belongs (goals, prayer requests, the group code, etc.) — it's always current since it sits next to the features it explains, and doesn't require separately maintaining the same explanation elsewhere.
 - The welcome email is a short first-touch intro, not the full manual — enough to get someone oriented, pointing back to Settings for anything deeper.
 - A separate, unlisted Squarespace resource page (discussed outside this app's build, not part of this technical spec) serves a different purpose — a broader ministry hub with tools, self-evaluations, and book recommendations, not a duplicate of in-app instructions. It may include a brief one- or two-line pointer back to the in-app Settings tab for app-specific how-to content, rather than re-explaining app features itself.
+
+## Round 7: Bugs Found in Live Testing
+
+Three real bugs found while testing Rounds 4–6 in actual use.
+
+### Reactions showing on weeks with no Prayer & Life Update
+
+In the 6-week history view, reaction icons and counts are currently showing even on weeks where the member didn't submit a Prayer & Life Update — meaning four buttons all sitting at zero, with nothing to react to. Fix: only show the reaction icons for a given week in history if that week actually has update text. If there's no update, don't show reactions at all for that week.
+
+### Changing meeting day causes a full logout/crash
+
+Changing a group's meeting day in Group Settings currently forces the user completely out of the app, requiring a fresh login. On the next login, a message correctly explains when the change will take effect — but the forced logout itself should never happen. This is a straightforward crash to fix, unrelated to whether the deferred-change behavior below is correct.
+
+### Meeting day change logic — revised, not just a bug fix
+
+This supersedes what was originally written above and earlier in this section. Real use showed the original rule (a meeting day change only takes effect after the current week locks, always deferred to the following week) was more restrictive than actually wanted — it meant even a Tuesday-decided "let's meet Thursday this week instead" change couldn't take effect until an entire extra stale week had passed.
+
+The revised rule, worked through with real examples: the deadline for the currently open week is always recalculated live, as the next occurrence of the (possibly just-changed) meeting day that comes strictly after today. Never today itself, which is what prevents the broken same-day or next-day lock bug entirely. Two concrete examples that define the intended behavior:
+
+- Current meeting day is Monday, current week is in progress. It's now Tuesday. Leader changes the meeting day to Tuesday. Since today is already Tuesday, the system looks past today and finds next Tuesday — a full week out. The current week stretches to accommodate this (an 8-day week in this case), rather than locking today or creating a broken short week.
+- Current meeting day is Monday, current week is in progress. It's now Tuesday. Leader changes the meeting day to Thursday. Thursday is only 2 days away, so the current week now ends there instead — a real, intentionally short 3-day week (Tuesday through Thursday), reflecting that the whole group already knows about the change.
+
+No day of the week is ever restricted or unselectable, in any scenario — every day remains a valid choice at all times, including one that matches today's date.
+
+This also resolves the original crash-adjacent 1-day-week bug from the earlier version of this fix — there's no more "snapshot the old schedule and defer" logic to get wrong, since the deadline is simply always recalculated live off the current settings.
+
+Messaging: whenever a leader changes the meeting day, show the actual resulting date the current week will now lock on (e.g. "Your current week will now lock on Thursday, August 21"), so the effect is always clear and never something the leader has to calculate themselves.
+
+### Add a settings reminder about permanent vs. one-time changes
+
+Because this rule can genuinely reshape the currently open week for the whole group, add a short, clear note near the meeting day setting in Group Settings — something like: "Changing this updates your group's regular schedule going forward, and may shorten or lengthen the week currently in progress. Only use this for a lasting change to your meeting day — not to move or skip a single week's meeting."
 
 ## Handoff Note for Claude Code
 
