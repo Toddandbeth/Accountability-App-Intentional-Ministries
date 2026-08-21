@@ -272,7 +272,9 @@ Completed and sent to Claude Code:
 - Round 5 — history access and data retention
 - Round 6 — goals feature and in-app instructions reference (welcome email itself on hold pending an email provider)
 - Round 7 — reactions-in-history fix, meeting-day-change crash fix, and the (now superseded by Round 8) short-week transition formula
-- Round 8 — revises Round 7's meeting day change formula: no short weeks are allowed anymore, the new lock date is always at least 7 full days from the current week's original start
+- Round 8 — no-short-weeks meeting day change formula
+- App deployed live via GitHub + Vercel; performance fixes (loading states, parallelized data fetching) identified and implemented after initial live testing revealed sluggish navigation
+- Round 9 — Settings page reorganization (interaction patterns, section order) and moving goal-editing from Settings to the check-in screen
 
 Pending, not yet sent:
 - None
@@ -442,7 +444,7 @@ Fires once, automatically, after a person's first successful signup — same con
 
 See the Goal entity in the Data Model section above. A member can optionally set a goal for each of his group's 5 categories (e.g. "consistent quiet times," "memorize 10 scriptures"). Unlike ratings and Prayer & Life Updates, a goal is not tied to any single week — it stays exactly as set until the member changes it himself, with no reset, no lock, no deadline.
 
-Displayed on the group dashboard as a second, separate drop-down beneath the Prayer & Life Update drop-down (see the expanded dashboard row spec above) — a member can browse the group's current answers without ever seeing goals unless he specifically taps in to look.
+Displayed on the group dashboard as a second, separate drop-down beneath the Prayer & Life Update drop-down (see the expanded dashboard row spec above) — a member can browse the group's current answers without ever seeing goals unless he specifically taps in to look. This is for viewing another member's goals and is unchanged — see Round 9 for where a member edits their own goals.
 
 ### Where "how this works" content lives — avoid duplicating instructions in three places
 
@@ -502,6 +504,37 @@ No day of the week is ever restricted or unselectable — every day remains a va
 ### On requiring changes to only happen after the current week closes
 
 Explicitly not building this as an additional restriction. The 7-day-minimum formula above already guarantees no short week regardless of when during the current week a leader makes the change — requiring changes to only happen after close would add friction without preventing anything the formula doesn't already handle.
+
+## Round 9: Settings Page Reorganization
+
+Pure UI/navigation reorganization — no data model or schema changes. The current Settings page has grown cluttered as features accumulated across earlier rounds; this reorders and restructures it for clarity, using three distinct interaction patterns depending on what each section actually is.
+
+### Interaction patterns to use
+
+- Inline, always visible — for content simple or important enough that it should never be hidden
+- Collapsible reveal — for short, static content (like an explanation), expands in place without leaving the page
+- Slide-over panel (iOS-style: tap a row, slide to a dedicated screen, back arrow to return) — for anything substantial with real editable content (multiple fields, lists, actions)
+
+### Final order, top to bottom
+
+1. Profile — inline, always visible, not collapsible. Too important to hide behind a tap.
+2. How It Works — collapsible reveal. Static explanatory text, no editing, so a simple expand/collapse is enough; doesn't need its own full screen.
+3. Your Groups — stays open and visible, not collapsed, since a user may want to switch groups often. Lists every group the user belongs to; the currently active group is visually distinct (e.g. bolded) so everything below it has clear context. Directly beneath the active group's name, in this order: group code (for sharing), meeting day with time zone folded in (previously a separate field, now combined), member list. The separate "Group Info" box from earlier rounds is removed — it only duplicated the group name, which is now already shown here.
+   - Member list ordering: pending join requests appear at the top (they need the leader's attention first), each showing the member's name with an Approve action. Below that, active and removed members, matching current behavior (active shown in green, removed shown greyed out with a Remove action available on active members) — this part is unchanged from how it already works, just repositioned within the new structure.
+4. Weekly Questions — its own slide-over panel. Substantial editable content (5 questions, edit and reset actions) warrants a dedicated screen rather than an inline expand.
+5. Bottom cluster, grouped together: Join a Group, Create a Group, and Deactivate This Group. These are all occasional, one-time-per-group-lifecycle actions, so they're grouped at the bottom rather than mixed in with routinely-referenced content above. Deactivate This Group should be visually distinct from Join/Create (e.g. red text or extra spacing) to signal it's a different category of action — ending something, not configuring it — even though the same confirmation-dialog safety net from before still applies and is what actually prevents accidental use.
+6. Platform Admin section — only rendered for users with platform_admin set to true, unchanged from Round 3.
+7. Logout — very bottom, unchanged.
+
+### Goals editing moves from Settings to the check-in screen
+
+A member's own goal-editing form currently lives in Settings. This moves to the check-in screen instead, directly beneath the Prayer & Life Update field, since setting personal goals is closer to weekly reflection than to app configuration.
+
+- Prayer & Life Update stays exactly as-is: permanently open/visible on the check-in screen, no collapse
+- Goals get a substantial, clearly labeled button (not a small text link) directly beneath it — tapping it reveals the 5 goal fields, styled with the same generous spacing and substantial feel as the rest of the check-in screen
+- Unlike Prayer & Life Update, the goals section always starts collapsed and closed by default, every time the check-in screen is opened — even if a member had it open moments ago, navigating away (e.g. tapping Home) and back closes it again. This is deliberate: goals change rarely compared to the weekly rating and update, so keeping the primary check-in flow uncluttered takes priority over remembering the open/closed state.
+- This entirely replaces the Settings-based goal editor — goals are edited in exactly one place, not two, to avoid the two locations drifting out of sync or confusing which one is authoritative
+- Viewing another member's goals from the dashboard (the "See [Name]'s Goals" button, described earlier) is unaffected by this change — that remains on the dashboard as-is
 
 ## Handoff Note for Claude Code
 

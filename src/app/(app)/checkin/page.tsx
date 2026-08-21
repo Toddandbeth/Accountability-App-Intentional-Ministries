@@ -56,9 +56,14 @@ export default async function CheckInPage() {
 
   // Independent of each other — only editable/checkIn below actually need
   // weekStart's value.
-  const [{ data: questions }, { data: weekStart }] = await Promise.all([
+  const [{ data: questions }, { data: weekStart }, { data: myGoals }] = await Promise.all([
     supabase.from("group_questions").select("*").eq("group_id", groupId).order("slot_number"),
     supabase.rpc("current_week_start", { p_group_id: groupId }),
+    supabase
+      .from("goals")
+      .select("question_slot, goal_text")
+      .eq("group_id", groupId)
+      .eq("user_id", user.id),
   ]);
 
   const [{ data: editable }, { data: checkIn }] = await Promise.all([
@@ -80,6 +85,14 @@ export default async function CheckInPage() {
     5: checkIn?.rating_5 ?? null,
   };
 
+  const goalsQuestions = (questions ?? []).map((q) => ({
+    slot_number: q.slot_number,
+    label_short: q.label_short,
+  }));
+  const initialGoals = Object.fromEntries(
+    (myGoals ?? []).map((g) => [g.question_slot, g.goal_text ?? ""])
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex items-start justify-between">
@@ -100,6 +113,8 @@ export default async function CheckInPage() {
         initialRatings={initialRatings}
         initialPrayerRequest={checkIn?.prayer_request ?? ""}
         editable={Boolean(editable)}
+        goalsQuestions={goalsQuestions}
+        initialGoals={initialGoals}
       />
     </div>
   );

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { RatingButtonRow } from "@/components/RatingButtonRow";
+import { GoalsForm } from "@/components/GoalsForm";
 import type { GroupQuestion } from "@/lib/supabase/types";
 
 interface CheckInFormProps {
@@ -13,6 +14,8 @@ interface CheckInFormProps {
   initialRatings: Record<number, number | null>;
   initialPrayerRequest: string;
   editable: boolean;
+  goalsQuestions: { slot_number: number; label_short: string }[];
+  initialGoals: Record<number, string>;
 }
 
 const RATING_COLUMNS = ["rating_1", "rating_2", "rating_3", "rating_4", "rating_5"] as const;
@@ -27,6 +30,8 @@ export function CheckInForm({
   initialRatings,
   initialPrayerRequest,
   editable,
+  goalsQuestions,
+  initialGoals,
 }: CheckInFormProps) {
   const supabase = createClient();
 
@@ -38,6 +43,10 @@ export function CheckInForm({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [prayerJustSaved, setPrayerJustSaved] = useState(false);
   const [showDescriptions, setShowDescriptions] = useState(true);
+  // Deliberately plain state, no persistence — the goals section starts
+  // collapsed every time this screen mounts, even if it was open moments
+  // ago, since goals change far less often than the weekly rating/update.
+  const [goalsOpen, setGoalsOpen] = useState(false);
 
   useEffect(() => {
     // Reads localStorage (unavailable during SSR) after mount, so this
@@ -168,6 +177,22 @@ export function CheckInForm({
           )}
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={() => setGoalsOpen((v) => !v)}
+        className="w-full rounded-xl border border-neutral-200 bg-white p-4 text-left text-sm font-semibold"
+      >
+        {goalsOpen ? "Hide your goals" : "Your goals"}
+      </button>
+      {goalsOpen && (
+        <GoalsForm
+          userId={userId}
+          groupId={groupId}
+          questions={goalsQuestions}
+          initialGoals={initialGoals}
+        />
+      )}
 
       {saveError && <p className="text-sm text-red-600">{saveError}</p>}
     </div>

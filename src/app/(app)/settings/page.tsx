@@ -7,11 +7,12 @@ import { JoinGroupForm } from "@/components/JoinGroupForm";
 import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { ProfileForm } from "@/components/ProfileForm";
 import { GroupSettingsForm } from "@/components/GroupSettingsForm";
-import { GoalsForm } from "@/components/GoalsForm";
 import { HowThisWorksSection } from "@/components/HowThisWorksSection";
 import { QuestionsEditor } from "@/components/QuestionsEditor";
 import { GroupMembersSection } from "@/components/GroupMembersSection";
 import { PlatformAdminSection } from "@/components/PlatformAdminSection";
+import { SlideOverPanel } from "@/components/SlideOverPanel";
+import { DeactivateGroupButton } from "@/components/DeactivateGroupButton";
 import type { GroupBasicInfo } from "@/lib/supabase/types";
 
 export default async function SettingsPage() {
@@ -81,17 +82,14 @@ export default async function SettingsPage() {
 
   const activeGroupId = profile?.active_group_id ?? null;
 
-  // Group Settings (name/timezone/meeting day, questions, members) is
-  // specific to whichever group is currently active, and only relevant if
-  // the user administers that group.
+  // Group Settings (meeting day/timezone, questions, members) is specific
+  // to whichever group is currently active, and only relevant if the user
+  // administers that group.
   let activeGroup = null;
   let isAdminOfActiveGroup = false;
-  let isActiveMemberOfActiveGroup = false;
   let questions: { id: string; group_id: string; label_short: string; label_description: string; slot_number: number; goal_enabled: boolean }[] = [];
   let allMemberships: { id: string; user_id: string; role: string; status: string; joined_at: string }[] = [];
   let profileById = new Map<string, { first_name: string | null; last_name: string | null }>();
-  let myGoalQuestions: { slot_number: number; label_short: string }[] = [];
-  let myGoalsBySlot: Record<number, string> = {};
 
   if (activeGroupId) {
     // Independent of each other — both only need activeGroupId/user.id.
@@ -106,43 +104,23 @@ export default async function SettingsPage() {
     ]);
     activeGroup = g;
     isAdminOfActiveGroup = myMembership?.role === "admin";
-    isActiveMemberOfActiveGroup = myMembership?.status === "active";
-
-    // Admins always need the full question rows anyway, so fetch those
-    // once and derive the goals form's slimmer shape from them instead of
-    // running group_questions twice when both flags are true.
-    const needsQuestions = isActiveMemberOfActiveGroup || isAdminOfActiveGroup;
-
-    const [{ data: qs }, { data: myGoals }, { data: ms }] = await Promise.all([
-      needsQuestions
-        ? supabase.from("group_questions").select("*").eq("group_id", activeGroupId).order("slot_number")
-        : { data: [] },
-      isActiveMemberOfActiveGroup
-        ? supabase
-            .from("goals")
-            .select("question_slot, goal_text")
-            .eq("group_id", activeGroupId)
-            .eq("user_id", user.id)
-        : { data: [] },
-      isAdminOfActiveGroup
-        ? supabase
-            .from("memberships")
-            .select("id, user_id, role, status, joined_at")
-            .eq("group_id", activeGroupId)
-            .order("joined_at")
-        : { data: [] },
-    ]);
-
-    if (isAdminOfActiveGroup) questions = qs ?? [];
-    if (isActiveMemberOfActiveGroup) {
-      myGoalQuestions = (qs ?? []).map((q) => ({ slot_number: q.slot_number, label_short: q.label_short }));
-      myGoalsBySlot = Object.fromEntries(
-        (myGoals ?? []).map((goal) => [goal.question_slot, goal.goal_text ?? ""])
-      );
-    }
 
     if (isAdminOfActiveGroup) {
+      const [{ data: qs }, { data: ms }] = await Promise.all([
+        supabase
+          .from("group_questions")
+          .select("*")
+          .eq("group_id", activeGroupId)
+          .order("slot_number"),
+        supabase
+          .from("memberships")
+          .select("id, user_id, role, status, joined_at")
+          .eq("group_id", activeGroupId)
+          .order("joined_at"),
+      ]);
+      questions = qs ?? [];
       allMemberships = ms ?? [];
+
       const memberUserIds = allMemberships.map((m) => m.user_id);
       const { data: memberProfiles } = memberUserIds.length
         ? await supabase.from("profiles").select("id, first_name, last_name").in("id", memberUserIds)
@@ -178,6 +156,27 @@ export default async function SettingsPage() {
           userId={user.id}
           groups={visibleActiveGroups}
           activeGroupId={activeGroupId}
+          activeGroupExtra={
+            isAdminOfActiveGroup && activeGroup ? (
+              <>
+                <div className="rounded-xl border border-neutral-200 bg-white p-4">
+                  <p className="text-xs font-semibold text-neutral-500">Group code</p>
+                  <p className="mt-1 font-mono text-2xl tracking-wider">{activeGroup.code}</p>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    Share this with the men you want in the group.
+                  </p>
+                </div>
+                <GroupSettingsForm group={activeGroup} />
+                <GroupMembersSection
+                  currentUserId={user.id}
+                  activeMembers={activeMembers}
+                  pendingMembers={pendingMembers}
+                  otherMembers={otherMembers}
+                  nameFor={nameFor}
+                />
+              </>
+            ) : undefined
+          }
         />
         <HiddenGroupsSection groups={hiddenActiveGroups} />
       </div>
@@ -214,45 +213,27 @@ export default async function SettingsPage() {
         </div>
       )}
 
-      {isActiveMemberOfActiveGroup && activeGroup && myGoalQuestions.length > 0 && (
-        <GoalsForm
-          userId={user.id}
-          groupId={activeGroup.id}
-          questions={myGoalQuestions}
-          initialGoals={myGoalsBySlot}
-        />
-      )}
-
-      <JoinGroupForm />
-      <CreateGroupForm />
-
       {isAdminOfActiveGroup && activeGroup && (
-        <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-neutral-700">
-            Group Settings — {activeGroup.name}
-          </h2>
-          <div className="rounded-xl border border-neutral-200 bg-white p-4">
-            <p className="text-xs font-semibold text-neutral-500">Group code</p>
-            <p className="mt-1 font-mono text-2xl tracking-wider">{activeGroup.code}</p>
-            <p className="mt-1 text-xs text-neutral-500">
-              Share this with the men you want in the group.
-            </p>
-          </div>
-          <GroupMembersSection
-            currentUserId={user.id}
-            activeMembers={activeMembers}
-            pendingMembers={pendingMembers}
-            otherMembers={otherMembers}
-            nameFor={nameFor}
-          />
-          <GroupSettingsForm group={activeGroup} />
+        <SlideOverPanel label="Weekly Questions" title="Weekly Questions">
           <QuestionsEditor
             key={questions.map((q) => q.id).join("-")}
             groupId={activeGroup.id}
             questions={questions}
           />
-        </div>
+        </SlideOverPanel>
       )}
+
+      <div className="space-y-3">
+        <JoinGroupForm />
+        <CreateGroupForm />
+
+        {isAdminOfActiveGroup && activeGroup && (
+          <div className="mt-2 space-y-2 rounded-xl border border-red-100 bg-white p-4">
+            <h2 className="text-sm font-semibold text-red-600">Deactivate this group</h2>
+            <DeactivateGroupButton groupId={activeGroup.id} isActive={activeGroup.is_active} />
+          </div>
+        )}
+      </div>
 
       {profile?.platform_admin && (
         <PlatformAdminSection

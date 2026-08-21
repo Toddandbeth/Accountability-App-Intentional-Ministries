@@ -10,9 +10,18 @@ interface ActiveGroupSwitcherProps {
   userId: string;
   groups: { id: string; name: string; membershipId: string; isDeactivated?: boolean }[];
   activeGroupId: string | null;
+  // Rendered directly beneath the active group's own row — e.g. its group
+  // code, meeting day, and member list — so that content stays visually
+  // tied to the group it belongs to regardless of list order.
+  activeGroupExtra?: React.ReactNode;
 }
 
-export function ActiveGroupSwitcher({ userId, groups, activeGroupId }: ActiveGroupSwitcherProps) {
+export function ActiveGroupSwitcher({
+  userId,
+  groups,
+  activeGroupId,
+  activeGroupExtra,
+}: ActiveGroupSwitcherProps) {
   const router = useRouter();
   const supabase = createClient();
   const [switching, setSwitching] = useState<string | null>(null);
@@ -47,30 +56,34 @@ export function ActiveGroupSwitcher({ userId, groups, activeGroupId }: ActiveGro
       {groups.map((g) => {
         const isActive = g.id === activeGroupId;
         return (
-          <div
-            key={g.id}
-            className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
-              isActive ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 bg-white"
-            }`}
-          >
-            <button
-              type="button"
-              onClick={() => switchTo(g.id)}
-              disabled={switching === g.id}
-              className="flex flex-1 items-center justify-between text-left disabled:opacity-50"
+          <div key={g.id}>
+            <div
+              className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
+                isActive ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 bg-white"
+              }`}
             >
-              <span>{g.name}</span>
-              {isActive && <span className="text-xs font-semibold text-neutral-500">Active</span>}
-            </button>
-            {g.isDeactivated && (
-              <Link
-                href={`/roster/${g.id}`}
-                className="shrink-0 text-xs font-medium text-neutral-500 underline"
+              <button
+                type="button"
+                onClick={() => switchTo(g.id)}
+                disabled={switching === g.id}
+                className="flex flex-1 items-center justify-between text-left disabled:opacity-50"
               >
-                Roster
-              </Link>
-            )}
-            <HideGroupToggle membershipId={g.membershipId} hidden={false} />
+                <span className={isActive ? "font-semibold" : ""}>{g.name}</span>
+                {isActive && (
+                  <span className="text-xs font-semibold text-neutral-500">Active</span>
+                )}
+              </button>
+              {g.isDeactivated && (
+                <Link
+                  href={`/roster/${g.id}`}
+                  className="shrink-0 text-xs font-medium text-neutral-500 underline"
+                >
+                  Roster
+                </Link>
+              )}
+              <HideGroupToggle membershipId={g.membershipId} hidden={false} />
+            </div>
+            {isActive && activeGroupExtra && <div className="mt-2 space-y-3">{activeGroupExtra}</div>}
           </div>
         );
       })}
