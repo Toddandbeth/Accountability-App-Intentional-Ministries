@@ -43,10 +43,21 @@ export default async function HistoryPage({
 
   // Own historical check-ins remain readable regardless of current
   // membership status in this group, so past/removed groups are looked up
-  // via this narrow RPC rather than a direct groups-table read.
-  const { data: groupInfoData } = await supabase
-    .rpc("get_group_basic_info", { p_group_id: groupId })
-    .single();
+  // via this narrow RPC rather than a direct groups-table read. All three
+  // of these only depend on groupId/user.id, not on each other — checkIns
+  // doesn't actually need groupInfo or weekStart to run, so there's no
+  // reason to wait for those first.
+  const [{ data: groupInfoData }, { data: weekStart }, { data: checkIns }] = await Promise.all([
+    supabase.rpc("get_group_basic_info", { p_group_id: groupId }).single(),
+    supabase.rpc("current_week_start", { p_group_id: groupId }),
+    supabase
+      .from("weekly_check_ins")
+      .select("*")
+      .eq("group_id", groupId)
+      .eq("user_id", user.id)
+      .order("week_start_date", { ascending: false })
+      .limit(HISTORY_WEEKS),
+  ]);
   const groupInfo = groupInfoData as GroupBasicInfo | null;
 
   if (!groupInfo) {
@@ -61,16 +72,6 @@ export default async function HistoryPage({
   }
 
   const isCurrentlyActiveGroup = groupId === profile?.active_group_id;
-
-  const { data: weekStart } = await supabase.rpc("current_week_start", { p_group_id: groupId });
-
-  const { data: checkIns } = await supabase
-    .from("weekly_check_ins")
-    .select("*")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .order("week_start_date", { ascending: false })
-    .limit(HISTORY_WEEKS);
 
   return (
     <div className="space-y-4">

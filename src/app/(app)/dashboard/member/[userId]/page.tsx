@@ -47,24 +47,21 @@ export default async function MemberHistoryPage({
     );
   }
 
-  const { data: memberProfile } = await supabase
-    .from("profiles")
-    .select("first_name, last_name")
-    .eq("id", userId)
-    .single();
+  // Independent of each other — none of these need another's result.
+  const [{ data: memberProfile }, { data: weekStart }, { data: checkIns }] = await Promise.all([
+    supabase.from("profiles").select("first_name, last_name").eq("id", userId).single(),
+    supabase.rpc("current_week_start", { p_group_id: groupId }),
+    supabase
+      .from("weekly_check_ins")
+      .select("*")
+      .eq("group_id", groupId)
+      .eq("user_id", userId)
+      .order("week_start_date", { ascending: false })
+      .limit(HISTORY_WEEKS),
+  ]);
   const name = memberProfile
     ? `${memberProfile.first_name ?? ""} ${memberProfile.last_name ?? ""}`.trim() || "Unnamed"
     : "Unnamed";
-
-  const { data: weekStart } = await supabase.rpc("current_week_start", { p_group_id: groupId });
-
-  const { data: checkIns } = await supabase
-    .from("weekly_check_ins")
-    .select("*")
-    .eq("group_id", groupId)
-    .eq("user_id", userId)
-    .order("week_start_date", { ascending: false })
-    .limit(HISTORY_WEEKS);
 
   return (
     <div className="space-y-4">

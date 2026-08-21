@@ -54,23 +54,23 @@ export default async function CheckInPage() {
     );
   }
 
-  const { data: questions } = await supabase
-    .from("group_questions")
-    .select("*")
-    .eq("group_id", groupId)
-    .order("slot_number");
-  const { data: weekStart } = await supabase.rpc("current_week_start", { p_group_id: groupId });
-  const { data: editable } = await supabase.rpc("is_week_editable", {
-    p_group_id: groupId,
-    p_week_start: weekStart!,
-  });
-  const { data: checkIn } = await supabase
-    .from("weekly_check_ins")
-    .select("*")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .eq("week_start_date", weekStart!)
-    .maybeSingle();
+  // Independent of each other — only editable/checkIn below actually need
+  // weekStart's value.
+  const [{ data: questions }, { data: weekStart }] = await Promise.all([
+    supabase.from("group_questions").select("*").eq("group_id", groupId).order("slot_number"),
+    supabase.rpc("current_week_start", { p_group_id: groupId }),
+  ]);
+
+  const [{ data: editable }, { data: checkIn }] = await Promise.all([
+    supabase.rpc("is_week_editable", { p_group_id: groupId, p_week_start: weekStart! }),
+    supabase
+      .from("weekly_check_ins")
+      .select("*")
+      .eq("group_id", groupId)
+      .eq("user_id", user.id)
+      .eq("week_start_date", weekStart!)
+      .maybeSingle(),
+  ]);
 
   const initialRatings = {
     1: checkIn?.rating_1 ?? null,

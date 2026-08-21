@@ -30,11 +30,14 @@ export default async function SettingsPage() {
   // Any status, not just active — this drives the visible/hidden active
   // list below plus the "past groups" section for removed/inactive
   // memberships, which retain access to their own history but not the
-  // live group.
-  const { data: myMemberships } = await supabase
-    .from("memberships")
-    .select("id, group_id, status, hidden_by_user")
-    .eq("user_id", user.id);
+  // live group. platformSettings doesn't depend on anything above it, so
+  // it's fetched here too rather than waiting until the end of the page.
+  const [{ data: myMemberships }, { data: platformSettings }] = await Promise.all([
+    supabase.from("memberships").select("id, group_id, status, hidden_by_user").eq("user_id", user.id),
+    profile?.platform_admin
+      ? supabase.from("platform_settings").select("resource_link_url, resource_link_label").single()
+      : { data: null },
+  ]);
 
   const myMembershipList = myMemberships ?? [];
 
@@ -91,53 +94,55 @@ export default async function SettingsPage() {
   let myGoalsBySlot: Record<number, string> = {};
 
   if (activeGroupId) {
-    const { data: g } = await supabase.from("groups").select("*").eq("id", activeGroupId).single();
+    // Independent of each other — both only need activeGroupId/user.id.
+    const [{ data: g }, { data: myMembership }] = await Promise.all([
+      supabase.from("groups").select("*").eq("id", activeGroupId).single(),
+      supabase
+        .from("memberships")
+        .select("role, status")
+        .eq("group_id", activeGroupId)
+        .eq("user_id", user.id)
+        .single(),
+    ]);
     activeGroup = g;
-
-    const { data: myMembership } = await supabase
-      .from("memberships")
-      .select("role, status")
-      .eq("group_id", activeGroupId)
-      .eq("user_id", user.id)
-      .single();
     isAdminOfActiveGroup = myMembership?.role === "admin";
     isActiveMemberOfActiveGroup = myMembership?.status === "active";
 
+    // Admins always need the full question rows anyway, so fetch those
+    // once and derive the goals form's slimmer shape from them instead of
+    // running group_questions twice when both flags are true.
+    const needsQuestions = isActiveMemberOfActiveGroup || isAdminOfActiveGroup;
+
+    const [{ data: qs }, { data: myGoals }, { data: ms }] = await Promise.all([
+      needsQuestions
+        ? supabase.from("group_questions").select("*").eq("group_id", activeGroupId).order("slot_number")
+        : { data: [] },
+      isActiveMemberOfActiveGroup
+        ? supabase
+            .from("goals")
+            .select("question_slot, goal_text")
+            .eq("group_id", activeGroupId)
+            .eq("user_id", user.id)
+        : { data: [] },
+      isAdminOfActiveGroup
+        ? supabase
+            .from("memberships")
+            .select("id, user_id, role, status, joined_at")
+            .eq("group_id", activeGroupId)
+            .order("joined_at")
+        : { data: [] },
+    ]);
+
+    if (isAdminOfActiveGroup) questions = qs ?? [];
     if (isActiveMemberOfActiveGroup) {
-      const [{ data: qs }, { data: myGoals }] = await Promise.all([
-        supabase
-          .from("group_questions")
-          .select("slot_number, label_short")
-          .eq("group_id", activeGroupId)
-          .order("slot_number"),
-        supabase
-          .from("goals")
-          .select("question_slot, goal_text")
-          .eq("group_id", activeGroupId)
-          .eq("user_id", user.id),
-      ]);
-      myGoalQuestions = qs ?? [];
+      myGoalQuestions = (qs ?? []).map((q) => ({ slot_number: q.slot_number, label_short: q.label_short }));
       myGoalsBySlot = Object.fromEntries(
         (myGoals ?? []).map((goal) => [goal.question_slot, goal.goal_text ?? ""])
       );
     }
 
     if (isAdminOfActiveGroup) {
-      const [{ data: qs }, { data: ms }] = await Promise.all([
-        supabase
-          .from("group_questions")
-          .select("*")
-          .eq("group_id", activeGroupId)
-          .order("slot_number"),
-        supabase
-          .from("memberships")
-          .select("id, user_id, role, status, joined_at")
-          .eq("group_id", activeGroupId)
-          .order("joined_at"),
-      ]);
-      questions = qs ?? [];
       allMemberships = ms ?? [];
-
       const memberUserIds = allMemberships.map((m) => m.user_id);
       const { data: memberProfiles } = memberUserIds.length
         ? await supabase.from("profiles").select("id, first_name, last_name").in("id", memberUserIds)
@@ -156,13 +161,6 @@ export default async function SettingsPage() {
   const otherMembers = allMemberships.filter(
     (m) => m.status !== "active" && m.status !== "pending"
   );
-
-  const { data: platformSettings } = profile?.platform_admin
-    ? await supabase
-        .from("platform_settings")
-        .select("resource_link_url, resource_link_label")
-        .single()
-    : { data: null };
 
   return (
     <div className="space-y-4">

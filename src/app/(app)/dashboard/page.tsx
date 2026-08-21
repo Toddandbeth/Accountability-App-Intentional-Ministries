@@ -53,51 +53,46 @@ export default async function DashboardPage() {
     );
   }
 
-  const { data: weekStart } = await supabase.rpc("current_week_start", { p_group_id: groupId });
-  const { data: questions } = await supabase
-    .from("group_questions")
-    .select("slot_number, label_short")
-    .eq("group_id", groupId)
-    .order("slot_number");
-  const { data: platformSettings } = await supabase
-    .from("platform_settings")
-    .select("resource_link_url, resource_link_label")
-    .single();
-
-  const { data: myMembership } = await supabase
-    .from("memberships")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
+  // These five only depend on groupId/user.id (already known), not on each
+  // other, so they run as one batch of round-trips instead of five in a row.
+  const [
+    { data: weekStart },
+    { data: questions },
+    { data: platformSettings },
+    { data: myMembership },
+    { data: memberships },
+  ] = await Promise.all([
+    supabase.rpc("current_week_start", { p_group_id: groupId }),
+    supabase
+      .from("group_questions")
+      .select("slot_number, label_short")
+      .eq("group_id", groupId)
+      .order("slot_number"),
+    supabase.from("platform_settings").select("resource_link_url, resource_link_label").single(),
+    supabase.from("memberships").select("role").eq("group_id", groupId).eq("user_id", user.id).single(),
+    supabase
+      .from("memberships")
+      .select("user_id, role, joined_at")
+      .eq("group_id", groupId)
+      .eq("status", "active")
+      .order("joined_at"),
+  ]);
   const isAdmin = myMembership?.role === "admin";
-
-  const { data: memberships } = await supabase
-    .from("memberships")
-    .select("user_id, role, joined_at")
-    .eq("group_id", groupId)
-    .eq("status", "active")
-    .order("joined_at");
-
   const userIds = memberships?.map((m) => m.user_id) ?? [];
 
-  const { data: profiles } = userIds.length
-    ? await supabase.from("profiles").select("*").in("id", userIds)
-    : { data: [] };
-
-  const { data: checkIns } = await supabase
-    .from("weekly_check_ins")
-    .select("*")
-    .eq("group_id", groupId)
-    .eq("week_start_date", weekStart!);
-
-  const { data: goals } = userIds.length
-    ? await supabase
-        .from("goals")
-        .select("user_id, question_slot, goal_text")
-        .eq("group_id", groupId)
-        .in("user_id", userIds)
-    : { data: [] };
+  // Same idea: these three only depend on userIds/weekStart from above, not
+  // on each other.
+  const [{ data: profiles }, { data: checkIns }, { data: goals }] = await Promise.all([
+    userIds.length ? supabase.from("profiles").select("*").in("id", userIds) : { data: [] },
+    supabase.from("weekly_check_ins").select("*").eq("group_id", groupId).eq("week_start_date", weekStart!),
+    userIds.length
+      ? supabase
+          .from("goals")
+          .select("user_id, question_slot, goal_text")
+          .eq("group_id", groupId)
+          .in("user_id", userIds)
+      : { data: [] },
+  ]);
 
   const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
   const checkInByUserId = new Map((checkIns ?? []).map((c) => [c.user_id, c]));
