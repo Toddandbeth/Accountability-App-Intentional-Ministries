@@ -5,7 +5,10 @@
 // duplicate). Server-only: RESEND_API_KEY must never reach the client.
 
 const RESEND_API_URL = "https://api.resend.com/emails";
-const FROM_ADDRESS = "Intentional Ministries <app@intentionalministries.com>";
+// Resend verified mail.intentionalministries.com (a subdomain), not the
+// bare root domain — sending from the root domain bounces with a 550
+// "domain is not verified" even though the root domain itself resolves.
+const FROM_ADDRESS = "Intentional Ministries <app@mail.intentionalministries.com>";
 
 interface WelcomeEmailParams {
   to: string;
