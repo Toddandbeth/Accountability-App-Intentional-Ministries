@@ -276,10 +276,11 @@ Completed and sent to Claude Code:
 - Round 8 — no-short-weeks meeting day change formula
 - App deployed live via GitHub + Vercel; performance fixes (loading states, parallelized data fetching) identified and implemented after initial live testing revealed sluggish navigation
 - Round 9 — Settings reorganization and goals relocated to check-in screen; deployed live
-- Round 10 — typography scale, brand colors applied throughout, dashboard icon change, several visual polish fixes, initials-circle color customization, active-group reordering, group renaming restored, and the Round 9 "all groups should display together" bug fixed
+- Round 10 — typography scale, brand colors, visual polish, dashboard row redesign, active-group logic, group renaming, Round 9 group-list bug fix
+- Login/signup screen now shows the actual IM_-_Main.png brand logo (vertical lockup) above the form — the real brand asset files arrived and were placed in public/brand/, superseding the earlier placeholder plan
 
 Pending, not yet sent:
-- None
+- Round 11 — follow-up from Round 10 live testing: unresponsive bottom nav icons (real bug), inconsistent icon sizing, font scale not fully verified as applied, and active/inactive contrast fix in Your Groups
 
 ## Round 2: Fixes and Additions from Real Testing
 
@@ -321,8 +322,11 @@ Brand assets — finalized, ready whenever this round is scheduled:
 - Primary color: #253551 (main navy blue) — use for headers, primary buttons, the app icon background
 - Accent color: #7993c2 (periwinkle blue) — use for highlights and accents, distinct enough from the primary to stand out without clashing
 - Secondary/neutral color: #ccd0d6 (light grey-blue) — use for backgrounds, dividers, and secondary or inactive states
-- App icon: a rounded-square navy background with a white serif "I" mark — already sized and shaped correctly for use as a PWA home screen icon with minimal adjustment
-- Also available: a square (non-rounded) version of the same mark, a reversed version (white background, navy mark), and a horizontal lockup with "INTENTIONAL MINISTRIES" wordmark for use in places needing the full name, not just the icon mark
+- App icon: a rounded-square navy background with a white serif "I" mark (files: IM_-_App_Icon_-_blue_with_white.png and IM_-_App_Icon_-_white_with_blue.png) — use for the PWA home screen icon and browser tab icon
+- Login/first screen: use IM_-_Main.png specifically — the vertical logo with the square "I" mark, "INTENTIONAL" in blue, "MINISTRIES" in grey beneath. This is a correction — an earlier instruction specified the horizontal version for this spot, which was not what was actually wanted.
+- IM_-_Horizontal_-_blue_with_grey.png — the horizontal lockup, available for other places needing the full wordmark where a wide format fits better than the vertical Main logo (exact placement not yet specified beyond login)
+- IM_-_logo_-_blue.png — the square (non-rounded) mark alone, available as needed
+- Actual image files were sent directly in chat and needed to be manually added to the project folder before Claude Code could use them — this was missed during Round 10 and corrected afterward (see Round 11 follow-up)
 
 ## Round 3: Bottom Nav Fix, Platform Admin, and Group Update
 
@@ -572,6 +576,31 @@ Use the finalized palette from earlier: #253551 (primary navy — headers, prima
 ### Dashboard row sizing (see also the collapsed row spec in Screens, above)
 
 As font sizes increase per the new type scale, the 5 rating boxes need proportionally more room. First name text has been removed from the collapsed dashboard row entirely (see the updated Screens section) to make room — identification relies on the photo/initials circle, with full name shown immediately on tap into the expanded row. Confirmed acceptable given these are small, familiar groups.
+
+## Round 11: Follow-Up From Round 10 Live Testing
+
+Real use of Round 10 surfaced a few things — one real bug, one inconsistency, one thing that may not have fully applied, and one styling fix, plus confirmation of what's working well.
+
+### Bottom nav icons unresponsive — real bug, priority fix
+
+Bottom nav icons (Home, Dashboard, Settings) are now requiring multiple taps — 5 to 7 in some cases — before they register, even though the app otherwise feels faster since the performance fixes. This is a real functional bug, not a styling issue, and should be treated as a priority alongside the visual items below.
+
+### Dashboard tab icon sizing inconsistency
+
+The new gauge-style Dashboard icon itself looks fine, but it renders visibly smaller than the Home and Settings icons next to it. All three bottom nav icons should be sized consistently with each other.
+
+### Font size — verify what actually changed
+
+The typography scale from Round 10 doesn't seem to have made a noticeable difference in several places — text still feels too small in spots. Worth asking Claude Code to explicitly confirm what was actually changed against the Round 10 spec (the four-tier scale and the "never smaller than the Group Update label" floor), rather than assuming it was fully applied.
+
+### Settings — Your Groups active/inactive contrast is backwards
+
+In the "Your Groups" list, the currently active group's highlight color is too close to the surrounding background, so it doesn't stand out — while the non-active group (shown in white) visually pops more than the active one, which is backwards. Fix: use the periwinkle accent color (#7993c2) for the active group's highlight so it clearly stands out against both the white inactive group card and the grey page background behind it.
+
+### Confirmed working well, no changes needed
+
+- The overall dashboard redesign from Round 10, including the "Intentional Ministries" prominent button/box and the larger buttons generally
+- Group renaming — implemented as an inline option within the group's own section (not a separate box), which works well and wasn't explicitly specified this way beforehand — this placement is approved as final
 
 
 
