@@ -88,6 +88,7 @@ export const RPC = {
   currentWeekStart: "current_week_start",
   isWeekEditable: "is_week_editable",
   weekDeadline: "week_deadline",
+  currentMeetingDate: "current_meeting_date",
   postGroupUpdate: "post_group_update",
   markGroupUpdateSeen: "mark_group_update_seen",
   getPlatformStats: "get_platform_stats",

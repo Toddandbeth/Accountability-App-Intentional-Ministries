@@ -8,6 +8,8 @@ import { AutoShrinkTitle } from "@/components/AutoShrinkTitle";
 import type { GroupQuestion } from "@/lib/supabase/types";
 
 interface CheckInFormProps {
+  groupName: string;
+  meetingDate: string | null;
   userId: string;
   groupId: string;
   weekStart: string;
@@ -24,6 +26,8 @@ const PRAYER_REQUEST_MAX_LENGTH = 500;
 const SHOW_DESCRIPTIONS_KEY = "showQuestionDescriptions";
 
 export function CheckInForm({
+  groupName,
+  meetingDate,
   userId,
   groupId,
   weekStart,
@@ -115,21 +119,28 @@ export function CheckInForm({
 
   return (
     <div className="space-y-4">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="text-[17px] text-neutral-500">{groupName}</p>
+          <h1 className="text-2xl font-bold text-brand-navy">This Week&apos;s Check-In</h1>
+          {meetingDate && (
+            <p className="text-[17px] text-neutral-500">Meeting: {meetingDate}</p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={toggleDescriptions}
+          className="mt-1 shrink-0 text-[17px] text-neutral-500 underline"
+        >
+          {showDescriptions ? "Hide descriptions" : "Show descriptions"}
+        </button>
+      </div>
+
       {!editable && (
         <div className="rounded-lg bg-neutral-200 px-3 py-2 text-[17px] text-neutral-700">
           This week is locked. You can no longer edit your answers.
         </div>
       )}
-
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={toggleDescriptions}
-          className="text-[17px] text-neutral-500 underline"
-        >
-          {showDescriptions ? "Hide descriptions" : "Show descriptions"}
-        </button>
-      </div>
 
       {questions.map((q) => (
         <div key={q.id} className="rounded-xl border border-neutral-200 bg-white p-4">

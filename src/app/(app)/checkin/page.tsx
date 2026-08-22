@@ -7,6 +7,7 @@ import { CheckInForm } from "@/components/CheckInForm";
 import { OnboardingExplainer } from "@/components/OnboardingExplainer";
 import { PendingApprovalScreen } from "@/components/PendingApprovalScreen";
 import { sendWelcomeEmail } from "@/lib/welcomeEmail";
+import { formatMeetingDate } from "@/lib/dates";
 import type { GroupBasicInfo } from "@/lib/supabase/types";
 
 export default async function CheckInPage() {
@@ -122,15 +123,17 @@ export default async function CheckInPage() {
 
   // Independent of each other — only editable/checkIn below actually need
   // weekStart's value.
-  const [{ data: questions }, { data: weekStart }, { data: myGoals }] = await Promise.all([
-    supabase.from("group_questions").select("*").eq("group_id", groupId).order("slot_number"),
-    supabase.rpc("current_week_start", { p_group_id: groupId }),
-    supabase
-      .from("goals")
-      .select("question_slot, goal_text")
-      .eq("group_id", groupId)
-      .eq("user_id", user.id),
-  ]);
+  const [{ data: questions }, { data: weekStart }, { data: meetingDate }, { data: myGoals }] =
+    await Promise.all([
+      supabase.from("group_questions").select("*").eq("group_id", groupId).order("slot_number"),
+      supabase.rpc("current_week_start", { p_group_id: groupId }),
+      supabase.rpc("current_meeting_date", { p_group_id: groupId }),
+      supabase
+        .from("goals")
+        .select("question_slot, goal_text")
+        .eq("group_id", groupId)
+        .eq("user_id", user.id),
+    ]);
 
   const [{ data: editable }, { data: checkIn }] = await Promise.all([
     supabase.rpc("is_week_editable", { p_group_id: groupId, p_week_start: weekStart! }),
@@ -160,28 +163,18 @@ export default async function CheckInPage() {
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-[17px] text-neutral-500">{group?.name}</p>
-          <h1 className="text-2xl font-bold text-brand-navy">This week&apos;s check-in</h1>
-        </div>
-        <Link href="/history" className="mt-1 text-[17px] text-neutral-500 underline">
-          Your history
-        </Link>
-      </div>
-
-      <CheckInForm
-        userId={user.id}
-        groupId={groupId}
-        weekStart={weekStart!}
-        questions={questions ?? []}
-        initialRatings={initialRatings}
-        initialPrayerRequest={checkIn?.prayer_request ?? ""}
-        editable={Boolean(editable)}
-        goalsQuestions={goalsQuestions}
-        initialGoals={initialGoals}
-      />
-    </div>
+    <CheckInForm
+      groupName={group.name}
+      meetingDate={meetingDate ? formatMeetingDate(meetingDate) : null}
+      userId={user.id}
+      groupId={groupId}
+      weekStart={weekStart!}
+      questions={questions ?? []}
+      initialRatings={initialRatings}
+      initialPrayerRequest={checkIn?.prayer_request ?? ""}
+      editable={Boolean(editable)}
+      goalsQuestions={goalsQuestions}
+      initialGoals={initialGoals}
+    />
   );
 }

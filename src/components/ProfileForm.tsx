@@ -54,6 +54,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4">
       <h2 className="text-xl font-semibold text-brand-navy">Your profile</h2>
 
+      <p className="text-[17px] text-neutral-500">{profile.email}</p>
+
       <AvatarUpload
         userId={profile.id}
         name={displayName}

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { DashboardRow } from "@/components/DashboardRow";
 import { DashboardColumnHeaders } from "@/components/DashboardColumnHeaders";
 import { GroupUpdateBar } from "@/components/GroupUpdateBar";
+import { formatMeetingDate } from "@/lib/dates";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -56,12 +57,14 @@ export default async function DashboardPage() {
   // other, so they run as one batch of round-trips instead of five in a row.
   const [
     { data: weekStart },
+    { data: meetingDate },
     { data: questions },
     { data: platformSettings },
     { data: myMembership },
     { data: memberships },
   ] = await Promise.all([
     supabase.rpc("current_week_start", { p_group_id: groupId }),
+    supabase.rpc("current_meeting_date", { p_group_id: groupId }),
     supabase
       .from("group_questions")
       .select("slot_number, short_label")
@@ -113,7 +116,9 @@ export default async function DashboardPage() {
       <div>
         <p className="text-[17px] text-neutral-500">{group.name}</p>
         <h1 className="text-2xl font-bold text-brand-navy">Dashboard</h1>
-        <p className="text-[17px] text-neutral-500">Week of {weekStart}</p>
+        {meetingDate && (
+          <p className="text-[17px] text-neutral-500">Meeting: {formatMeetingDate(meetingDate)}</p>
+        )}
       </div>
 
       <GroupUpdateBar

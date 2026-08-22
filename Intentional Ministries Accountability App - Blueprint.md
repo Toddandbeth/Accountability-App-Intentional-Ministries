@@ -282,10 +282,8 @@ Completed and sent to Claude Code:
 - Round 12 — onboarding content fixes, pending-approval waiting screen, login screen redesign, goals button restyle, Help & Tips navigation shell (structure had gaps — see Round 13), and three bug fixes (password reset regression, plus-addressed email confirmation, PWA home screen icon); deployed live
 - Font sizing — final exact pixel values (24/20/17/12px) applied app-wide and deployed live, including confirming the 12px utility tier fits real content
 - Round 13 — rating button size fix, auto-shrink question titles, Help & Tips structural fix, editable category labels; deployed live
-- Round 14 (everything except email branding) — "Helper text" renamed to "Full Description" in the question editor; confirmation-link sign-in fixed (the login screen now detects the session a confirmation link just established and carries the user straight into onboarding instead of leaving them looking logged out); the "Check your email" screen now stays in the navy theme instead of dropping to white; auto-shrink's ceiling capped at 17px so a short title like "God" can no longer render noticeably larger than its neighbors (verified: the 5 defaults now span 14.5–17px, down from 14.5–19.5px); Weekly Questions moved to sit between Meeting Day and Members, with its label color fixed to #253551 (verified via computed style). All deployed live except the email branding piece, which is still waiting on the Resend domain to finish verifying.
-
-Pending, not yet sent:
-- Round 14 email branding — confirmation/reset emails still send from Supabase's generic address; waiting on the Resend domain verification before wiring up a branded "from" address (and, per the Round 14 note, unlocking the Round 6 welcome email at the same time)
+- Round 14 — question editor label rename, confirmation email redirect fix, theme consistency on the check-email screen, auto-shrink max-size cap, Weekly Questions repositioning/color fix; Resend email provider set up and connected (app@mail.intentionalministries.com — Resend required a subdomain, not the root domain), fixing confirmation/reset email branding and unlocking the welcome email feature; deployed live
+- Round 15 — meeting date now shown instead of week-start date on dashboard and check-in (new current_meeting_date RPC, migration 0015); personal history moved from a standalone check-in link to the dashboard row-tap pattern — tapping your own row now shows full uncapped history (the old 10-week cap on /history is gone entirely), other members stay capped at 6 weeks as before; check-in header simplified to group name, "This Week's Check-In" in proper title case, the meeting date, and the descriptions toggle, all in one row (logic lifted into CheckInForm so the toggle and the question cards share one state); email moved out of the Settings page header into Profile, next to the rest of the profile info; bottom nav icons now show a filled version on the active tab and an outline version otherwise; sign-up screen brought into the same navy theme as login/check-your-email; full Help & Tips content uploaded for all 6 topics. The welcome email button turned out to already read its label from the platform admin's resource field correctly — what looked like a hardcoded "This month's challenge" was actually a hardcoded value in Claude Code's own one-off test script sent to verify deliverability, not a bug in the app itself; no code change was needed there. Also fixed in passing: the nav tap/long-press bug — root-caused to iOS Safari's default long-press link callout and tap-delay ambiguity (not a hit-target or z-index issue), closed with touch-action: manipulation and -webkit-touch-callout: none on the nav links. Deployed live; needs migration 0015 applied.
 
 ## Round 2: Fixes and Additions from Real Testing
 
@@ -704,7 +702,116 @@ Round 13's per-title auto-shrink is working correctly in principle, but revealed
 
 Content review is still in progress; will be included in a future round once finalized, not this one.
 
-## Handoff Note for Claude Code
+## Round 15: Meeting Date Display, Personal History Relocation, Header Cleanup, Nav Diagnostics, and Help & Tips Content
+
+### Help & Tips — upload the actual content now
+
+The navigation structure for Help & Tips was already built in Round 13 (six topics shown directly in Settings, each opening its own full page). This round adds the actual written content for all six pages — final, ready to upload as-is.
+
+**1. Adding this to your home screen**
+
+Why do this? This app lives on the web, not in the App Store — but you can still make it act like a normal app on your phone, with its own icon on your home screen and no browser bar cluttering the screen. It only takes a minute.
+
+On iPhone (Safari):
+1. Open the app link in Safari (this only works in Safari, not Chrome or another browser, on iPhone).
+2. Tap the Share button — the square with an arrow pointing up, usually at the bottom of the screen.
+3. Scroll down and tap "Add to Home Screen."
+4. You can rename it if you want, then tap "Add" in the top right.
+5. The app icon now appears on your home screen. Tap it any time to open the app full-screen, just like a downloaded app.
+
+On Android (Chrome):
+1. Open the app link in Chrome.
+2. Tap the three-dot menu in the top right corner.
+3. Tap "Add to Home screen," then confirm.
+4. The app icon now appears on your home screen.
+
+One-time only. You won't need to do this again — the icon stays on your home screen like any other app.
+
+**2. Joining or starting a group**
+
+Every group has its own unique code.
+
+If you're joining a group: get the code from your leader and enter it when you sign up or from Settings. You'll then see a waiting screen while your leader reviews your request. Once approved, the app automatically takes you into the group — no need to check back or refresh anything.
+
+If you're starting a group: you're instantly placed in it as leader, with your own unique code generated automatically. From there, it's your job to share that code with your guys. As they enter it, you'll see their requests waiting for your approval in Settings, under Your Groups — approve each one individually to let them in.
+
+Belonging to more than one group? You can join or lead as many groups as you want. Switch between them anytime from Settings — whichever one you select becomes your active group, and everything you see (check-in, dashboard, history) reflects that group until you switch again.
+
+**3. Your weekly rhythm**
+
+The basics: each week, you rate yourself in 5 categories and can optionally add a Prayer & Life Update. This resets fresh every week, tied to your group's meeting day.
+
+When does it lock? Your answers stay fully editable — change them as many times as you want — right up until 11:59 PM on your group's meeting day. After that, the week locks permanently. No exceptions, so make sure you've checked in before your group meets.
+
+What if I miss a week? No problem. A missed week just shows as blank on the dashboard — it doesn't carry over anything from the week before, and it doesn't affect future weeks. Just check in again next week.
+
+Can I look back at past weeks? Yes, two ways: your own personal history shows every week you've ever submitted, so you can spot your own patterns over time. You can also tap any group member's name on the dashboard to see their last 6 weeks — this works both ways, so others can do the same for you. It's meant to help the group actually follow up with each other, not just glance at the current week and move on.
+
+If your leader changes the meeting day: your current week's deadline may shift as a result, but it will never create a short, rushed week — the app guarantees you'll always have at least a full week's notice.
+
+**4. Prayer & Life Updates and reactions**
+
+What is it? A short optional space on your weekly check-in — not just for prayer requests, but for anything you want your group to know: a struggle, a praise, an answered prayer, a life update. Whatever fits that week.
+
+Who sees it? Your whole group, not just the leader. Tap into any member's name on the dashboard to read theirs, right alongside their name and phone number.
+
+Reactions. Once you've read someone's update, you can tap a reaction — a heart, praying hands, a thumbs up, or raised hands for celebration. These are simple and anonymous: your group sees that someone reacted, not who specifically did. It's a quiet way to let a guy know he's been seen, without needing to type a message.
+
+One thing to know: your update locks along with the rest of your answers once the week's deadline passes — but reactions stay open even after that, so someone can still respond to your update the next day or later, once it's sitting in history.
+
+**5. Goals**
+
+What are goals, and how are they different from the weekly check-in? Your 5 weekly ratings reset every week. Goals don't — they're something you set once for each category (like "consistent quiet times" or "memorize 10 scriptures") and they stay exactly as you left them until you decide to change them yourself. No weekly reset, no deadline.
+
+Where do I find mine? On the check-in screen, right below your Prayer & Life Update, tap "Manage Your Goals" to open and edit them. It stays closed by default every time you open check-in, so it doesn't clutter your normal weekly routine — just tap it open whenever you actually want to look at or update them.
+
+Can I see other people's goals? Yes — tap any group member's name on the dashboard, and you'll find a button to view their current goals in each category, right alongside their prayer updates and history.
+
+**6. For leaders**
+
+Group Update. A collapsible bar at the top of your dashboard where you can post a short message and an optional link to your group — use it for reminders, encouragement, or anything you want your guys to see before they check in. There's also a permanent ministry-wide link here, managed by Intentional Ministries, separate from anything you control.
+
+Managing members. In Settings, under Your Groups, you'll find your group's member list. New join requests appear at the top — approve them to let someone in, or leave a request pending if you're not ready yet. You can also remove an active member at any time.
+
+Changing your meeting day. You can update this anytime in Settings. The app will always guarantee at least a full week's notice before the change takes effect — you'll never end up with a short, rushed week as a result of changing the schedule.
+
+Renaming your group. Tap the edit option next to your group's name under Your Groups.
+
+Deactivating a group. When a group has truly run its course, you can deactivate it from Settings — you'll be asked to confirm first, since this isn't reversible. Once deactivated, every past member (even someone previously removed) can still see who was part of the group, though not each other's private answers — a simple, lasting record of who walked through it together.
+
+### Welcome email button should pull its label text, not just its link, from the platform admin's resource field
+
+The platform admin's ministry-wide resource box already has an editable title/label (recently changed to "Discipleship Resources") and an editable URL, both already working correctly for the in-app display. Confirmed working correctly. The welcome email's matching button currently pulls the URL from this same source, but its visible text is hardcoded ("This month's challenge") rather than reading from the same title field. Fix: the welcome email button should use both the label text and the URL from the platform admin's resource field, so editing it in one place updates both the app and the email consistently. No new field needed — connect the email template to the field that already exists.
+
+### Sign-up (create account) screen should stay in theme
+
+The navy branding was fixed on the login screen and the "check your email" waiting screen, but the sign-up screen itself — reached by tapping "Create a new account" from login, where you enter name, email, and password — was missed and still renders as a plain grey/white screen. Fix: bring this screen into the same navy theme as the rest of the auth flow (login → sign-up → check your email → welcome), so the whole sequence feels consistent rather than breaking theme partway through.
+
+### Meeting date, not week-start date
+
+Both the dashboard and the check-in screen currently show the current week's week_start_date (e.g. "Week of 8/17") — this is backward-looking and not useful to a user, since nobody needs to know when the cycle began. Replace it on both screens with the current week's actual meeting/lock date instead — the same date the app already calculates internally to enforce the deadline (see Weekly Cycle Rules above), just surfaced to the user. Label it something like "Meeting: [date]" rather than "Week of [date]." This should always read as the upcoming or current meeting, never a date in the past.
+
+### Personal history moves from a standalone link to the dashboard, unified with the existing member-tap pattern
+
+Remove the standalone "Your History" link from the top of the check-in screen entirely. Instead, extend the existing dashboard row-tap pattern: when a user taps their own row on the dashboard (the same gesture used to view any other member), the history button shows their complete, uncapped personal history instead of the standard 6-week cap that applies when viewing another member's row. Same interaction everywhere, different depth depending on whose row it is — your own row unlocks everything, any other member's row stays capped at 6 weeks as already built.
+
+### Check-in screen header cleanup
+
+With the "Your History" link removed per above, the check-in header simplifies to four elements in a row: group name, "This Week's Check-In" as the page title (proper title case, consistent with the Page Title tier of the type scale), the meeting date (see above), and the "Hide Descriptions" toggle — position at the top is fine, no strong preference beyond that. No branding/logo repeated here — keep it clean, consistent with the login screen being the one strong branding moment in the app.
+
+### Settings — move email out of the page header
+
+The user's email currently sits awkwardly at the top of the Settings page, disconnected from the rest of their profile information (photo, name, phone) shown just below in the Profile section. Move it into Profile alongside those, and let the Settings page header simply read "Settings."
+
+### Bottom nav icons — outline vs. filled states
+
+Bottom nav icons currently look flat and don't clearly communicate which tab is active. Standard, well-established fix: inactive tabs use a lighter outline-style version of their icon; the currently active tab uses a solid/filled version of the same icon, colored with the navy or periwinkle accent. This gives a persistent, always-visible signal of the current screen, rather than only a brief flash of feedback on tap.
+
+### Bottom nav responsiveness — diagnostic investigation needed
+
+A new, more specific symptom beyond the earlier "needs multiple taps" report: sometimes a nav button doesn't respond to a normal tap at all, and holding it down instead opens a different, unintended screen. This suggests a touch-event handling issue, not just a performance issue — worth real diagnostic investigation into how the nav icons are set up as tap targets, rather than another guess-and-check styling fix.
+
+
 
 This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Round 4 is urgent and should be sent and completed first. Round 5 and Round 6 can follow in either order, but Round 5 is the smaller, more self-contained of the two.
 

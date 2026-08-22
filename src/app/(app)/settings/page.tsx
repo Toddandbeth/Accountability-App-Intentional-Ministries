@@ -149,8 +149,6 @@ export default async function SettingsPage() {
     <div className="space-y-4">
       <h1 className="text-2xl font-bold text-brand-navy">Settings</h1>
 
-      <p className="text-[17px] text-neutral-500">{profile?.email}</p>
-
       {profile && <ProfileForm profile={profile} />}
 
       <HelpAndTipsSection />

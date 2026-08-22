@@ -3,8 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { WeekHistoryRow } from "@/components/WeekHistoryRow";
 import type { GroupBasicInfo } from "@/lib/supabase/types";
 
-const HISTORY_WEEKS = 10;
-
 export default async function HistoryPage({
   searchParams,
 }: {
@@ -55,8 +53,7 @@ export default async function HistoryPage({
       .select("*")
       .eq("group_id", groupId)
       .eq("user_id", user.id)
-      .order("week_start_date", { ascending: false })
-      .limit(HISTORY_WEEKS),
+      .order("week_start_date", { ascending: false }),
   ]);
   const groupInfo = groupInfoData as GroupBasicInfo | null;
 
@@ -77,10 +74,10 @@ export default async function HistoryPage({
     <div className="space-y-4">
       <div>
         <Link
-          href={isCurrentlyActiveGroup ? "/checkin" : "/settings"}
+          href={isCurrentlyActiveGroup ? "/dashboard" : "/settings"}
           className="text-[17px] text-neutral-500 underline"
         >
-          {isCurrentlyActiveGroup ? "← Back to check-in" : "← Back to settings"}
+          {isCurrentlyActiveGroup ? "← Back to dashboard" : "← Back to settings"}
         </Link>
         <h1 className="text-2xl font-bold text-brand-navy">Your history</h1>
         <p className="text-[17px] text-neutral-500">{groupInfo.name}</p>

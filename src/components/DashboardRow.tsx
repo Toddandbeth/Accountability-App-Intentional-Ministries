@@ -109,14 +109,12 @@ export function DashboardRow({
               {prayerRequest?.trim() ? prayerRequest : "No update submitted this week."}
             </p>
             <ReactionButtons checkInId={checkInId} counts={reactionCounts} />
-            {!isYou && (
-              <Link
-                href={`/dashboard/member/${userId}`}
-                className="mt-2 inline-block text-[17px] font-medium text-brand-periwinkle underline"
-              >
-                6-Week History
-              </Link>
-            )}
+            <Link
+              href={isYou ? "/history" : `/dashboard/member/${userId}`}
+              className="mt-2 inline-block text-[17px] font-medium text-brand-periwinkle underline"
+            >
+              {isYou ? "Your Full History" : "6-Week History"}
+            </Link>
           </div>
 
           <div className="h-px bg-neutral-200" />
