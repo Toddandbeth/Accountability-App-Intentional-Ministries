@@ -6,6 +6,7 @@ import { JoinGroupForm } from "@/components/JoinGroupForm";
 import { CheckInForm } from "@/components/CheckInForm";
 import { OnboardingExplainer } from "@/components/OnboardingExplainer";
 import { PendingApprovalScreen } from "@/components/PendingApprovalScreen";
+import { sendWelcomeEmail } from "@/lib/welcomeEmail";
 import type { GroupBasicInfo } from "@/lib/supabase/types";
 
 export default async function CheckInPage() {
@@ -21,6 +22,38 @@ export default async function CheckInPage() {
     .select("*")
     .eq("id", user.id)
     .single();
+
+  // Fires once, the first time a confirmed user lands here — whether or
+  // not they've joined a group yet. The update's WHERE ... IS NULL claims
+  // the send atomically, so a race between two rapid requests still only
+  // sends once; a failed Resend call is a rare miss rather than a retry.
+  if (profile && !profile.welcome_email_sent_at) {
+    const { data: claimed } = await supabase
+      .from("profiles")
+      .update({ welcome_email_sent_at: new Date().toISOString() })
+      .eq("id", user.id)
+      .is("welcome_email_sent_at", null)
+      .select("id")
+      .maybeSingle();
+
+    if (claimed) {
+      const { data: platformSettings } = await supabase
+        .from("platform_settings")
+        .select("resource_link_url, resource_link_label")
+        .single();
+
+      try {
+        await sendWelcomeEmail({
+          to: profile.email ?? user.email ?? "",
+          firstName: profile.first_name ?? "",
+          ministryLinkUrl: platformSettings?.resource_link_url ?? null,
+          ministryLinkLabel: platformSettings?.resource_link_label ?? null,
+        });
+      } catch (err) {
+        console.error("Failed to send welcome email", err);
+      }
+    }
+  }
 
   if (!profile?.active_group_id) {
     // A pending join request takes over this whole screen — the member

@@ -17,6 +17,7 @@ export interface Profile {
   active_group_id: string | null;
   platform_admin: boolean;
   created_at: string;
+  welcome_email_sent_at: string | null;
 }
 
 export interface Group {
