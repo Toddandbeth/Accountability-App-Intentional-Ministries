@@ -178,6 +178,13 @@ export default async function SettingsPage() {
             </p>
           </div>
           <GroupSettingsForm group={activeGroup} />
+          <SlideOverPanel label="Weekly Questions" title="Weekly Questions">
+            <QuestionsEditor
+              key={questions.map((q) => q.id).join("-")}
+              groupId={activeGroup.id}
+              questions={questions}
+            />
+          </SlideOverPanel>
           <GroupMembersSection
             currentUserId={user.id}
             activeMembers={activeMembers}
@@ -218,16 +225,6 @@ export default async function SettingsPage() {
             ))}
           </div>
         </div>
-      )}
-
-      {isAdminOfActiveGroup && activeGroup && (
-        <SlideOverPanel label="Weekly Questions" title="Weekly Questions">
-          <QuestionsEditor
-            key={questions.map((q) => q.id).join("-")}
-            groupId={activeGroup.id}
-            questions={questions}
-          />
-        </SlideOverPanel>
       )}
 
       <div className="space-y-3">

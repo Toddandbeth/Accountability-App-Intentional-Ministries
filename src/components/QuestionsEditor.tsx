@@ -104,7 +104,7 @@ export function QuestionsEditor({ groupId, questions }: QuestionsEditorProps) {
             onChange={(e) => update(d.id, "label_short", e.target.value)}
             className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
           />
-          <label className="block text-[17px] font-medium text-neutral-500">Helper text</label>
+          <label className="block text-[17px] font-medium text-neutral-500">Full Description</label>
           <textarea
             value={d.label_description}
             onChange={(e) => update(d.id, "label_description", e.target.value)}

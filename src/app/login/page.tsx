@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,39 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    // A confirmation-email link lands here (the app's Site URL) with the
+    // new session's tokens in the URL, which the client picks up and
+    // signs in automatically — without this, that session just sits there
+    // silently while the plain login form keeps showing, so the user has
+    // to log in again from scratch even though they're already confirmed
+    // and signed in. Catches both orderings: a session already established
+    // by the time this effect runs, or one that lands moments later.
+    let cancelled = false;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!cancelled && session) {
+        router.push("/checkin");
+        router.refresh();
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        router.push("/checkin");
+        router.refresh();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- supabase client is a stable singleton
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

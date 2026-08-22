@@ -281,10 +281,11 @@ Completed and sent to Claude Code:
 - Round 11 — sent to Claude Code (unresponsive nav icons, icon sizing, font scale verification, active/inactive contrast fix)
 - Round 12 — onboarding content fixes, pending-approval waiting screen, login screen redesign, goals button restyle, Help & Tips navigation shell (structure had gaps — see Round 13), and three bug fixes (password reset regression, plus-addressed email confirmation, PWA home screen icon); deployed live
 - Font sizing — final exact pixel values (24/20/17/12px) applied app-wide and deployed live, including confirming the 12px utility tier fits real content
-- Round 13 (structure complete, content pending) — rating selector buttons resized to 15px so labels fit; question titles auto-shrink per-title to stay on one line (verified: 19.5px down to 14.5px across the 5 defaults, all fit); Help & Tips corrected — "How This Works" removed entirely, the 6 topics now show directly on Settings in its old spot, and tapping one opens its detail one level deep with a direct back-to-Settings arrow (verified live via the DOM, since the topic bodies themselves are still "Content coming soon." placeholders — see below); short_label added as its own editable field in the question editor, dashboard columns and the goals view now read from it instead of deriving from the title. Needs a migration applied (supabase/migrations/0012_round13_short_label.sql) before short_label will show real values instead of blank.
+- Round 13 — rating button size fix, auto-shrink question titles, Help & Tips structural fix, editable category labels; deployed live
+- Round 14 (everything except email branding) — "Helper text" renamed to "Full Description" in the question editor; confirmation-link sign-in fixed (the login screen now detects the session a confirmation link just established and carries the user straight into onboarding instead of leaving them looking logged out); the "Check your email" screen now stays in the navy theme instead of dropping to white; auto-shrink's ceiling capped at 17px so a short title like "God" can no longer render noticeably larger than its neighbors (verified: the 5 defaults now span 14.5–17px, down from 14.5–19.5px); Weekly Questions moved to sit between Meeting Day and Members, with its label color fixed to #253551 (verified via computed style). All deployed live except the email branding piece, which is still waiting on the Resend domain to finish verifying.
 
 Pending, not yet sent:
-- Help & Tips actual topic content — the "Help and Tips - Content Plan" reference document mentioned in Round 13 wasn't available in the project folder; the 6 detail screens are structurally correct but still show "Content coming soon." placeholders until that content is provided
+- Round 14 email branding — confirmation/reset emails still send from Supabase's generic address; waiting on the Resend domain verification before wiring up a branded "from" address (and, per the Round 14 note, unlocking the Round 6 welcome email at the same time)
 
 ## Round 2: Fixes and Additions from Real Testing
 
@@ -675,6 +676,36 @@ Round 12's written spec did not clearly capture the actual intent, and what got 
 
 Currently, the one-word labels used for dashboard column headers and the category names shown in the goals view (God, Family, Work, Personal, Purity) are tied to fixed slot position, not to any editable field — confirmed through testing that editing a question's title or description does not affect these labels. Fix: add a third editable field to the question editor (short_label, see Data Model above) specifically for this one-word label, alongside the existing title and description fields. Dashboard column headers and the goals view should read from this new field instead of any hardcoded slot-based default. Default values remain God/Family/Work/Personal/Purity, but are now genuinely editable like everything else in the question editor.
 
+## Round 14: Question Editor Labeling, Email Branding, Auto-Shrink Cap, and Settings Placement
 
+### Question editor field label
+
+Rename "Helper text" to "Full Description" in the question editor — same field, clearer label.
+
+### Confirmation email branding and redirect
+
+- The email confirmation link currently sends users back to the login screen after confirming, requiring them to log in again from scratch. Fix: confirming should log the user in automatically and carry them into onboarding, not dump them back at login looking like nothing happened.
+- The confirmation email itself currently comes from a generic Supabase address, which looks jarring against the Intentional Ministries branding a user just saw on the login screen. This connects directly to the still-unresolved welcome email feature from Round 6, which has been on hold waiting for an email provider (e.g. Resend) — setting that up now would solve both problems at once: a properly branded "from" address for confirmation and password reset emails, and unlocking the welcome email feature that's been paused this whole time. Worth doing together rather than solving the branding piece in isolation and revisiting the provider question again later.
+
+### "Check your email" screen should stay in theme
+
+Currently, this screen reverts to a plain white background after the navy-themed login screen, breaking visual continuity. Fix: keep this screen in the same navy theme as login, rather than switching to white.
+
+### Auto-shrink cap for question titles
+
+Round 13's per-title auto-shrink is working correctly in principle, but revealed a new issue: short titles that don't need to shrink at all (specifically "God — My Daily Walk with God," the shortest of the 5) render at the algorithm's uncapped maximum size, looking dramatically larger than its neighbors even though each title is individually "correct" for its own length. Fix: cap the maximum size the auto-shrink range is allowed to reach, so even a short title can't render noticeably bigger than the others — the goal is visual consistency across all 5 titles, not just each one individually fitting on one line.
+
+### Weekly Questions placement and styling in Settings
+
+- Move the Weekly Questions entry to sit directly after Meeting Day and before Members, so it reads as part of the core group-configuration cluster (code, meeting day, questions) rather than appearing attached to or part of the Members section below it.
+- Fix its text color, which currently renders black instead of the main navy blue (#253551 — not the periwinkle accent, #7993c2) used by other major buttons/links in Settings — should match.
+
+### Help & Tips content — not part of this round
+
+Content review is still in progress; will be included in a future round once finalized, not this one.
+
+## Handoff Note for Claude Code
 
 This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Round 4 is urgent and should be sent and completed first. Round 5 and Round 6 can follow in either order, but Round 5 is the smaller, more self-contained of the two.
+
+

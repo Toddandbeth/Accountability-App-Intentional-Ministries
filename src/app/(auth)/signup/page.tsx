@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -44,12 +45,26 @@ export default function SignupPage() {
   }
 
   if (pendingConfirmation) {
+    // A fixed full-bleed overlay rather than relying on the shared
+    // (auth)/layout.tsx background — that layout stays light for the
+    // signup form itself, but this state should carry the same navy
+    // treatment as /login rather than breaking continuity right after it.
     return (
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-brand-navy">Check your email</h1>
-        <p className="mt-2 text-[17px] text-neutral-600">
-          We sent a confirmation link to {email}. Follow it to finish creating your account.
-        </p>
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-brand-navy px-4 py-8">
+        <Image
+          src="/brand/IM_-_Main_-_white.png"
+          alt="Intentional Ministries"
+          width={1076}
+          height={917}
+          priority
+          className="mb-8 h-auto w-64"
+        />
+        <div className="w-full max-w-sm space-y-2 rounded-xl bg-white p-6 text-center">
+          <h1 className="text-2xl font-bold text-brand-navy">Check your email</h1>
+          <p className="text-[17px] text-neutral-600">
+            We sent a confirmation link to {email}. Follow it to finish creating your account.
+          </p>
+        </div>
       </div>
     );
   }
