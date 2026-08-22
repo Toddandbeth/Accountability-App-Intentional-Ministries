@@ -277,11 +277,14 @@ Completed and sent to Claude Code:
 - App deployed live via GitHub + Vercel; performance fixes (loading states, parallelized data fetching) identified and implemented after initial live testing revealed sluggish navigation
 - Round 9 — Settings reorganization and goals relocated to check-in screen; deployed live
 - Round 10 — typography scale, brand colors, visual polish, dashboard row redesign, active-group logic, group renaming, Round 9 group-list bug fix
-- Login/signup screen now shows the actual IM_-_Main.png brand logo (vertical lockup) above the form — the real brand asset files arrived and were placed in public/brand/, superseding the earlier placeholder plan
-- Round 11 — fixed the real bottom-nav-unresponsive bug (a leftover full-screen overlay from the Weekly Questions slide-over was intercepting taps even while closed/off-screen), evened up the dashboard gauge icon's size against the other two nav icons, fixed several places where the Round 10 type scale hadn't actually been applied (all four auth screens were still on the old smaller title size, several section headers were missing the brand color), and switched the active group's Settings highlight to the periwinkle accent so it actually stands out
+- Round 11 — unresponsive nav icons, icon sizing, font scale verification, active/inactive contrast fix
+- Round 12 (mostly complete) — onboarding content fixes, pending-approval waiting screen (auto-advances on approval via the existing active-group trigger, no realtime infra needed), login screen redesign (own route, navy background, large logo, periwinkle button), goals button restyle and rename, Help & Tips navigation shell (6 topics, two-level back nav — content itself still pending, see below). Of the three bug reports: email confirmation was actually a Supabase dashboard setting that had reverted off (fixed and verified live — a fresh signup now correctly requires confirmation); password reset was almost certainly a missing production URL in Supabase's redirect allowlist (added, not independently re-verified since it needs clicking a real emailed link); the PWA home screen icon fix is blocked on the two dedicated IM_-_App_Icon_ files, not yet sent (the other 5 brand files sent earlier don't include a proper full-bleed icon asset)
+- Font size baseline-and-preview exercise — pixel sizes of current text reported, temporary /font-preview page built with 3 candidate scales (A/current, B/modest, C/larger) for viewing on phone via local dev server — awaiting a decision before applying anything app-wide
 
 Pending, not yet sent:
-- None
+- Ongoing, separate: Help & Tips actual written content for all 6 topics (see "Help and Tips - Content Plan" reference file) — structure is in Round 12, content is not
+- PWA home screen icon — needs the two IM_-_App_Icon_ files
+- Round 10 — typography scale, brand colors applied throughout, dashboard icon change, several visual polish fixes, initials-circle color customization, active-group reordering, and a fix for a Round 9 bug (all groups should display together under "Your Groups")
 
 ## Round 2: Fixes and Additions from Real Testing
 
@@ -603,6 +606,41 @@ In the "Your Groups" list, the currently active group's highlight color is too c
 - The overall dashboard redesign from Round 10, including the "Intentional Ministries" prominent button/box and the larger buttons generally
 - Group renaming — implemented as an inline option within the group's own section (not a separate box), which works well and wasn't explicitly specified this way beforehand — this placement is approved as final
 
+## Round 12: Onboarding Content, Login Screen, Goals Button, Help & Tips Structure, and Bug Reports
 
+### Onboarding page fixes
+
+- Fix stale wording: currently says something implying only the leader can see responses — this is outdated since Round 5 opened visibility to everyone in the group. Correct it to reflect that everyone in the group can see responses.
+- Rename the "when things reset" section heading to "Weekly Reset"
+- Replace the group code explanation with this exact, finalized wording — do not alter beyond fixing genuine spelling or grammar errors: "Every group is assigned a unique code. If you're joining a group, get the code from your leader — you'll then wait for approval from Settings before you can see the group. If you're starting a group, you're instantly placed in it as leader, with your own code generated automatically. You will need to share this code with your group members."
+- Add a brief pointer noting that more detail is always available in Settings, reinforcing that onboarding is the short version and Settings is the full explanation (consistent with the pattern established in Round 6)
+- Add the horizontal logo (IM_-_Horizontal_-_blue_with_grey.png) as a banner at the top of this page specifically
+
+### Pending-approval waiting screen
+
+After a member enters a group code, they land on a waiting screen that clearly indicates their request is pending approval. This screen should automatically advance to the home screen the moment the leader approves them, without requiring the member to refresh or reopen the app. If the member closes the app instead of waiting, no separate confirmation is needed — simply landing on the home screen (rather than the waiting screen) the next time they open the app is itself the confirmation they've been approved.
+
+### Login screen redesign
+
+- Navy (#253551) background
+- Large, prominent logo — use IM_-_Main.png (vertical logo, square "I" mark, "INTENTIONAL" in blue, "MINISTRIES" in grey), sized meaningfully larger than its current small rendering
+- No "Accountability App" or similar descriptive subtitle — the logo stands alone; by the time someone reaches this screen they already know what the app is
+- Primary "Sign in" button uses the periwinkle accent color (#7993c2), consistent with periwinkle being reserved for primary/standout actions elsewhere in the app
+
+### Goals button on check-in screen
+
+Rename from "Your Goals" to "Manage Your Goals." Current periwinkle border-only styling isn't providing enough visual contrast — change to a solid fill (periwinkle or navy, whichever tests with better contrast against the surrounding check-in screen) rather than an outline.
+
+### Help & Tips section — structure only, content tracked separately
+
+Add a new "Help & Tips" row in Settings, using the same slide-over navigation pattern as Weekly Questions. Inside, six tappable topic buttons, each opening its own dedicated, fully scrollable page (back arrow returns to the Help & Tips list; another back arrow returns to Settings). Full normal reading font size on these pages — no shrinking just because it's help content. The six topics: adding the app to your home screen, joining or starting a group, your weekly rhythm, Prayer & Life Updates and reactions, goals, and a leader-specific topic. The actual written content for each topic is being drafted separately (see the "Help and Tips - Content Plan" reference document) and is not part of this round — build the navigation shell and structure now; content gets filled in afterward.
+
+### Bugs to fix
+
+- Password reset regression: this was tested and confirmed working earlier, but is now broken. Investigate as a regression — something in a recent round likely broke previously-working functionality, rather than starting the investigation from scratch.
+- Email confirmation not sending for plus-addressed emails (e.g. you+leader2@gmail.com after you@gmail.com was already confirmed): likely cause is email normalization treating the plus-addressed variant as the same identity as the already-confirmed base address, so no new confirmation email is triggered. Needs investigation specifically around how email confirmation handles plus-addressing.
+- PWA home screen icon shows a generic green checkmark instead of the actual logo when the app is saved to a phone's home screen. Configure IM_-_App_Icon_-_blue_with_white.png (or white_with_blue, whichever tests better) as the proper home screen icon.
+
+## Handoff Note for Claude Code
 
 This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Round 4 is urgent and should be sent and completed first. Round 5 and Round 6 can follow in either order, but Round 5 is the smaller, more self-contained of the two.

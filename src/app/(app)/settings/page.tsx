@@ -12,6 +12,7 @@ import { QuestionsEditor } from "@/components/QuestionsEditor";
 import { GroupMembersSection } from "@/components/GroupMembersSection";
 import { PlatformAdminSection } from "@/components/PlatformAdminSection";
 import { SlideOverPanel } from "@/components/SlideOverPanel";
+import { HelpAndTipsPanel } from "@/components/HelpAndTipsPanel";
 import { DeactivateGroupButton } from "@/components/DeactivateGroupButton";
 import type { GroupBasicInfo } from "@/lib/supabase/types";
 
@@ -154,6 +155,8 @@ export default async function SettingsPage() {
       {profile && <ProfileForm profile={profile} />}
 
       <HowThisWorksSection />
+
+      <HelpAndTipsPanel />
 
       <div className="space-y-2">
         <h2 className="text-base font-semibold text-brand-navy">Your groups</h2>

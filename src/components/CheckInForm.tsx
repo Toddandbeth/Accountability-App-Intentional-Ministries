@@ -181,9 +181,9 @@ export function CheckInForm({
       <button
         type="button"
         onClick={() => setGoalsOpen((v) => !v)}
-        className="w-full rounded-xl border-2 border-brand-periwinkle bg-brand-periwinkle/10 p-4 text-left text-sm font-bold text-brand-navy"
+        className="w-full rounded-xl bg-brand-periwinkle p-4 text-left text-sm font-bold text-white"
       >
-        {goalsOpen ? "Hide your goals" : "Your goals"}
+        {goalsOpen ? "Hide Your Goals" : "Manage Your Goals"}
       </button>
       {goalsOpen && (
         <GoalsForm

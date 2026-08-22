@@ -1,9 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { JoinGroupForm } from "@/components/JoinGroupForm";
 import { CheckInForm } from "@/components/CheckInForm";
 import { OnboardingExplainer } from "@/components/OnboardingExplainer";
+import { PendingApprovalScreen } from "@/components/PendingApprovalScreen";
+import type { GroupBasicInfo } from "@/lib/supabase/types";
 
 export default async function CheckInPage() {
   const supabase = await createClient();
@@ -20,8 +23,38 @@ export default async function CheckInPage() {
     .single();
 
   if (!profile?.active_group_id) {
+    // A pending join request takes over this whole screen — the member
+    // stays here (auto-updating, no refresh needed) until a leader
+    // approves them, rather than seeing the general welcome/onboarding
+    // content mixed in with a request that's already in flight.
+    const { data: pendingMembership } = await supabase
+      .from("memberships")
+      .select("group_id")
+      .eq("user_id", user.id)
+      .eq("status", "pending")
+      .order("joined_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (pendingMembership) {
+      const { data: groupInfo } = await supabase
+        .rpc("get_group_basic_info", { p_group_id: pendingMembership.group_id })
+        .single();
+      return (
+        <PendingApprovalScreen groupName={(groupInfo as GroupBasicInfo | null)?.name ?? "your group"} />
+      );
+    }
+
     return (
       <div className="space-y-4">
+        <Image
+          src="/brand/IM_-_Horizontal_-_blue_with_grey.png"
+          alt="Intentional Ministries"
+          width={1567}
+          height={503}
+          priority
+          className="h-auto w-full max-w-xs"
+        />
         <h1 className="text-2xl font-bold text-brand-navy">Welcome</h1>
         <p className="text-sm text-neutral-600">
           You&apos;re not part of a group yet. Create one, or join one with a code.

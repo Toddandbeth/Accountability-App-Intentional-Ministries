@@ -10,7 +10,11 @@ const PUBLIC_PATHS = ["/login", "/signup"];
 // established client-side (PKCE code exchange) after this middleware has
 // already run, so there's no reliable server-side auth state to gate on
 // here anyway.
-const ALWAYS_ACCESSIBLE_PATHS = ["/forgot-password", "/reset-password"];
+// /font-preview is a TEMPORARY dev-only page (see src/app/font-preview) for
+// viewing candidate type sizes on a phone via the local dev server without
+// needing to log in there separately. Remove this line when that route is
+// deleted.
+const ALWAYS_ACCESSIBLE_PATHS = ["/forgot-password", "/reset-password", "/font-preview"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
