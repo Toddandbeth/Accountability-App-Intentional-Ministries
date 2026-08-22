@@ -52,6 +52,7 @@ export interface Membership {
 export interface GroupQuestion {
   id: string;
   group_id: string;
+  short_label: string;
   label_short: string;
   label_description: string;
   slot_number: number; // 1-5

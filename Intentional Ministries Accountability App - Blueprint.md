@@ -108,6 +108,7 @@ Exactly one Membership per user per group. This table is the only source of trut
 
 GroupQuestion (the 5 questions for a specific group)
 - group
+- short_label (one word — e.g. "God," "Family" — used for dashboard column headers and category labels in the goals view, see Round 13)
 - label_short (the question title)
 - label_description (the helper text explaining what it's asking)
 - slot_number (1–5, controls order)
@@ -277,12 +278,13 @@ Completed and sent to Claude Code:
 - App deployed live via GitHub + Vercel; performance fixes (loading states, parallelized data fetching) identified and implemented after initial live testing revealed sluggish navigation
 - Round 9 — Settings reorganization and goals relocated to check-in screen; deployed live
 - Round 10 — typography scale, brand colors, visual polish, dashboard row redesign, active-group logic, group renaming, Round 9 group-list bug fix
-- Round 11 — unresponsive nav icons, icon sizing, font scale verification, active/inactive contrast fix
-- Round 12 (complete) — onboarding content fixes, pending-approval waiting screen (auto-advances on approval via the existing active-group trigger, no realtime infra needed), login screen redesign (own route, navy background, large logo, periwinkle button), goals button restyle and rename, Help & Tips navigation shell (6 topics, two-level back nav — content itself still pending, see below). Of the three bug reports: email confirmation was actually a Supabase dashboard setting that had reverted off (fixed and verified live — a fresh signup now correctly requires confirmation); password reset was almost certainly a missing production URL in Supabase's redirect allowlist (added, not independently re-verified since it needs clicking a real emailed link); the PWA home screen icon is fixed — the navy IM_-_App_Icon_-_blue_with_white.png was regenerated into all 5 required sizes and deployed, confirmed live serving the real icon (no white-background variant exists, so only the navy version is used)
-- Finalized typography scale applied app-wide — 24px page titles, 20px section headers, 17px body text/buttons/labels, 12px utility text (rating box labels, column headers, avatar initials). Deployed live; the 12px rating labels were verified against real content ("Strong") in both the dashboard and history views with no overflow. The temporary /font-preview comparison page used to pick these sizes has been removed.
+- Round 11 — sent to Claude Code (unresponsive nav icons, icon sizing, font scale verification, active/inactive contrast fix)
+- Round 12 — onboarding content fixes, pending-approval waiting screen, login screen redesign, goals button restyle, Help & Tips navigation shell (structure had gaps — see Round 13), and three bug fixes (password reset regression, plus-addressed email confirmation, PWA home screen icon); deployed live
+- Font sizing — final exact pixel values (24/20/17/12px) applied app-wide and deployed live, including confirming the 12px utility tier fits real content
+- Round 13 (structure complete, content pending) — rating selector buttons resized to 15px so labels fit; question titles auto-shrink per-title to stay on one line (verified: 19.5px down to 14.5px across the 5 defaults, all fit); Help & Tips corrected — "How This Works" removed entirely, the 6 topics now show directly on Settings in its old spot, and tapping one opens its detail one level deep with a direct back-to-Settings arrow (verified live via the DOM, since the topic bodies themselves are still "Content coming soon." placeholders — see below); short_label added as its own editable field in the question editor, dashboard columns and the goals view now read from it instead of deriving from the title. Needs a migration applied (supabase/migrations/0012_round13_short_label.sql) before short_label will show real values instead of blank.
 
 Pending, not yet sent:
-- Ongoing, separate: Help & Tips actual written content for all 6 topics (see "Help and Tips - Content Plan" reference file) — structure is in Round 12, content is not
+- Help & Tips actual topic content — the "Help and Tips - Content Plan" reference document mentioned in Round 13 wasn't available in the project folder; the 6 detail screens are structurally correct but still show "Content coming soon." placeholders until that content is provided
 
 ## Round 2: Fixes and Additions from Real Testing
 
@@ -552,7 +554,18 @@ A member's own goal-editing form currently lives in Settings. This moves to the 
 
 This round applies the finalized brand colors from earlier (see the "Held for a later, dedicated styling round" note — that round is now happening) across the whole app in one pass, alongside a defined typography scale and a list of specific visual fixes found in real use.
 
-### Typography scale — one consistent system, four tiers
+### Typography scale — final, exact values (supersedes the earlier relative version below)
+
+The original version of this section (kept just below for history) described sizes relatively — "at least as big as the Group Update label" — which proved too ambiguous across two earlier rounds and didn't get applied consistently. This is now replaced with an explicit, audited, real-device-tested scale. Apply these exact pixel values everywhere, with no exceptions unless a specific element genuinely can't fit one (see the utility tier note below):
+
+- Page titles (e.g. "Dashboard," "Settings"): 24px, bold
+- Section headers (e.g. "Your Groups," "Group Update," "How This Works"): 20px
+- Body text, buttons, and all standard interactive labels (check-in questions, prayer updates, general reading text, the "Group Update" label itself): 17px — chosen deliberately to match iOS's own native body text default, since the app is used almost entirely on iPhones and should feel consistent with the rest of the phone
+- Utility text — dashboard rating box labels (Strong/Good/Okay/Weak/Help), dashboard column headers, avatar initials: 12px. This tier is deliberately kept smaller than the others because these elements have limited physical space (e.g. rating box labels) — but before finalizing, actually test the rating boxes at whatever size the surrounding layout changes push them to. If 12px genuinely doesn't fit once real label text (like "HELP") is rendered inside, report back with options (shrink label wording, widen the box, or accept 11px on that specific element only) rather than shipping something visually broken.
+
+This scale was determined by first auditing the actual current pixel sizes in the live app, then building a temporary side-by-side preview (16px vs 17px body text) viewed on a real phone before deciding — 17px was chosen as a genuine preference match to iOS's platform default, not a guess.
+
+### Typography scale — original version, superseded above, kept for history
 
 Currently there's no clearly defined type scale, and some text (the expanded history view, the "How It Works" description in Settings) is uncomfortably small. Define and apply consistently everywhere:
 
@@ -639,6 +652,29 @@ Add a new "Help & Tips" row in Settings, using the same slide-over navigation pa
 - Email confirmation not sending for plus-addressed emails (e.g. you+leader2@gmail.com after you@gmail.com was already confirmed): likely cause is email normalization treating the plus-addressed variant as the same identity as the already-confirmed base address, so no new confirmation email is triggered. Needs investigation specifically around how email confirmation handles plus-addressing.
 - PWA home screen icon shows a generic green checkmark instead of the actual logo when the app is saved to a phone's home screen. Configure IM_-_App_Icon_-_blue_with_white.png (or white_with_blue, whichever tests better) as the proper home screen icon.
 
-## Handoff Note for Claude Code
+## Round 13: Font Overflow Fixes, Question Title Wrapping, Help & Tips Correction, Editable Category Labels
+
+### Rating selector buttons — dedicated size exception
+
+The 5-way rating selector buttons on the check-in screen (Strong/Good/Okay/Weak/Help) are a narrow, fixed-width layout — five buttons across one row — and don't have room for the standard 17px button text; words like "Strong" touch or overflow the edges. This is a deliberate, documented exception to the standard type scale, not a scale-wide change: reduce specifically these five buttons to approximately 15px, adjusted until the longest label ("Strong") fits comfortably without touching the button edges.
+
+### Question titles — auto-shrink to fit one line
+
+Category titles on the check-in screen (e.g. "God — My Daily Walk with God," "Family — Loving and Leading My Family") should never wrap to a second line. Rather than picking one smaller fixed size for all five titles (which would unnecessarily shrink short titles that already fit fine), implement auto-shrink-to-fit: each title's font size reduces dynamically, only as much as needed, to stay on one line — short titles render at full size, longer ones shrink slightly on their own.
+
+### Help & Tips — correction to Round 12's implementation
+
+Round 12's written spec did not clearly capture the actual intent, and what got built reflects that gap — not a build error. Correct structure, replacing what's there now:
+
+- "How This Works" is removed entirely, not left in place alongside the new content.
+- In its exact former spot on the Settings page, show the 6 Help & Tips topics directly, as their own visible entries right on the Settings page — not hidden behind an intermermediate "Help & Tips" tap-through screen.
+- Tapping any of the 6 topics slides over to its own dedicated detail page — one level of navigation deep, not two. Back arrow returns directly to Settings.
+- Content for each of the 6 topics is already fully written — see the "Help and Tips - Content Plan" reference document.
+
+### Editable one-word category labels
+
+Currently, the one-word labels used for dashboard column headers and the category names shown in the goals view (God, Family, Work, Personal, Purity) are tied to fixed slot position, not to any editable field — confirmed through testing that editing a question's title or description does not affect these labels. Fix: add a third editable field to the question editor (short_label, see Data Model above) specifically for this one-word label, alongside the existing title and description fields. Dashboard column headers and the goals view should read from this new field instead of any hardcoded slot-based default. Default values remain God/Family/Work/Personal/Purity, but are now genuinely editable like everything else in the question editor.
+
+
 
 This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Round 4 is urgent and should be sent and completed first. Round 5 and Round 6 can follow in either order, but Round 5 is the smaller, more self-contained of the two.

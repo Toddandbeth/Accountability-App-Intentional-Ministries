@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { DashboardRow } from "@/components/DashboardRow";
 import { DashboardColumnHeaders } from "@/components/DashboardColumnHeaders";
 import { GroupUpdateBar } from "@/components/GroupUpdateBar";
-import { shortColumnLabel } from "@/lib/questions";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -65,7 +64,7 @@ export default async function DashboardPage() {
     supabase.rpc("current_week_start", { p_group_id: groupId }),
     supabase
       .from("group_questions")
-      .select("slot_number, label_short")
+      .select("slot_number, short_label")
       .eq("group_id", groupId)
       .order("slot_number"),
     supabase.from("platform_settings").select("resource_link_url, resource_link_label").single(),
@@ -106,7 +105,7 @@ export default async function DashboardPage() {
 
   const columnLabels = [1, 2, 3, 4, 5].map((slot) => {
     const q = questions?.find((q) => q.slot_number === slot);
-    return q ? shortColumnLabel(q.label_short) : "";
+    return q?.short_label ?? "";
   });
 
   return (

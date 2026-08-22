@@ -9,7 +9,7 @@ const GOAL_TEXT_MAX_LENGTH = 250;
 interface GoalsFormProps {
   userId: string;
   groupId: string;
-  questions: { slot_number: number; label_short: string }[];
+  questions: { slot_number: number; short_label: string }[];
   initialGoals: Record<number, string>;
 }
 
@@ -68,7 +68,7 @@ export function GoalsForm({ userId, groupId, questions, initialGoals }: GoalsFor
           key={q.slot_number}
           className="space-y-1 rounded-lg border border-neutral-200 bg-neutral-50 p-3"
         >
-          <label className="block text-[17px] font-bold text-brand-navy">{q.label_short}</label>
+          <label className="block text-[17px] font-bold text-brand-navy">{q.short_label}</label>
           <input
             type="text"
             value={drafts[q.slot_number] ?? ""}

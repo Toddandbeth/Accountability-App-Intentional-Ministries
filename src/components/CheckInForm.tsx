@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { RatingButtonRow } from "@/components/RatingButtonRow";
 import { GoalsForm } from "@/components/GoalsForm";
+import { AutoShrinkTitle } from "@/components/AutoShrinkTitle";
 import type { GroupQuestion } from "@/lib/supabase/types";
 
 interface CheckInFormProps {
@@ -14,7 +15,7 @@ interface CheckInFormProps {
   initialRatings: Record<number, number | null>;
   initialPrayerRequest: string;
   editable: boolean;
-  goalsQuestions: { slot_number: number; label_short: string }[];
+  goalsQuestions: { slot_number: number; short_label: string }[];
   initialGoals: Record<number, string>;
 }
 
@@ -132,7 +133,7 @@ export function CheckInForm({
 
       {questions.map((q) => (
         <div key={q.id} className="rounded-xl border border-neutral-200 bg-white p-4">
-          <h3 className="text-xl font-semibold text-brand-navy">{q.label_short}</h3>
+          <AutoShrinkTitle text={q.label_short} className="font-semibold text-brand-navy" />
           {showDescriptions && (
             <p className="mt-1 text-[17px] text-neutral-500">{q.label_description}</p>
           )}

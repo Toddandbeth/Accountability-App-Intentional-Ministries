@@ -120,7 +120,7 @@ export default async function CheckInPage() {
 
   const goalsQuestions = (questions ?? []).map((q) => ({
     slot_number: q.slot_number,
-    label_short: q.label_short,
+    short_label: q.short_label,
   }));
   const initialGoals = Object.fromEntries(
     (myGoals ?? []).map((g) => [g.question_slot, g.goal_text ?? ""])

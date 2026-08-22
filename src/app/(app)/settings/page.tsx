@@ -7,14 +7,13 @@ import { JoinGroupForm } from "@/components/JoinGroupForm";
 import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { ProfileForm } from "@/components/ProfileForm";
 import { GroupSettingsForm } from "@/components/GroupSettingsForm";
-import { HowThisWorksSection } from "@/components/HowThisWorksSection";
 import { QuestionsEditor } from "@/components/QuestionsEditor";
 import { GroupMembersSection } from "@/components/GroupMembersSection";
 import { PlatformAdminSection } from "@/components/PlatformAdminSection";
 import { SlideOverPanel } from "@/components/SlideOverPanel";
-import { HelpAndTipsPanel } from "@/components/HelpAndTipsPanel";
+import { HelpAndTipsSection } from "@/components/HelpAndTipsSection";
 import { DeactivateGroupButton } from "@/components/DeactivateGroupButton";
-import type { GroupBasicInfo } from "@/lib/supabase/types";
+import type { GroupBasicInfo, GroupQuestion } from "@/lib/supabase/types";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -93,7 +92,7 @@ export default async function SettingsPage() {
   // administers that group.
   let activeGroup = null;
   let isAdminOfActiveGroup = false;
-  let questions: { id: string; group_id: string; label_short: string; label_description: string; slot_number: number; goal_enabled: boolean }[] = [];
+  let questions: GroupQuestion[] = [];
   let allMemberships: { id: string; user_id: string; role: string; status: string; joined_at: string }[] = [];
   let profileById = new Map<string, { first_name: string | null; last_name: string | null }>();
 
@@ -154,9 +153,7 @@ export default async function SettingsPage() {
 
       {profile && <ProfileForm profile={profile} />}
 
-      <HowThisWorksSection />
-
-      <HelpAndTipsPanel />
+      <HelpAndTipsSection />
 
       <div className="space-y-2">
         <h2 className="text-xl font-semibold text-brand-navy">Your groups</h2>

@@ -15,13 +15,18 @@ export function QuestionsEditor({ groupId, questions }: QuestionsEditorProps) {
   const supabase = createClient();
 
   const [drafts, setDrafts] = useState(
-    questions.map((q) => ({ id: q.id, label_short: q.label_short, label_description: q.label_description }))
+    questions.map((q) => ({
+      id: q.id,
+      short_label: q.short_label,
+      label_short: q.label_short,
+      label_description: q.label_description,
+    }))
   );
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function update(id: string, field: "label_short" | "label_description", value: string) {
+  function update(id: string, field: "short_label" | "label_short" | "label_description", value: string) {
     setDrafts((prev) => prev.map((d) => (d.id === id ? { ...d, [field]: value } : d)));
   }
 
@@ -33,7 +38,11 @@ export function QuestionsEditor({ groupId, questions }: QuestionsEditorProps) {
       drafts.map((d) =>
         supabase
           .from("group_questions")
-          .update({ label_short: d.label_short, label_description: d.label_description })
+          .update({
+            short_label: d.short_label,
+            label_short: d.label_short,
+            label_description: d.label_description,
+          })
           .eq("id", d.id)
       )
     );
@@ -79,6 +88,15 @@ export function QuestionsEditor({ groupId, questions }: QuestionsEditorProps) {
 
       {drafts.map((d, i) => (
         <div key={d.id} className="space-y-1 border-t border-neutral-100 pt-3 first:border-0 first:pt-0">
+          <label className="block text-[17px] font-medium text-neutral-500">
+            Question {i + 1} one-word label
+          </label>
+          <input
+            type="text"
+            value={d.short_label}
+            onChange={(e) => update(d.id, "short_label", e.target.value)}
+            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
+          />
           <label className="block text-[17px] font-medium text-neutral-500">Question {i + 1} title</label>
           <input
             type="text"
