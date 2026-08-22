@@ -55,7 +55,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
         />
 
         <input
@@ -64,26 +64,26 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
         />
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-[17px] text-red-600">{error}</p>}
 
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-md bg-brand-periwinkle py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="w-full rounded-md bg-brand-periwinkle py-2 text-[17px] font-semibold text-white disabled:opacity-50"
         >
           {submitting ? "Logging in…" : "Log in"}
         </button>
 
-        <p className="text-center text-sm">
+        <p className="text-center text-[17px]">
           <Link href="/forgot-password" className="text-neutral-500 underline">
             Forgot password?
           </Link>
         </p>
 
-        <p className="text-center text-sm text-neutral-600">
+        <p className="text-center text-[17px] text-neutral-600">
           Don&apos;t have an account?{" "}
           <Link href="/signup" className="font-medium text-neutral-900 underline">
             Sign up

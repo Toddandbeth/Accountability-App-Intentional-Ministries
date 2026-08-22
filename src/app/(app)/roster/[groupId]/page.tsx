@@ -24,10 +24,10 @@ export default async function GroupRosterPage({
   if (!groupInfo || groupInfo.is_active) {
     return (
       <div className="space-y-2">
-        <Link href="/settings" className="text-sm text-neutral-500 underline">
+        <Link href="/settings" className="text-[17px] text-neutral-500 underline">
           ← Back to settings
         </Link>
-        <p className="text-sm text-neutral-600">
+        <p className="text-[17px] text-neutral-600">
           That roster isn&apos;t available — the group either isn&apos;t deactivated, or you were
           never a member of it.
         </p>
@@ -41,11 +41,11 @@ export default async function GroupRosterPage({
   return (
     <div className="space-y-4">
       <div>
-        <Link href="/settings" className="text-sm text-neutral-500 underline">
+        <Link href="/settings" className="text-[17px] text-neutral-500 underline">
           ← Back to settings
         </Link>
         <h1 className="text-2xl font-bold text-brand-navy">{groupInfo.name}</h1>
-        <p className="text-sm text-neutral-500">
+        <p className="text-[17px] text-neutral-500">
           This group is no longer active. Here&apos;s who was part of it — no weekly content, just
           who was there.
         </p>
@@ -65,10 +65,10 @@ export default async function GroupRosterPage({
                 initialsColor={m.initials_circle_color}
                 size={32}
               />
-              <span className="text-sm font-medium">
+              <span className="text-[17px] font-medium">
                 {name}
                 {m.user_id === user.id && (
-                  <span className="ml-1 text-sm text-neutral-400">(you)</span>
+                  <span className="ml-1 text-[17px] text-neutral-400">(you)</span>
                 )}
               </span>
             </div>

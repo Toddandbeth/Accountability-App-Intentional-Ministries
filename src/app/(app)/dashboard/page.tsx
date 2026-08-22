@@ -23,7 +23,7 @@ export default async function DashboardPage() {
     return (
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-brand-navy">Dashboard</h1>
-        <p className="text-sm text-neutral-600">
+        <p className="text-[17px] text-neutral-600">
           You&apos;re not part of a group yet.{" "}
           <Link href="/checkin" className="underline">
             Create or join one
@@ -42,7 +42,7 @@ export default async function DashboardPage() {
     return (
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-brand-navy">No longer a member</h1>
-        <p className="text-sm text-neutral-600">
+        <p className="text-[17px] text-neutral-600">
           You&apos;re no longer an active member of that group.{" "}
           <Link href="/settings" className="underline">
             Switch groups or join another
@@ -112,9 +112,9 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-sm text-neutral-500">{group.name}</p>
+        <p className="text-[17px] text-neutral-500">{group.name}</p>
         <h1 className="text-2xl font-bold text-brand-navy">Dashboard</h1>
-        <p className="text-sm text-neutral-500">Week of {weekStart}</p>
+        <p className="text-[17px] text-neutral-500">Week of {weekStart}</p>
       </div>
 
       <GroupUpdateBar

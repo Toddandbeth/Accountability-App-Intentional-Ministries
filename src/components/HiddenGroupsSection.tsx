@@ -17,7 +17,7 @@ export function HiddenGroupsSection({ groups }: HiddenGroupsSectionProps) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="text-sm font-medium text-neutral-500 underline"
+        className="text-[17px] font-medium text-neutral-500 underline"
       >
         {open ? "Hide" : "Show"} Hidden Groups ({groups.length})
       </button>
@@ -26,7 +26,7 @@ export function HiddenGroupsSection({ groups }: HiddenGroupsSectionProps) {
           {groups.map((g) => (
             <div
               key={g.id}
-              className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-white p-3 text-sm text-neutral-500"
+              className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-white p-3 text-[17px] text-neutral-500"
             >
               <span className="flex-1">{g.name}</span>
               <HideGroupToggle membershipId={g.membershipId} hidden />

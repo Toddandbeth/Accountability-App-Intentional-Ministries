@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
     return (
       <div className="text-center">
         <h1 className="text-2xl font-bold text-brand-navy">Password updated</h1>
-        <p className="mt-2 text-sm text-neutral-600">Taking you back to the app…</p>
+        <p className="mt-2 text-[17px] text-neutral-600">Taking you back to the app…</p>
       </div>
     );
   }
@@ -74,10 +74,10 @@ export default function ResetPasswordPage() {
     return (
       <div className="text-center">
         <h1 className="text-2xl font-bold text-brand-navy">Reset link needed</h1>
-        <p className="mt-2 text-sm text-neutral-600">
+        <p className="mt-2 text-[17px] text-neutral-600">
           Open this page from the reset link in your email, or request a new one.
         </p>
-        <Link href="/forgot-password" className="mt-4 inline-block text-sm font-medium underline">
+        <Link href="/forgot-password" className="mt-4 inline-block text-[17px] font-medium underline">
           Request a reset link
         </Link>
       </div>
@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
         onChange={(e) => setPassword(e.target.value)}
         required
         minLength={8}
-        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
       />
       <input
         type="password"
@@ -104,15 +104,15 @@ export default function ResetPasswordPage() {
         onChange={(e) => setConfirmPassword(e.target.value)}
         required
         minLength={8}
-        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
       />
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-[17px] text-red-600">{error}</p>}
 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-md bg-brand-navy py-2 text-sm font-semibold text-white disabled:opacity-50"
+        className="w-full rounded-md bg-brand-navy py-2 text-[17px] font-semibold text-white disabled:opacity-50"
       >
         {submitting ? "Saving…" : "Save new password"}
       </button>

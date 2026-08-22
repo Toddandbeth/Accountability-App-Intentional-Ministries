@@ -150,7 +150,7 @@ export default async function SettingsPage() {
     <div className="space-y-4">
       <h1 className="text-2xl font-bold text-brand-navy">Settings</h1>
 
-      <p className="text-sm text-neutral-500">{profile?.email}</p>
+      <p className="text-[17px] text-neutral-500">{profile?.email}</p>
 
       {profile && <ProfileForm profile={profile} />}
 
@@ -159,7 +159,7 @@ export default async function SettingsPage() {
       <HelpAndTipsPanel />
 
       <div className="space-y-2">
-        <h2 className="text-base font-semibold text-brand-navy">Your groups</h2>
+        <h2 className="text-xl font-semibold text-brand-navy">Your groups</h2>
         <ActiveGroupSwitcher
           userId={user.id}
           groups={visibleActiveGroups}
@@ -172,11 +172,11 @@ export default async function SettingsPage() {
       {isAdminOfActiveGroup && activeGroup && (
         <div className="space-y-2">
           <div className="rounded-xl border border-neutral-200 bg-white p-4">
-            <p className="text-sm font-semibold text-neutral-500">Group code</p>
+            <p className="text-[17px] font-semibold text-neutral-500">Group code</p>
             <p className="mt-1 font-mono text-2xl tracking-wider text-brand-navy">
               {activeGroup.code}
             </p>
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-[17px] text-neutral-500">
               Share this with the men you want in the group.
             </p>
           </div>
@@ -193,25 +193,25 @@ export default async function SettingsPage() {
 
       {pastGroups.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-base font-semibold text-brand-navy">Past groups</h2>
+          <h2 className="text-xl font-semibold text-brand-navy">Past groups</h2>
           <div className="space-y-2">
             {pastGroups.map((g) => (
               <div
                 key={g.id}
-                className="flex items-center justify-between gap-2 rounded-lg border border-neutral-200 bg-white p-3 text-sm"
+                className="flex items-center justify-between gap-2 rounded-lg border border-neutral-200 bg-white p-3 text-[17px]"
               >
                 <span className="text-neutral-600">{g.name}</span>
                 <span className="flex shrink-0 gap-3">
                   <Link
                     href={`/history?group=${g.id}`}
-                    className="text-sm font-medium text-neutral-500 underline"
+                    className="text-[17px] font-medium text-neutral-500 underline"
                   >
                     Your history
                   </Link>
                   {g.isDeactivated && (
                     <Link
                       href={`/roster/${g.id}`}
-                      className="text-sm font-medium text-neutral-500 underline"
+                      className="text-[17px] font-medium text-neutral-500 underline"
                     >
                       Roster
                     </Link>
@@ -239,7 +239,7 @@ export default async function SettingsPage() {
 
         {isAdminOfActiveGroup && activeGroup && (
           <div className="mt-2 space-y-2 rounded-xl border border-red-100 bg-white p-4">
-            <h2 className="text-sm font-semibold text-red-600">Deactivate this group</h2>
+            <h2 className="text-xl font-semibold text-red-600">Deactivate this group</h2>
             <DeactivateGroupButton groupId={activeGroup.id} isActive={activeGroup.is_active} />
           </div>
         )}

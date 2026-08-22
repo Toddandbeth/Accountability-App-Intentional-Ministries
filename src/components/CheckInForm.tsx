@@ -115,7 +115,7 @@ export function CheckInForm({
   return (
     <div className="space-y-4">
       {!editable && (
-        <div className="rounded-lg bg-neutral-200 px-3 py-2 text-sm text-neutral-700">
+        <div className="rounded-lg bg-neutral-200 px-3 py-2 text-[17px] text-neutral-700">
           This week is locked. You can no longer edit your answers.
         </div>
       )}
@@ -124,7 +124,7 @@ export function CheckInForm({
         <button
           type="button"
           onClick={toggleDescriptions}
-          className="text-sm text-neutral-500 underline"
+          className="text-[17px] text-neutral-500 underline"
         >
           {showDescriptions ? "Hide descriptions" : "Show descriptions"}
         </button>
@@ -132,9 +132,9 @@ export function CheckInForm({
 
       {questions.map((q) => (
         <div key={q.id} className="rounded-xl border border-neutral-200 bg-white p-4">
-          <h3 className="text-base font-semibold text-brand-navy">{q.label_short}</h3>
+          <h3 className="text-xl font-semibold text-brand-navy">{q.label_short}</h3>
           {showDescriptions && (
-            <p className="mt-1 text-sm text-neutral-500">{q.label_description}</p>
+            <p className="mt-1 text-[17px] text-neutral-500">{q.label_description}</p>
           )}
           <div className="mt-3">
             <RatingButtonRow
@@ -147,7 +147,7 @@ export function CheckInForm({
       ))}
 
       <div className="rounded-xl border border-neutral-200 bg-white p-4">
-        <h3 className="text-base font-semibold text-brand-navy">Prayer &amp; Life Update (optional)</h3>
+        <h3 className="text-xl font-semibold text-brand-navy">Prayer &amp; Life Update (optional)</h3>
         <textarea
           value={prayerRequest}
           onChange={(e) => {
@@ -158,9 +158,9 @@ export function CheckInForm({
           rows={3}
           maxLength={PRAYER_REQUEST_MAX_LENGTH}
           placeholder="A prayer request, a praise, or a quick update on one of the categories above."
-          className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm disabled:opacity-50"
+          className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px] disabled:opacity-50"
         />
-        <div className="mt-1 text-right text-sm text-neutral-400">
+        <div className="mt-1 text-right text-[17px] text-neutral-400">
           {prayerRequest.length}/{PRAYER_REQUEST_MAX_LENGTH}
         </div>
         <div className="flex items-center gap-3">
@@ -168,12 +168,12 @@ export function CheckInForm({
             type="button"
             onClick={submitPrayerRequest}
             disabled={!editable || savingPrayer || !prayerRequestDirty}
-            className="rounded-md bg-brand-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-md bg-brand-navy px-4 py-2 text-[17px] font-semibold text-white disabled:opacity-50"
           >
             {savingPrayer ? "Submitting…" : "Submit"}
           </button>
           {prayerJustSaved && !prayerRequestDirty && (
-            <span className="text-sm text-neutral-500">Saved.</span>
+            <span className="text-[17px] text-neutral-500">Saved.</span>
           )}
         </div>
       </div>
@@ -181,7 +181,7 @@ export function CheckInForm({
       <button
         type="button"
         onClick={() => setGoalsOpen((v) => !v)}
-        className="w-full rounded-xl bg-brand-periwinkle p-4 text-left text-sm font-bold text-white"
+        className="w-full rounded-xl bg-brand-periwinkle p-4 text-left text-[17px] font-bold text-white"
       >
         {goalsOpen ? "Hide Your Goals" : "Manage Your Goals"}
       </button>
@@ -194,7 +194,7 @@ export function CheckInForm({
         />
       )}
 
-      {saveError && <p className="text-sm text-red-600">{saveError}</p>}
+      {saveError && <p className="text-[17px] text-red-600">{saveError}</p>}
     </div>
   );
 }

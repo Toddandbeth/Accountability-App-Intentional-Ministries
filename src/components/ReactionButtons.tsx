@@ -49,10 +49,10 @@ export function ReactionButtons({ checkInId, counts: initialCounts }: ReactionBu
           onClick={() => react(r.key)}
           disabled={!checkInId || busy === r.key}
           title={r.label}
-          className="flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-sm disabled:opacity-40"
+          className="flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-[17px] disabled:opacity-40"
         >
           <span>{r.emoji}</span>
-          <span className="text-sm font-medium text-neutral-600">{counts[r.key]}</span>
+          <span className="text-[17px] font-medium text-neutral-600">{counts[r.key]}</span>
         </button>
       ))}
     </div>

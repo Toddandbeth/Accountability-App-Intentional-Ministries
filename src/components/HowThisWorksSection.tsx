@@ -24,14 +24,14 @@ const TOPICS = [
 export function HowThisWorksSection() {
   return (
     <div className="space-y-2 rounded-xl border border-neutral-200 bg-white p-4">
-      <h2 className="text-base font-semibold text-brand-navy">How this works</h2>
+      <h2 className="text-xl font-semibold text-brand-navy">How this works</h2>
       <div className="divide-y divide-neutral-100">
         {TOPICS.map((topic) => (
           <details key={topic.title} className="group py-2 first:pt-0 last:pb-0">
-            <summary className="cursor-pointer text-sm font-medium text-neutral-700 marker:text-neutral-400">
+            <summary className="cursor-pointer text-[17px] font-medium text-neutral-700 marker:text-neutral-400">
               {topic.title}
             </summary>
-            <p className="mt-1 text-sm text-neutral-500">{topic.body}</p>
+            <p className="mt-1 text-[17px] text-neutral-500">{topic.body}</p>
           </details>
         ))}
       </div>

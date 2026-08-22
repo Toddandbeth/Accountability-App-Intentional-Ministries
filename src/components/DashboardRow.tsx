@@ -67,7 +67,7 @@ export function DashboardRow({
             return (
               <span
                 key={i}
-                className="flex h-11 flex-1 items-center justify-center rounded-md text-[11px] font-bold"
+                className="flex h-11 flex-1 items-center justify-center rounded-md text-xs font-bold"
                 style={{
                   backgroundColor: r?.bg ?? "#e5e5e5",
                   color: r?.text ?? "#a3a3a3",
@@ -84,12 +84,12 @@ export function DashboardRow({
       {expanded && (
         <div className="border-t border-neutral-100">
           <div className="p-3">
-            <p className="text-sm font-medium text-brand-navy">
+            <p className="text-[17px] font-medium text-brand-navy">
               {fullName}
-              {isYou && <span className="ml-1 text-sm text-neutral-400">(you)</span>}
+              {isYou && <span className="ml-1 text-[17px] text-neutral-400">(you)</span>}
             </p>
             {cellPhone && (
-              <p className="mt-0.5 text-sm text-neutral-500">
+              <p className="mt-0.5 text-[17px] text-neutral-500">
                 <a href={`tel:${cellPhone}`} className="underline">
                   {cellPhone}
                 </a>{" "}
@@ -103,8 +103,8 @@ export function DashboardRow({
 
           <div className="h-px bg-neutral-200" />
 
-          <div className="p-3 text-sm">
-            <p className="mb-1 text-sm font-semibold text-neutral-500">Prayer &amp; Life Update</p>
+          <div className="p-3 text-[17px]">
+            <p className="mb-1 text-[17px] font-semibold text-neutral-500">Prayer &amp; Life Update</p>
             <p className="text-neutral-700">
               {prayerRequest?.trim() ? prayerRequest : "No update submitted this week."}
             </p>
@@ -112,7 +112,7 @@ export function DashboardRow({
             {!isYou && (
               <Link
                 href={`/dashboard/member/${userId}`}
-                className="mt-2 inline-block text-sm font-medium text-brand-periwinkle underline"
+                className="mt-2 inline-block text-[17px] font-medium text-brand-periwinkle underline"
               >
                 6-Week History
               </Link>
@@ -121,11 +121,11 @@ export function DashboardRow({
 
           <div className="h-px bg-neutral-200" />
 
-          <div className="p-3 text-sm">
+          <div className="p-3 text-[17px]">
             <button
               type="button"
               onClick={() => setGoalsExpanded((v) => !v)}
-              className="text-sm font-medium text-brand-periwinkle underline"
+              className="text-[17px] font-medium text-brand-periwinkle underline"
             >
               {goalsExpanded ? "Hide" : "See"} {firstName}&apos;s Goals
             </button>
@@ -136,7 +136,7 @@ export function DashboardRow({
                   const text = goalsBySlot[slot]?.trim();
                   return (
                     <div key={slot} className="rounded-lg border border-neutral-100 bg-neutral-50 p-2">
-                      <p className="text-sm font-bold text-brand-navy">{label}</p>
+                      <p className="text-[17px] font-bold text-brand-navy">{label}</p>
                       <p className="text-neutral-700">{text || "No goal set."}</p>
                     </div>
                   );

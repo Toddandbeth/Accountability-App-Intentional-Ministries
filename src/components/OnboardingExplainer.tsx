@@ -24,11 +24,11 @@ export function OnboardingExplainer() {
     <div className="space-y-2 rounded-xl border border-neutral-200 bg-white p-4">
       {POINTS.map((point) => (
         <div key={point.title}>
-          <p className="text-sm font-semibold">{point.title}</p>
-          <p className="text-sm text-neutral-500">{point.body}</p>
+          <p className="text-[17px] font-semibold">{point.title}</p>
+          <p className="text-[17px] text-neutral-500">{point.body}</p>
         </div>
       ))}
-      <p className="text-sm text-neutral-500">
+      <p className="text-[17px] text-neutral-500">
         This is the short version — the full explanation of every feature is always available in{" "}
         <Link href="/settings" className="underline">
           Settings

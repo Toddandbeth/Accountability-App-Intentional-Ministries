@@ -38,7 +38,7 @@ export function HelpAndTipsPanel() {
         onClick={() => setOpen(true)}
         className="flex w-full items-center justify-between rounded-xl border border-neutral-200 bg-white p-4 text-left"
       >
-        <span className="text-sm font-semibold">Help &amp; Tips</span>
+        <span className="text-[17px] font-semibold">Help &amp; Tips</span>
         <span className="text-neutral-400">›</span>
       </button>
 
@@ -52,7 +52,7 @@ export function HelpAndTipsPanel() {
           <button
             type="button"
             onClick={handleBack}
-            className="mb-4 flex items-center gap-1 text-sm font-medium text-neutral-500"
+            className="mb-4 flex items-center gap-1 text-[17px] font-medium text-neutral-500"
           >
             <span aria-hidden>←</span> {activeTopic ? "Help & Tips" : "Settings"}
           </button>
@@ -60,7 +60,7 @@ export function HelpAndTipsPanel() {
           {activeTopic ? (
             <div className="space-y-3">
               <h1 className="text-2xl font-bold text-brand-navy">{activeTopic.title}</h1>
-              <p className="text-base text-neutral-700">Content coming soon.</p>
+              <p className="text-[17px] text-neutral-700">Content coming soon.</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -72,7 +72,7 @@ export function HelpAndTipsPanel() {
                   onClick={() => setTopicId(topic.id)}
                   className="flex w-full items-center justify-between rounded-xl border border-neutral-200 bg-white p-4 text-left"
                 >
-                  <span className="text-sm font-semibold">{topic.title}</span>
+                  <span className="text-[17px] font-semibold">{topic.title}</span>
                   <span className="text-neutral-400">›</span>
                 </button>
               ))}

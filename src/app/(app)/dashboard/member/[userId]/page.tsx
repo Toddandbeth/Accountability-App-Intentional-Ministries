@@ -37,10 +37,10 @@ export default async function MemberHistoryPage({
   if (myMembership?.status !== "active") {
     return (
       <div className="space-y-2">
-        <Link href="/dashboard" className="text-sm text-neutral-500 underline">
+        <Link href="/dashboard" className="text-[17px] text-neutral-500 underline">
           ← Back to dashboard
         </Link>
-        <p className="text-sm text-neutral-600">
+        <p className="text-[17px] text-neutral-600">
           Only active group members can view another member&apos;s history.
         </p>
       </div>
@@ -66,15 +66,15 @@ export default async function MemberHistoryPage({
   return (
     <div className="space-y-4">
       <div>
-        <Link href="/dashboard" className="text-sm text-neutral-500 underline">
+        <Link href="/dashboard" className="text-[17px] text-neutral-500 underline">
           ← Back to dashboard
         </Link>
         <h1 className="text-2xl font-bold text-brand-navy">{name}&apos;s history</h1>
-        <p className="text-sm text-neutral-500">Last {HISTORY_WEEKS} weeks.</p>
+        <p className="text-[17px] text-neutral-500">Last {HISTORY_WEEKS} weeks.</p>
       </div>
 
       {(!checkIns || checkIns.length === 0) && (
-        <p className="text-sm text-neutral-600">No check-ins yet for this member.</p>
+        <p className="text-[17px] text-neutral-600">No check-ins yet for this member.</p>
       )}
 
       <div className="space-y-2">

@@ -50,13 +50,13 @@ export function RenameGroupInput({ groupId, currentName, onDone }: RenameGroupIn
           value={name}
           onChange={(e) => setName(e.target.value)}
           autoFocus
-          className="min-w-0 flex-1 rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+          className="min-w-0 flex-1 rounded-md border border-neutral-300 px-2 py-1.5 text-[17px]"
         />
         <button
           type="button"
           onClick={save}
           disabled={saving || !name.trim()}
-          className="shrink-0 rounded-md bg-brand-navy px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
+          className="shrink-0 rounded-md bg-brand-navy px-3 py-1.5 text-[17px] font-semibold text-white disabled:opacity-50"
         >
           Save
         </button>
@@ -64,12 +64,12 @@ export function RenameGroupInput({ groupId, currentName, onDone }: RenameGroupIn
           type="button"
           onClick={onDone}
           disabled={saving}
-          className="shrink-0 rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-neutral-500"
+          className="shrink-0 rounded-md border border-neutral-300 px-3 py-1.5 text-[17px] text-neutral-500"
         >
           Cancel
         </button>
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-[17px] text-red-600">{error}</p>}
     </div>
   );
 }

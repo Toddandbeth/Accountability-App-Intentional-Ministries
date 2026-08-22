@@ -34,8 +34,8 @@ export function JoinGroupForm() {
   if (submitted) {
     return (
       <div className="rounded-xl border border-neutral-200 bg-white p-4">
-        <h2 className="text-base font-semibold text-brand-navy">Request sent</h2>
-        <p className="mt-1 text-sm text-neutral-600">
+        <h2 className="text-xl font-semibold text-brand-navy">Request sent</h2>
+        <p className="mt-1 text-[17px] text-neutral-600">
           Waiting on the group leader to approve you. You&apos;ll see the group here as soon as
           they do.
         </p>
@@ -45,8 +45,8 @@ export function JoinGroupForm() {
 
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-4">
-      <h2 className="text-base font-semibold text-brand-navy">Join a group</h2>
-      <p className="mt-1 text-sm text-neutral-600">
+      <h2 className="text-xl font-semibold text-brand-navy">Join a group</h2>
+      <p className="mt-1 text-[17px] text-neutral-600">
         Enter the code your group leader shared with you.
       </p>
 
@@ -57,18 +57,18 @@ export function JoinGroupForm() {
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
           required
-          className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm uppercase tracking-wider"
+          className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-[17px] uppercase tracking-wider"
         />
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-md bg-brand-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-md bg-brand-navy px-4 py-2 text-[17px] font-semibold text-white disabled:opacity-50"
         >
           {submitting ? "…" : "Join"}
         </button>
       </form>
 
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-[17px] text-red-600">{error}</p>}
     </div>
   );
 }

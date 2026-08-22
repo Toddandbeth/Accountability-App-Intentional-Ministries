@@ -47,7 +47,7 @@ export default function SignupPage() {
     return (
       <div className="text-center">
         <h1 className="text-2xl font-bold text-brand-navy">Check your email</h1>
-        <p className="mt-2 text-sm text-neutral-600">
+        <p className="mt-2 text-[17px] text-neutral-600">
           We sent a confirmation link to {email}. Follow it to finish creating your account.
         </p>
       </div>
@@ -65,7 +65,7 @@ export default function SignupPage() {
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           required
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className="rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
         />
         <input
           type="text"
@@ -73,7 +73,7 @@ export default function SignupPage() {
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
           required
-          className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className="rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
         />
       </div>
 
@@ -83,7 +83,7 @@ export default function SignupPage() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
-        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
       />
 
       <input
@@ -93,20 +93,20 @@ export default function SignupPage() {
         onChange={(e) => setPassword(e.target.value)}
         required
         minLength={8}
-        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
       />
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-[17px] text-red-600">{error}</p>}
 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-md bg-brand-navy py-2 text-sm font-semibold text-white disabled:opacity-50"
+        className="w-full rounded-md bg-brand-navy py-2 text-[17px] font-semibold text-white disabled:opacity-50"
       >
         {submitting ? "Creating account…" : "Sign up"}
       </button>
 
-      <p className="text-center text-sm text-neutral-600">
+      <p className="text-center text-[17px] text-neutral-600">
         Already have an account?{" "}
         <Link href="/login" className="font-medium text-neutral-900 underline">
           Log in

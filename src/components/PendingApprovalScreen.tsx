@@ -21,7 +21,7 @@ export function PendingApprovalScreen({ groupName }: { groupName: string }) {
   return (
     <div className="space-y-2 text-center">
       <h1 className="text-2xl font-bold text-brand-navy">Waiting for approval</h1>
-      <p className="text-sm text-neutral-600">
+      <p className="text-[17px] text-neutral-600">
         Your request to join <span className="font-semibold">{groupName}</span> is pending. The
         group leader needs to approve you before you can see or submit anything — this page
         updates on its own the moment they do, no need to refresh.

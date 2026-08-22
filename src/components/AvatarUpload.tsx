@@ -114,7 +114,7 @@ export function AvatarUpload({ userId, name, currentImageUrl, initialsColor }: A
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-semibold text-neutral-700 disabled:opacity-50"
+          className="rounded-md border border-neutral-300 px-3 py-1.5 text-[17px] font-semibold text-neutral-700 disabled:opacity-50"
         >
           {uploading ? "Uploading…" : previewUrl ? "Change photo" : "Upload photo"}
         </button>
@@ -125,7 +125,7 @@ export function AvatarUpload({ userId, name, currentImageUrl, initialsColor }: A
           onChange={handleFileChange}
           className="hidden"
         />
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-1 text-[17px] text-red-600">{error}</p>}
       </div>
     </div>
   );

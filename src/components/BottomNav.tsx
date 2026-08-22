@@ -61,7 +61,7 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-1 py-2.5 text-sm font-medium ${
+              className={`flex flex-col items-center gap-1 py-2.5 text-[17px] font-medium ${
                 active ? "text-brand-navy" : "text-brand-light"
               }`}
             >

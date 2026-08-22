@@ -18,7 +18,7 @@ export function SlideOverPanel({ label, title, children }: SlideOverPanelProps) 
         onClick={() => setOpen(true)}
         className="flex w-full items-center justify-between rounded-xl border border-neutral-200 bg-white p-4 text-left"
       >
-        <span className="text-sm font-semibold">{label}</span>
+        <span className="text-[17px] font-semibold">{label}</span>
         <span className="text-neutral-400">›</span>
       </button>
 
@@ -32,7 +32,7 @@ export function SlideOverPanel({ label, title, children }: SlideOverPanelProps) 
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="mb-4 flex items-center gap-1 text-sm font-medium text-neutral-500"
+            className="mb-4 flex items-center gap-1 text-[17px] font-medium text-neutral-500"
           >
             <span aria-hidden>←</span> {title}
           </button>

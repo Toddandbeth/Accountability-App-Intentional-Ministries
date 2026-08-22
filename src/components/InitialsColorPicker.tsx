@@ -34,7 +34,7 @@ export function InitialsColorPicker({ userId, currentColor }: InitialsColorPicke
 
   return (
     <div>
-      <p className="mb-1 text-sm font-medium text-neutral-600">
+      <p className="mb-1 text-[17px] font-medium text-neutral-600">
         Circle color (used when you don&apos;t have a photo)
       </p>
       <div className="flex flex-wrap items-center gap-2">
@@ -43,7 +43,7 @@ export function InitialsColorPicker({ userId, currentColor }: InitialsColorPicke
           onClick={() => choose(null)}
           disabled={saving !== null}
           title="Default"
-          className={`flex h-8 w-8 items-center justify-center rounded-full border-2 bg-brand-light text-sm text-brand-navy disabled:opacity-50 ${
+          className={`flex h-8 w-8 items-center justify-center rounded-full border-2 bg-brand-light text-[17px] text-brand-navy disabled:opacity-50 ${
             currentColor === null ? "border-brand-navy" : "border-transparent"
           }`}
         >

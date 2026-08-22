@@ -56,7 +56,7 @@ export default async function CheckInPage() {
           className="h-auto w-full max-w-xs"
         />
         <h1 className="text-2xl font-bold text-brand-navy">Welcome</h1>
-        <p className="text-sm text-neutral-600">
+        <p className="text-[17px] text-neutral-600">
           You&apos;re not part of a group yet. Create one, or join one with a code.
         </p>
         <OnboardingExplainer />
@@ -76,7 +76,7 @@ export default async function CheckInPage() {
     return (
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-brand-navy">No longer a member</h1>
-        <p className="text-sm text-neutral-600">
+        <p className="text-[17px] text-neutral-600">
           You&apos;re no longer an active member of that group.{" "}
           <Link href="/settings" className="underline">
             Switch groups or join another
@@ -130,10 +130,10 @@ export default async function CheckInPage() {
     <div className="space-y-4">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-neutral-500">{group?.name}</p>
+          <p className="text-[17px] text-neutral-500">{group?.name}</p>
           <h1 className="text-2xl font-bold text-brand-navy">This week&apos;s check-in</h1>
         </div>
-        <Link href="/history" className="mt-1 text-sm text-neutral-500 underline">
+        <Link href="/history" className="mt-1 text-[17px] text-neutral-500 underline">
           Your history
         </Link>
       </div>

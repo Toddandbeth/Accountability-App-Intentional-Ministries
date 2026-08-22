@@ -39,16 +39,16 @@ export function DeactivateGroupButton({ groupId, isActive }: DeactivateGroupButt
   if (!isActive) {
     return (
       <div className="space-y-2">
-        <p className="text-sm text-neutral-500">
+        <p className="text-[17px] text-neutral-500">
           This group is deactivated. Anyone who was ever a member can still view a simple roster,
           but the group no longer appears as an active dashboard for anyone.
         </p>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-[17px] text-red-600">{error}</p>}
         <button
           type="button"
           disabled={busy}
           onClick={() => setActive(true)}
-          className="text-sm font-medium text-neutral-500 underline disabled:opacity-50"
+          className="text-[17px] font-medium text-neutral-500 underline disabled:opacity-50"
         >
           Reactivate group
         </button>
@@ -59,17 +59,17 @@ export function DeactivateGroupButton({ groupId, isActive }: DeactivateGroupButt
   if (confirming) {
     return (
       <div className="space-y-2">
-        <p className="text-sm text-neutral-600">
+        <p className="text-[17px] text-neutral-600">
           Deactivating doesn&apos;t delete anything — everyone who was ever a member will still be
           able to see a simple roster, just not the live dashboard.
         </p>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-[17px] text-red-600">{error}</p>}
         <span className="flex gap-1">
           <button
             type="button"
             disabled={busy}
             onClick={() => setActive(false)}
-            className="rounded-full bg-red-600 px-2 py-0.5 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-full bg-red-600 px-2 py-0.5 text-[17px] font-semibold text-white disabled:opacity-50"
           >
             Confirm deactivate
           </button>
@@ -77,7 +77,7 @@ export function DeactivateGroupButton({ groupId, isActive }: DeactivateGroupButt
             type="button"
             disabled={busy}
             onClick={() => setConfirming(false)}
-            className="rounded-full border border-neutral-300 px-2 py-0.5 text-sm text-neutral-500"
+            className="rounded-full border border-neutral-300 px-2 py-0.5 text-[17px] text-neutral-500"
           >
             Cancel
           </button>
@@ -90,7 +90,7 @@ export function DeactivateGroupButton({ groupId, isActive }: DeactivateGroupButt
     <button
       type="button"
       onClick={() => setConfirming(true)}
-      className="text-sm font-medium text-neutral-400 underline"
+      className="text-[17px] font-medium text-neutral-400 underline"
     >
       Deactivate this group
     </button>

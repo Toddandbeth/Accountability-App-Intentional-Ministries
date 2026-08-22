@@ -47,7 +47,7 @@ export function ActiveGroupSwitcher({
   }
 
   if (groups.length === 0) {
-    return <p className="text-sm text-neutral-600">You&apos;re not part of any groups yet.</p>;
+    return <p className="text-[17px] text-neutral-600">You&apos;re not part of any groups yet.</p>;
   }
 
   return (
@@ -59,7 +59,7 @@ export function ActiveGroupSwitcher({
           return (
             <div
               key={g.id}
-              className="rounded-lg border border-brand-periwinkle bg-brand-periwinkle/20 p-3 text-sm"
+              className="rounded-lg border border-brand-periwinkle bg-brand-periwinkle/20 p-3 text-[17px]"
             >
               <RenameGroupInput
                 groupId={g.id}
@@ -73,7 +73,7 @@ export function ActiveGroupSwitcher({
         return (
           <div
             key={g.id}
-            className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
+            className={`flex items-center gap-2 rounded-lg border p-3 text-[17px] ${
               isActive ? "border-brand-periwinkle bg-brand-periwinkle/20" : "border-neutral-200 bg-white"
             }`}
           >
@@ -85,7 +85,7 @@ export function ActiveGroupSwitcher({
             >
               <span className={isActive ? "font-semibold text-brand-navy" : ""}>{g.name}</span>
               {isActive && (
-                <span className="text-sm font-semibold text-brand-navy">Active</span>
+                <span className="text-[17px] font-semibold text-brand-navy">Active</span>
               )}
             </button>
             {isActive && canRenameActive && (
@@ -93,7 +93,7 @@ export function ActiveGroupSwitcher({
                 type="button"
                 onClick={() => setRenaming(true)}
                 title="Rename group"
-                className="shrink-0 text-sm text-neutral-400"
+                className="shrink-0 text-[17px] text-neutral-400"
               >
                 ✎
               </button>
@@ -101,7 +101,7 @@ export function ActiveGroupSwitcher({
             {g.isDeactivated && (
               <Link
                 href={`/roster/${g.id}`}
-                className="shrink-0 text-sm font-medium text-neutral-500 underline"
+                className="shrink-0 text-[17px] font-medium text-neutral-500 underline"
               >
                 Roster
               </Link>
@@ -113,7 +113,7 @@ export function ActiveGroupSwitcher({
           </div>
         );
       })}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-[17px] text-red-600">{error}</p>}
     </div>
   );
 }
