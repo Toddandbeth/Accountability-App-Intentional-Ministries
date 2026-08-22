@@ -44,8 +44,8 @@ export default async function GroupRosterPage({
         <Link href="/settings" className="text-sm text-neutral-500 underline">
           ← Back to settings
         </Link>
-        <h1 className="text-xl font-semibold">{groupInfo.name}</h1>
-        <p className="text-xs text-neutral-500">
+        <h1 className="text-2xl font-bold text-brand-navy">{groupInfo.name}</h1>
+        <p className="text-sm text-neutral-500">
           This group is no longer active. Here&apos;s who was part of it — no weekly content, just
           who was there.
         </p>
@@ -59,11 +59,16 @@ export default async function GroupRosterPage({
               key={m.user_id}
               className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white p-3"
             >
-              <Avatar name={name} imageUrl={m.profile_image_url} size={32} />
+              <Avatar
+                name={name}
+                imageUrl={m.profile_image_url}
+                initialsColor={m.initials_circle_color}
+                size={32}
+              />
               <span className="text-sm font-medium">
                 {name}
                 {m.user_id === user.id && (
-                  <span className="ml-1 text-xs text-neutral-400">(you)</span>
+                  <span className="ml-1 text-sm text-neutral-400">(you)</span>
                 )}
               </span>
             </div>

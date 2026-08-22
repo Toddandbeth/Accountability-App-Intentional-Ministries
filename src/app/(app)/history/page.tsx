@@ -29,7 +29,7 @@ export default async function HistoryPage({
   if (!groupId) {
     return (
       <div className="space-y-2">
-        <h1 className="text-xl font-semibold">Your history</h1>
+        <h1 className="text-2xl font-bold text-brand-navy">Your history</h1>
         <p className="text-sm text-neutral-600">
           You&apos;re not part of a group yet.{" "}
           <Link href="/checkin" className="underline">
@@ -82,8 +82,8 @@ export default async function HistoryPage({
         >
           {isCurrentlyActiveGroup ? "← Back to check-in" : "← Back to settings"}
         </Link>
-        <h1 className="text-xl font-semibold">Your history</h1>
-        <p className="text-xs text-neutral-500">{groupInfo.name}</p>
+        <h1 className="text-2xl font-bold text-brand-navy">Your history</h1>
+        <p className="text-sm text-neutral-500">{groupInfo.name}</p>
       </div>
 
       {(!checkIns || checkIns.length === 0) && (

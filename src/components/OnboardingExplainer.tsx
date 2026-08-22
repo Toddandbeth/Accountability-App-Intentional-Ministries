@@ -23,7 +23,7 @@ export function OnboardingExplainer() {
       {POINTS.map((point) => (
         <div key={point.title}>
           <p className="text-sm font-semibold">{point.title}</p>
-          <p className="text-xs text-neutral-500">{point.body}</p>
+          <p className="text-sm text-neutral-500">{point.body}</p>
         </div>
       ))}
     </div>

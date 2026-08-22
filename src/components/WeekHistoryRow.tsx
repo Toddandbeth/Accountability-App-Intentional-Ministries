@@ -28,7 +28,7 @@ export function WeekHistoryRow({
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">
           Week of {weekStartDate}
-          {isCurrentWeek && <span className="ml-1 text-xs text-neutral-400">(this week)</span>}
+          {isCurrentWeek && <span className="ml-1 text-sm text-neutral-400">(this week)</span>}
         </p>
       </div>
       <div className="mt-2 flex gap-1">
@@ -51,7 +51,7 @@ export function WeekHistoryRow({
       </div>
       {prayerRequest?.trim() && (
         <>
-          <p className="mt-2 text-xs text-neutral-600">
+          <p className="mt-2 text-sm text-neutral-600">
             <span className="font-semibold text-neutral-500">Prayer &amp; Life Update: </span>
             {prayerRequest}
           </p>

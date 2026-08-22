@@ -9,9 +9,10 @@ interface AvatarProps {
   name: string;
   imageUrl: string | null;
   size?: number;
+  initialsColor?: string | null;
 }
 
-export function Avatar({ name, imageUrl, size = 32 }: AvatarProps) {
+export function Avatar({ name, imageUrl, size = 32, initialsColor }: AvatarProps) {
   const style = { width: size, height: size };
 
   if (imageUrl) {
@@ -25,8 +26,10 @@ export function Avatar({ name, imageUrl, size = 32 }: AvatarProps) {
 
   return (
     <span
-      style={style}
-      className="flex shrink-0 items-center justify-center rounded-full bg-neutral-200 text-xs font-semibold text-neutral-600"
+      style={initialsColor ? { ...style, backgroundColor: initialsColor } : style}
+      className={`flex shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+        initialsColor ? "text-white" : "bg-brand-light text-brand-navy"
+      }`}
     >
       {initialsFor(name)}
     </span>

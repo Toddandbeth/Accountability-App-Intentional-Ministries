@@ -54,7 +54,7 @@ export function CreateGroupForm() {
         />
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-600">Meeting day</label>
+          <label className="mb-1 block text-sm font-medium text-neutral-600">Meeting day</label>
           <select
             value={meetingDay}
             onChange={(e) => setMeetingDay(Number(e.target.value))}
@@ -69,7 +69,7 @@ export function CreateGroupForm() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-600">Time zone</label>
+          <label className="mb-1 block text-sm font-medium text-neutral-600">Time zone</label>
           <select
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
@@ -88,7 +88,7 @@ export function CreateGroupForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-md bg-neutral-900 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="w-full rounded-md bg-brand-navy py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           {submitting ? "Creating…" : "Create group"}
         </button>

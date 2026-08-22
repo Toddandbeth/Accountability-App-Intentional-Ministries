@@ -11,6 +11,7 @@ interface AvatarUploadProps {
   userId: string;
   name: string;
   currentImageUrl: string | null;
+  initialsColor?: string | null;
 }
 
 function resizeToSquareJpeg(file: File): Promise<Blob> {
@@ -52,7 +53,7 @@ function resizeToSquareJpeg(file: File): Promise<Blob> {
   });
 }
 
-export function AvatarUpload({ userId, name, currentImageUrl }: AvatarUploadProps) {
+export function AvatarUpload({ userId, name, currentImageUrl, initialsColor }: AvatarUploadProps) {
   const router = useRouter();
   const supabase = createClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -107,13 +108,13 @@ export function AvatarUpload({ userId, name, currentImageUrl }: AvatarUploadProp
 
   return (
     <div className="flex items-center gap-3">
-      <Avatar name={name} imageUrl={previewUrl} size={56} />
+      <Avatar name={name} imageUrl={previewUrl} size={56} initialsColor={initialsColor} />
       <div>
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 disabled:opacity-50"
+          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-semibold text-neutral-700 disabled:opacity-50"
         >
           {uploading ? "Uploading…" : previewUrl ? "Change photo" : "Upload photo"}
         </button>
@@ -124,7 +125,7 @@ export function AvatarUpload({ userId, name, currentImageUrl }: AvatarUploadProp
           onChange={handleFileChange}
           className="hidden"
         />
-        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
       </div>
     </div>
   );

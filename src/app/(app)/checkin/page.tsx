@@ -22,7 +22,7 @@ export default async function CheckInPage() {
   if (!profile?.active_group_id) {
     return (
       <div className="space-y-4">
-        <h1 className="text-xl font-semibold">Welcome</h1>
+        <h1 className="text-2xl font-bold text-brand-navy">Welcome</h1>
         <p className="text-sm text-neutral-600">
           You&apos;re not part of a group yet. Create one, or join one with a code.
         </p>
@@ -42,7 +42,7 @@ export default async function CheckInPage() {
     // the membership was removed. Not the "no group at all" empty state.
     return (
       <div className="space-y-2">
-        <h1 className="text-xl font-semibold">No longer a member</h1>
+        <h1 className="text-2xl font-bold text-brand-navy">No longer a member</h1>
         <p className="text-sm text-neutral-600">
           You&apos;re no longer an active member of that group.{" "}
           <Link href="/settings" className="underline">
@@ -98,7 +98,7 @@ export default async function CheckInPage() {
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-neutral-500">{group?.name}</p>
-          <h1 className="text-xl font-semibold">This week&apos;s check-in</h1>
+          <h1 className="text-2xl font-bold text-brand-navy">This week&apos;s check-in</h1>
         </div>
         <Link href="/history" className="mt-1 text-sm text-neutral-500 underline">
           Your history

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AvatarUpload } from "@/components/AvatarUpload";
+import { InitialsColorPicker } from "@/components/InitialsColorPicker";
 import type { Profile } from "@/lib/supabase/types";
 
 interface ProfileFormProps {
@@ -51,13 +52,16 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
   return (
     <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4">
-      <h2 className="text-sm font-semibold">Your profile</h2>
+      <h2 className="text-base font-semibold text-brand-navy">Your profile</h2>
 
       <AvatarUpload
         userId={profile.id}
         name={displayName}
         currentImageUrl={profile.profile_image_url}
+        initialsColor={profile.initials_circle_color}
       />
+
+      <InitialsColorPicker userId={profile.id} currentColor={profile.initials_circle_color} />
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
@@ -93,7 +97,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         <button
           type="submit"
           disabled={saving}
-          className="w-full rounded-md bg-neutral-900 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="w-full rounded-md bg-brand-navy py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           {saving ? "Saving…" : "Save profile"}
         </button>

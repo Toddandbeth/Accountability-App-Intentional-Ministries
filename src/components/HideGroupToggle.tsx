@@ -29,7 +29,7 @@ export function HideGroupToggle({ membershipId, hidden }: HideGroupToggleProps) 
       type="button"
       onClick={toggle}
       disabled={busy}
-      className="shrink-0 text-xs text-neutral-400 underline disabled:opacity-50"
+      className="shrink-0 text-sm text-neutral-400 underline disabled:opacity-50"
     >
       {hidden ? "Unhide" : "Hide"}
     </button>

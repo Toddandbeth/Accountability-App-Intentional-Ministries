@@ -12,6 +12,7 @@ interface DashboardRowProps {
   firstName: string;
   fullName: string;
   imageUrl: string | null;
+  initialsColor: string | null;
   cellPhone: string | null;
   ratings: (number | null)[]; // slot 1..5 in order
   prayerRequest: string | null;
@@ -32,6 +33,7 @@ export function DashboardRow({
   firstName,
   fullName,
   imageUrl,
+  initialsColor,
   cellPhone,
   ratings,
   prayerRequest,
@@ -48,25 +50,24 @@ export function DashboardRow({
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center gap-1.5 p-3 text-left"
+        className="flex w-full items-center gap-2 p-3 text-left"
       >
-        <span className="flex w-24 shrink-0 items-center gap-1 overflow-hidden">
-          <Avatar name={fullName} imageUrl={imageUrl} size={24} />
-          <span className="truncate whitespace-nowrap text-sm font-medium">{firstName}</span>
+        <span className="relative shrink-0">
+          <Avatar name={fullName} imageUrl={imageUrl} size={40} initialsColor={initialsColor} />
           {prayerRequest?.trim() && (
             <span
-              className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"
+              className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-brand-periwinkle ring-2 ring-white"
               title="Submitted a Prayer & Life Update"
             />
           )}
         </span>
-        <span className="flex flex-1 justify-end gap-1">
+        <span className="flex flex-1 gap-1">
           {ratings.map((value, i) => {
             const r = ratingByValue(value);
             return (
               <span
                 key={i}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-[8px] font-bold"
+                className="flex h-11 flex-1 items-center justify-center rounded-md text-[11px] font-bold"
                 style={{
                   backgroundColor: r?.bg ?? "#e5e5e5",
                   color: r?.text ?? "#a3a3a3",
@@ -83,12 +84,12 @@ export function DashboardRow({
       {expanded && (
         <div className="border-t border-neutral-100">
           <div className="p-3">
-            <p className="text-sm font-medium">
+            <p className="text-sm font-medium text-brand-navy">
               {fullName}
-              {isYou && <span className="ml-1 text-xs text-neutral-400">(you)</span>}
+              {isYou && <span className="ml-1 text-sm text-neutral-400">(you)</span>}
             </p>
             {cellPhone && (
-              <p className="mt-0.5 text-xs text-neutral-500">
+              <p className="mt-0.5 text-sm text-neutral-500">
                 <a href={`tel:${cellPhone}`} className="underline">
                   {cellPhone}
                 </a>{" "}
@@ -103,7 +104,7 @@ export function DashboardRow({
           <div className="h-px bg-neutral-200" />
 
           <div className="p-3 text-sm">
-            <p className="mb-1 text-xs font-semibold text-neutral-500">Prayer &amp; Life Update</p>
+            <p className="mb-1 text-sm font-semibold text-neutral-500">Prayer &amp; Life Update</p>
             <p className="text-neutral-700">
               {prayerRequest?.trim() ? prayerRequest : "No update submitted this week."}
             </p>
@@ -111,9 +112,9 @@ export function DashboardRow({
             {!isYou && (
               <Link
                 href={`/dashboard/member/${userId}`}
-                className="mt-2 inline-block text-xs font-medium text-neutral-500 underline"
+                className="mt-2 inline-block text-sm font-medium text-brand-periwinkle underline"
               >
-                View last 6 weeks →
+                6-Week History
               </Link>
             )}
           </div>
@@ -124,7 +125,7 @@ export function DashboardRow({
             <button
               type="button"
               onClick={() => setGoalsExpanded((v) => !v)}
-              className="text-xs font-medium text-neutral-500 underline"
+              className="text-sm font-medium text-brand-periwinkle underline"
             >
               {goalsExpanded ? "Hide" : "See"} {firstName}&apos;s Goals
             </button>
@@ -134,8 +135,8 @@ export function DashboardRow({
                   const slot = i + 1;
                   const text = goalsBySlot[slot]?.trim();
                   return (
-                    <div key={slot}>
-                      <p className="text-xs font-semibold text-neutral-500">{label}</p>
+                    <div key={slot} className="rounded-lg border border-neutral-100 bg-neutral-50 p-2">
+                      <p className="text-sm font-bold text-brand-navy">{label}</p>
                       <p className="text-neutral-700">{text || "No goal set."}</p>
                     </div>
                   );

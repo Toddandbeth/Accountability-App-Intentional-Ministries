@@ -42,7 +42,7 @@ export function MembershipRequestRow({ membershipId, name }: MembershipRequestRo
           type="button"
           disabled={busy}
           onClick={() => respond("active")}
-          className="rounded-md bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+          className="rounded-md bg-brand-navy px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
         >
           Approve
         </button>
@@ -50,12 +50,12 @@ export function MembershipRequestRow({ membershipId, name }: MembershipRequestRo
           type="button"
           disabled={busy}
           onClick={() => respond("removed")}
-          className="rounded-md border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 disabled:opacity-50"
+          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-semibold text-neutral-700 disabled:opacity-50"
         >
           Deny
         </button>
       </div>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );
 }

@@ -77,6 +77,7 @@ User
 - first name, last name
 - email, cell phone (optional)
 - profile image
+- initials_circle_color (optional — a user-chosen color for their initials circle when no profile photo is uploaded, see Round 10)
 - active_group (which group they're currently viewing)
 - platform_admin (true/false — marks the app-wide admin; not tied to any single group)
 
@@ -177,12 +178,12 @@ Check-in screen (member view)
 - Each of the 5 questions listed as its own card: title, then the row of 5 rating buttons underneath
 - Takes roughly 20 seconds to complete — tap through all 5, done
 
-Dashboard screen (visible to the whole group, not just the admin) — collapsed row, per member
+Dashboard screen (visible to the whole group, not just the admin) — collapsed row, per member (revised — see Round 10)
 - One row per group member, current week only
-- Left side, fixed and compact: profile photo or initials icon, then first name only (not last name) — kept short and on a single line, never wrapping, so it doesn't crowd or resize the row
-- A small dot or indicator next to the name if that member submitted a Prayer & Life Update this week
+- Left side, fixed and compact: profile photo, or a colored initials circle if no photo is uploaded (see Profile customization below). No name text on this row at all, first or last — removed deliberately in Round 10 to give the 5 rating boxes more room as font sizes increase. Identification happens via the photo/initials circle, plus the member's full name is shown immediately upon tapping into the expanded row.
+- A small dot or indicator next to the icon if that member submitted a Prayer & Life Update this week
 - The rest of the row, given as much space as possible: that member's 5 answers shown as colored, labeled buttons, in question order — the question text itself is not restated on this row, just the answers, since column headers above the grid (see below) already establish the order
-- This row must stay visually clean and consistent at any name length — no wrapping, no squeezing the icons or rating buttons to make room for a name. First-name-only is deliberately chosen to keep this guaranteed.
+- This row must stay visually clean and consistent — no wrapping, nothing squeezing the rating buttons
 - The entire group should be readable in one glance — this is the main design goal, and nothing above should compromise it
 
 Column headers above the dashboard grid
@@ -274,7 +275,8 @@ Completed and sent to Claude Code:
 - Round 7 — reactions-in-history fix, meeting-day-change crash fix, and the (now superseded by Round 8) short-week transition formula
 - Round 8 — no-short-weeks meeting day change formula
 - App deployed live via GitHub + Vercel; performance fixes (loading states, parallelized data fetching) identified and implemented after initial live testing revealed sluggish navigation
-- Round 9 — Settings page reorganization (interaction patterns, section order) and moving goal-editing from Settings to the check-in screen
+- Round 9 — Settings reorganization and goals relocated to check-in screen; deployed live
+- Round 10 — typography scale, brand colors applied throughout, dashboard icon change, several visual polish fixes, initials-circle color customization, active-group reordering, group renaming restored, and the Round 9 "all groups should display together" bug fixed
 
 Pending, not yet sent:
 - None
@@ -520,6 +522,10 @@ Pure UI/navigation reorganization — no data model or schema changes. The curre
 1. Profile — inline, always visible, not collapsible. Too important to hide behind a tap.
 2. How It Works — collapsible reveal. Static explanatory text, no editing, so a simple expand/collapse is enough; doesn't need its own full screen.
 3. Your Groups — stays open and visible, not collapsed, since a user may want to switch groups often. Lists every group the user belongs to; the currently active group is visually distinct (e.g. bolded) so everything below it has clear context. Directly beneath the active group's name, in this order: group code (for sharing), meeting day with time zone folded in (previously a separate field, now combined), member list. The separate "Group Info" box from earlier rounds is removed — it only duplicated the group name, which is now already shown here.
+   - Bug found after Round 9 shipped, needs fixing: all of a user's groups must display together in one place, immediately visible under "Your Groups" — not with only the active group shown up top and other groups appearing further down the page. This was confusing in testing and does not match the original Round 9 intent.
+   - Active-group reordering (see Round 10): switching your active group should move it to the top of the list, not just highlight it in place. The other groups drop below it, unhighlighted.
+   - Edge case: a user cannot hide their currently active group. They must switch to a different active group first, then hide the one they just left. This prevents an active group from also sitting in the hidden list, which wouldn't make sense.
+   - Gap caught after Round 9 shipped: removing the old Group Info box also removed the only way to rename a group. Fix: add a small edit icon or "Rename" link next to the bolded active group name itself, rather than reviving a separate box.
    - Member list ordering: pending join requests appear at the top (they need the leader's attention first), each showing the member's name with an Approve action. Below that, active and removed members, matching current behavior (active shown in green, removed shown greyed out with a Remove action available on active members) — this part is unchanged from how it already works, just repositioned within the new structure.
 4. Weekly Questions — its own slide-over panel. Substantial editable content (5 questions, edit and reset actions) warrants a dedicated screen rather than an inline expand.
 5. Bottom cluster, grouped together: Join a Group, Create a Group, and Deactivate This Group. These are all occasional, one-time-per-group-lifecycle actions, so they're grouped at the bottom rather than mixed in with routinely-referenced content above. Deactivate This Group should be visually distinct from Join/Create (e.g. red text or extra spacing) to signal it's a different category of action — ending something, not configuring it — even though the same confirmation-dialog safety net from before still applies and is what actually prevents accidental use.
@@ -536,6 +542,37 @@ A member's own goal-editing form currently lives in Settings. This moves to the 
 - This entirely replaces the Settings-based goal editor — goals are edited in exactly one place, not two, to avoid the two locations drifting out of sync or confusing which one is authoritative
 - Viewing another member's goals from the dashboard (the "See [Name]'s Goals" button, described earlier) is unaffected by this change — that remains on the dashboard as-is
 
-## Handoff Note for Claude Code
+## Round 10: Typography Scale, Branding Colors, and Visual Polish
+
+This round applies the finalized brand colors from earlier (see the "Held for a later, dedicated styling round" note — that round is now happening) across the whole app in one pass, alongside a defined typography scale and a list of specific visual fixes found in real use.
+
+### Typography scale — one consistent system, four tiers
+
+Currently there's no clearly defined type scale, and some text (the expanded history view, the "How It Works" description in Settings) is uncomfortably small. Define and apply consistently everywhere:
+
+- Page titles (e.g. "Dashboard," "Settings") — largest, bold
+- Section headers (e.g. "Group Update," "Your Groups") — second tier
+- Button labels — clear and easily tappable
+- Body text (check-in questions, prayer updates, general reading text) — a genuinely comfortable mobile reading size
+- Hard floor: nothing in the app should ever render smaller than the current "Group Update" label size. This is the explicit minimum, including the two known current offenders (expanded history detail, Settings "How It Works" text), which must be brought up to at least this size.
+
+### Brand colors — apply throughout
+
+Use the finalized palette from earlier: #253551 (primary navy — headers, primary buttons, dashboard tab bar), #7993c2 (periwinkle accent — highlights, emphasis, anything meant to stand out), #ccd0d6 (light grey-blue — backgrounds, dividers, secondary/inactive states). Apply consistently across every screen, not just the login/landing page.
+
+### Specific fixes
+
+- Dashboard tab icon: replace the current icon with something resembling a car dashboard gauge, fitting the "dashboard" name
+- "Your Goals" button on the check-in screen: needs real visual prominence (border, background fill, or accent color) — currently blends in and doesn't read as a button
+- Goal input fields: current light grey text is hard to read; keep bold category titles and the boxed input style, but increase contrast and add clearer separation between each category so they don't visually run together
+- Group Update box: the platform admin's ministry-wide link needs real visual weight — a distinct, prominent box, not a plain link — since driving people to it matters. The group-specific leader link stays a normal underlined text link by contrast, deliberately less prominent.
+- Viewing a member's goals (dashboard drop-down): bold each category title, add spacing or light boxing between categories so they're easier to scan, without expanding this into multiple pages or excessive length
+- Profile: add the ability to customize initials-circle color for members who don't upload a photo (see initials_circle_color in the Data Model above), so members without photos aren't all visually identical
+
+### Dashboard row sizing (see also the collapsed row spec in Screens, above)
+
+As font sizes increase per the new type scale, the 5 rating boxes need proportionally more room. First name text has been removed from the collapsed dashboard row entirely (see the updated Screens section) to make room — identification relies on the photo/initials circle, with full name shown immediately on tap into the expanded row. Confirmed acceptable given these are small, familiar groups.
+
+
 
 This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Round 4 is urgent and should be sent and completed first. Round 5 and Round 6 can follow in either order, but Round 5 is the smaller, more self-contained of the two.

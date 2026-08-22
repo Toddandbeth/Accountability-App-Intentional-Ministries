@@ -16,9 +16,13 @@ function HomeIcon(props: SVGProps<SVGSVGElement>) {
 function DashboardIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      <rect x="3" y="4" width="18" height="4" rx="1" />
-      <rect x="3" y="11" width="8" height="9" rx="1" />
-      <rect x="13" y="11" width="8" height="9" rx="1" />
+      <path d="M4 17a8 8 0 0 1 16 0" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 17 16 11" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="17" r="1.3" fill="currentColor" stroke="none" />
+      <path
+        d="M4.5 17h1.2M18.3 17h1.2M6.6 11.3l.85.85M17.4 11.3l-.85.85M12 6.5v1.3"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -57,8 +61,8 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-1 py-2.5 text-xs font-medium ${
-                active ? "text-neutral-900" : "text-neutral-400"
+              className={`flex flex-col items-center gap-1 py-2.5 text-sm font-medium ${
+                active ? "text-brand-navy" : "text-brand-light"
               }`}
             >
               <Icon className="h-6 w-6" />

@@ -74,7 +74,7 @@ export function PlatformAdminSection({
 
   return (
     <div className="space-y-3 rounded-xl border border-neutral-300 bg-neutral-50 p-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+      <p className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
         Platform Admin
       </p>
 
@@ -85,7 +85,7 @@ export function PlatformAdminSection({
           className="flex w-full items-center justify-between p-3 text-left text-sm font-semibold"
         >
           System-Wide Stats
-          <span className="text-xs font-normal text-neutral-400">
+          <span className="text-sm font-normal text-neutral-400">
             {statsExpanded ? "Hide" : "View"}
           </span>
         </button>
@@ -115,7 +115,7 @@ export function PlatformAdminSection({
 
       <form onSubmit={handleSave} className="rounded-lg border border-neutral-200 bg-white p-3">
         <p className="text-sm font-semibold">Ministry-wide resource link</p>
-        <p className="mt-0.5 text-xs text-neutral-500">
+        <p className="mt-0.5 text-sm text-neutral-500">
           Shown to every user, in every group. Managed entirely outside the app — this just
           stores the URL.
         </p>
@@ -144,11 +144,11 @@ export function PlatformAdminSection({
           <button
             type="submit"
             disabled={saving}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-md bg-brand-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save"}
           </button>
-          {saved && <span className="text-xs text-neutral-500">Saved.</span>}
+          {saved && <span className="text-sm text-neutral-500">Saved.</span>}
         </div>
       </form>
     </div>

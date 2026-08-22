@@ -19,7 +19,7 @@ export function RatingButtonRow({ value, onChange, disabled }: RatingButtonRowPr
             type="button"
             disabled={disabled}
             onClick={() => onChange(r.value)}
-            className="flex flex-col items-center justify-center rounded-lg py-3 text-xs font-semibold transition disabled:opacity-50"
+            className="flex flex-col items-center justify-center rounded-lg py-3 text-sm font-semibold transition disabled:opacity-50"
             style={{
               backgroundColor: r.bg,
               color: r.text,

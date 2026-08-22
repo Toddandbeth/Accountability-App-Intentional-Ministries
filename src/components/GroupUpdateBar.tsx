@@ -79,11 +79,11 @@ export function GroupUpdateBar({
         onClick={handleExpand}
         className="flex w-full items-center gap-2 p-3 text-left"
       >
-        <span className="flex-1 text-sm font-semibold">Group Update</span>
+        <span className="flex-1 text-sm font-semibold text-brand-navy">Group Update</span>
         {flag && (
-          <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" title="New update" />
+          <span className="h-2 w-2 shrink-0 rounded-full bg-brand-periwinkle" title="New update" />
         )}
-        <span className="text-xs text-neutral-400">{expanded ? "Hide" : "View"}</span>
+        <span className="text-sm text-neutral-400">{expanded ? "Hide" : "View"}</span>
       </button>
 
       {expanded && (
@@ -93,7 +93,7 @@ export function GroupUpdateBar({
               href={platformLinkUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block underline"
+              className="block rounded-lg bg-brand-navy px-4 py-3 text-center font-semibold text-white"
             >
               {platformLinkLabel || platformLinkUrl}
             </a>
@@ -102,7 +102,7 @@ export function GroupUpdateBar({
           {isAdmin ? (
             <div className="space-y-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-neutral-600">
+                <label className="mb-1 block text-sm font-medium text-neutral-600">
                   Group link (optional)
                 </label>
                 <input
@@ -117,7 +117,7 @@ export function GroupUpdateBar({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-neutral-600">
+                <label className="mb-1 block text-sm font-medium text-neutral-600">
                   Text update (optional)
                 </label>
                 <textarea
@@ -131,7 +131,7 @@ export function GroupUpdateBar({
                   placeholder="What's going on with the group this week or month?"
                   className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
                 />
-                <div className="mt-1 text-right text-xs text-neutral-400">
+                <div className="mt-1 text-right text-sm text-neutral-400">
                   {text.length}/{UPDATE_TEXT_MAX_LENGTH}
                 </div>
               </div>
@@ -143,11 +143,11 @@ export function GroupUpdateBar({
                   type="button"
                   onClick={handlePostUpdate}
                   disabled={posting}
-                  className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                  className="rounded-md bg-brand-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
                 >
                   {posting ? "Posting…" : "Post Update"}
                 </button>
-                {posted && <span className="text-xs text-neutral-500">Posted.</span>}
+                {posted && <span className="text-sm text-neutral-500">Posted.</span>}
               </div>
             </div>
           ) : (

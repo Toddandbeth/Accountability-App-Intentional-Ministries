@@ -35,7 +35,7 @@ export function RemoveMemberButton({ membershipId }: RemoveMemberButtonProps) {
   }
 
   if (error) {
-    return <p className="text-xs text-red-600">{error}</p>;
+    return <p className="text-sm text-red-600">{error}</p>;
   }
 
   if (confirming) {
@@ -45,7 +45,7 @@ export function RemoveMemberButton({ membershipId }: RemoveMemberButtonProps) {
           type="button"
           disabled={busy}
           onClick={remove}
-          className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white disabled:opacity-50"
+          className="rounded-full bg-red-600 px-2 py-0.5 text-sm font-semibold text-white disabled:opacity-50"
         >
           Confirm?
         </button>
@@ -53,7 +53,7 @@ export function RemoveMemberButton({ membershipId }: RemoveMemberButtonProps) {
           type="button"
           disabled={busy}
           onClick={() => setConfirming(false)}
-          className="rounded-full border border-neutral-300 px-2 py-0.5 text-xs text-neutral-500"
+          className="rounded-full border border-neutral-300 px-2 py-0.5 text-sm text-neutral-500"
         >
           Cancel
         </button>
@@ -65,7 +65,7 @@ export function RemoveMemberButton({ membershipId }: RemoveMemberButtonProps) {
     <button
       type="button"
       onClick={() => setConfirming(true)}
-      className="rounded-full border border-neutral-200 px-2 py-0.5 text-xs text-neutral-400"
+      className="rounded-full border border-neutral-200 px-2 py-0.5 text-sm text-neutral-400"
     >
       Remove
     </button>

@@ -62,7 +62,7 @@ export function JoinGroupForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-md bg-brand-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           {submitting ? "…" : "Join"}
         </button>

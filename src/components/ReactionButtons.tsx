@@ -52,7 +52,7 @@ export function ReactionButtons({ checkInId, counts: initialCounts }: ReactionBu
           className="flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-sm disabled:opacity-40"
         >
           <span>{r.emoji}</span>
-          <span className="text-xs font-medium text-neutral-600">{counts[r.key]}</span>
+          <span className="text-sm font-medium text-neutral-600">{counts[r.key]}</span>
         </button>
       ))}
     </div>

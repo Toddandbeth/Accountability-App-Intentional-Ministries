@@ -5,11 +5,24 @@
   --foreground: #171717;
 }
 
+/*
+ * Brand palette (Round 10): #253551 primary navy (headers, primary
+ * buttons, the dashboard tab bar), #7993c2 periwinkle (accents,
+ * highlights, anything meant to stand out), #ccd0d6 light grey-blue
+ * (backgrounds, dividers, secondary/inactive states). Applied via these
+ * three tokens rather than overriding Tailwind's neutral scale directly,
+ * so existing neutral-* utilities (disabled states, rating colors, error
+ * red, etc.) are untouched and only deliberately-updated call sites pick
+ * up brand color.
+ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-brand-navy: #253551;
+  --color-brand-periwinkle: #7993c2;
+  --color-brand-light: #ccd0d6;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -69,8 +69,8 @@ export default async function MemberHistoryPage({
         <Link href="/dashboard" className="text-sm text-neutral-500 underline">
           ← Back to dashboard
         </Link>
-        <h1 className="text-xl font-semibold">{name}&apos;s history</h1>
-        <p className="text-xs text-neutral-500">Last {HISTORY_WEEKS} weeks.</p>
+        <h1 className="text-2xl font-bold text-brand-navy">{name}&apos;s history</h1>
+        <p className="text-sm text-neutral-500">Last {HISTORY_WEEKS} weeks.</p>
       </div>
 
       {(!checkIns || checkIns.length === 0) && (

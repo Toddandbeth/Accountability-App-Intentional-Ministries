@@ -124,7 +124,7 @@ export function CheckInForm({
         <button
           type="button"
           onClick={toggleDescriptions}
-          className="text-xs text-neutral-500 underline"
+          className="text-sm text-neutral-500 underline"
         >
           {showDescriptions ? "Hide descriptions" : "Show descriptions"}
         </button>
@@ -134,7 +134,7 @@ export function CheckInForm({
         <div key={q.id} className="rounded-xl border border-neutral-200 bg-white p-4">
           <h3 className="text-sm font-semibold">{q.label_short}</h3>
           {showDescriptions && (
-            <p className="mt-1 text-xs text-neutral-500">{q.label_description}</p>
+            <p className="mt-1 text-sm text-neutral-500">{q.label_description}</p>
           )}
           <div className="mt-3">
             <RatingButtonRow
@@ -160,7 +160,7 @@ export function CheckInForm({
           placeholder="A prayer request, a praise, or a quick update on one of the categories above."
           className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm disabled:opacity-50"
         />
-        <div className="mt-1 text-right text-xs text-neutral-400">
+        <div className="mt-1 text-right text-sm text-neutral-400">
           {prayerRequest.length}/{PRAYER_REQUEST_MAX_LENGTH}
         </div>
         <div className="flex items-center gap-3">
@@ -168,12 +168,12 @@ export function CheckInForm({
             type="button"
             onClick={submitPrayerRequest}
             disabled={!editable || savingPrayer || !prayerRequestDirty}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-md bg-brand-navy px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
           >
             {savingPrayer ? "Submitting…" : "Submit"}
           </button>
           {prayerJustSaved && !prayerRequestDirty && (
-            <span className="text-xs text-neutral-500">Saved.</span>
+            <span className="text-sm text-neutral-500">Saved.</span>
           )}
         </div>
       </div>
@@ -181,7 +181,7 @@ export function CheckInForm({
       <button
         type="button"
         onClick={() => setGoalsOpen((v) => !v)}
-        className="w-full rounded-xl border border-neutral-200 bg-white p-4 text-left text-sm font-semibold"
+        className="w-full rounded-xl border-2 border-brand-periwinkle bg-brand-periwinkle/10 p-4 text-left text-sm font-bold text-brand-navy"
       >
         {goalsOpen ? "Hide your goals" : "Your goals"}
       </button>

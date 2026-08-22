@@ -17,7 +17,7 @@ export function HiddenGroupsSection({ groups }: HiddenGroupsSectionProps) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="text-xs font-medium text-neutral-500 underline"
+        className="text-sm font-medium text-neutral-500 underline"
       >
         {open ? "Hide" : "Show"} Hidden Groups ({groups.length})
       </button>

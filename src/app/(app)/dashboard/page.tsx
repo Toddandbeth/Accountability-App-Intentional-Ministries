@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   if (!profile?.active_group_id) {
     return (
       <div className="space-y-2">
-        <h1 className="text-xl font-semibold">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-brand-navy">Dashboard</h1>
         <p className="text-sm text-neutral-600">
           You&apos;re not part of a group yet.{" "}
           <Link href="/checkin" className="underline">
@@ -41,7 +41,7 @@ export default async function DashboardPage() {
   if (!group) {
     return (
       <div className="space-y-2">
-        <h1 className="text-xl font-semibold">No longer a member</h1>
+        <h1 className="text-2xl font-bold text-brand-navy">No longer a member</h1>
         <p className="text-sm text-neutral-600">
           You&apos;re no longer an active member of that group.{" "}
           <Link href="/settings" className="underline">
@@ -113,8 +113,8 @@ export default async function DashboardPage() {
     <div className="space-y-4">
       <div>
         <p className="text-sm text-neutral-500">{group.name}</p>
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <p className="text-xs text-neutral-500">Week of {weekStart}</p>
+        <h1 className="text-2xl font-bold text-brand-navy">Dashboard</h1>
+        <p className="text-sm text-neutral-500">Week of {weekStart}</p>
       </div>
 
       <GroupUpdateBar
@@ -146,6 +146,7 @@ export default async function DashboardPage() {
               firstName={firstName}
               fullName={fullName}
               imageUrl={p?.profile_image_url ?? null}
+              initialsColor={p?.initials_circle_color ?? null}
               cellPhone={p?.cell_phone ?? null}
               ratings={
                 c

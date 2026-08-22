@@ -5,27 +5,26 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { HideGroupToggle } from "@/components/HideGroupToggle";
+import { RenameGroupInput } from "@/components/RenameGroupInput";
 
 interface ActiveGroupSwitcherProps {
   userId: string;
   groups: { id: string; name: string; membershipId: string; isDeactivated?: boolean }[];
   activeGroupId: string | null;
-  // Rendered directly beneath the active group's own row — e.g. its group
-  // code, meeting day, and member list — so that content stays visually
-  // tied to the group it belongs to regardless of list order.
-  activeGroupExtra?: React.ReactNode;
+  canRenameActive?: boolean;
 }
 
 export function ActiveGroupSwitcher({
   userId,
   groups,
   activeGroupId,
-  activeGroupExtra,
+  canRenameActive,
 }: ActiveGroupSwitcherProps) {
   const router = useRouter();
   const supabase = createClient();
   const [switching, setSwitching] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [renaming, setRenaming] = useState(false);
 
   async function switchTo(groupId: string) {
     if (groupId === activeGroupId) return;
@@ -55,35 +54,62 @@ export function ActiveGroupSwitcher({
     <div className="space-y-2">
       {groups.map((g) => {
         const isActive = g.id === activeGroupId;
-        return (
-          <div key={g.id}>
+
+        if (isActive && renaming) {
+          return (
             <div
-              className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
-                isActive ? "border-neutral-900 bg-neutral-50" : "border-neutral-200 bg-white"
-              }`}
+              key={g.id}
+              className="rounded-lg border border-brand-navy bg-neutral-50 p-3 text-sm"
             >
+              <RenameGroupInput
+                groupId={g.id}
+                currentName={g.name}
+                onDone={() => setRenaming(false)}
+              />
+            </div>
+          );
+        }
+
+        return (
+          <div
+            key={g.id}
+            className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
+              isActive ? "border-brand-navy bg-neutral-50" : "border-neutral-200 bg-white"
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => switchTo(g.id)}
+              disabled={switching === g.id}
+              className="flex flex-1 items-center justify-between text-left disabled:opacity-50"
+            >
+              <span className={isActive ? "font-semibold text-brand-navy" : ""}>{g.name}</span>
+              {isActive && (
+                <span className="text-sm font-semibold text-brand-periwinkle">Active</span>
+              )}
+            </button>
+            {isActive && canRenameActive && (
               <button
                 type="button"
-                onClick={() => switchTo(g.id)}
-                disabled={switching === g.id}
-                className="flex flex-1 items-center justify-between text-left disabled:opacity-50"
+                onClick={() => setRenaming(true)}
+                title="Rename group"
+                className="shrink-0 text-sm text-neutral-400"
               >
-                <span className={isActive ? "font-semibold" : ""}>{g.name}</span>
-                {isActive && (
-                  <span className="text-xs font-semibold text-neutral-500">Active</span>
-                )}
+                ✎
               </button>
-              {g.isDeactivated && (
-                <Link
-                  href={`/roster/${g.id}`}
-                  className="shrink-0 text-xs font-medium text-neutral-500 underline"
-                >
-                  Roster
-                </Link>
-              )}
-              <HideGroupToggle membershipId={g.membershipId} hidden={false} />
-            </div>
-            {isActive && activeGroupExtra && <div className="mt-2 space-y-3">{activeGroupExtra}</div>}
+            )}
+            {g.isDeactivated && (
+              <Link
+                href={`/roster/${g.id}`}
+                className="shrink-0 text-sm font-medium text-neutral-500 underline"
+              >
+                Roster
+              </Link>
+            )}
+            {/* An active group can't be hidden — switch to a different one
+                first, so it's never both the active group and sitting in
+                the hidden list at once. */}
+            {!isActive && <HideGroupToggle membershipId={g.membershipId} hidden={false} />}
           </div>
         );
       })}

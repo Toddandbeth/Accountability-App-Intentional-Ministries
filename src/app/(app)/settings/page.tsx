@@ -55,6 +55,10 @@ export default async function SettingsPage() {
     })
   );
 
+  const activeGroupIdForSort = profile?.active_group_id ?? null;
+
+  // Switching your active group moves it to the top of the list, not
+  // just highlighting it in place.
   const visibleActiveGroups = myMembershipList
     .filter((m) => m.status === "active" && !m.hidden_by_user)
     .map((m) => ({
@@ -62,7 +66,8 @@ export default async function SettingsPage() {
       membershipId: m.id,
       name: groupInfoById.get(m.group_id)?.name ?? "Unnamed group",
       isDeactivated: groupInfoById.get(m.group_id)?.is_active === false,
-    }));
+    }))
+    .sort((a, b) => Number(b.id === activeGroupIdForSort) - Number(a.id === activeGroupIdForSort));
 
   const hiddenActiveGroups = myMembershipList
     .filter((m) => m.status === "active" && m.hidden_by_user)
@@ -142,7 +147,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Settings</h1>
+      <h1 className="text-2xl font-bold text-brand-navy">Settings</h1>
 
       <p className="text-sm text-neutral-500">{profile?.email}</p>
 
@@ -151,39 +156,41 @@ export default async function SettingsPage() {
       <HowThisWorksSection />
 
       <div className="space-y-2">
-        <h2 className="text-sm font-semibold text-neutral-700">Your groups</h2>
+        <h2 className="text-base font-semibold text-brand-navy">Your groups</h2>
         <ActiveGroupSwitcher
           userId={user.id}
           groups={visibleActiveGroups}
           activeGroupId={activeGroupId}
-          activeGroupExtra={
-            isAdminOfActiveGroup && activeGroup ? (
-              <>
-                <div className="rounded-xl border border-neutral-200 bg-white p-4">
-                  <p className="text-xs font-semibold text-neutral-500">Group code</p>
-                  <p className="mt-1 font-mono text-2xl tracking-wider">{activeGroup.code}</p>
-                  <p className="mt-1 text-xs text-neutral-500">
-                    Share this with the men you want in the group.
-                  </p>
-                </div>
-                <GroupSettingsForm group={activeGroup} />
-                <GroupMembersSection
-                  currentUserId={user.id}
-                  activeMembers={activeMembers}
-                  pendingMembers={pendingMembers}
-                  otherMembers={otherMembers}
-                  nameFor={nameFor}
-                />
-              </>
-            ) : undefined
-          }
+          canRenameActive={isAdminOfActiveGroup}
         />
         <HiddenGroupsSection groups={hiddenActiveGroups} />
       </div>
 
+      {isAdminOfActiveGroup && activeGroup && (
+        <div className="space-y-2">
+          <div className="rounded-xl border border-neutral-200 bg-white p-4">
+            <p className="text-sm font-semibold text-neutral-500">Group code</p>
+            <p className="mt-1 font-mono text-2xl tracking-wider text-brand-navy">
+              {activeGroup.code}
+            </p>
+            <p className="mt-1 text-sm text-neutral-500">
+              Share this with the men you want in the group.
+            </p>
+          </div>
+          <GroupSettingsForm group={activeGroup} />
+          <GroupMembersSection
+            currentUserId={user.id}
+            activeMembers={activeMembers}
+            pendingMembers={pendingMembers}
+            otherMembers={otherMembers}
+            nameFor={nameFor}
+          />
+        </div>
+      )}
+
       {pastGroups.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-neutral-700">Past groups</h2>
+          <h2 className="text-base font-semibold text-brand-navy">Past groups</h2>
           <div className="space-y-2">
             {pastGroups.map((g) => (
               <div
@@ -194,14 +201,14 @@ export default async function SettingsPage() {
                 <span className="flex shrink-0 gap-3">
                   <Link
                     href={`/history?group=${g.id}`}
-                    className="text-xs font-medium text-neutral-500 underline"
+                    className="text-sm font-medium text-neutral-500 underline"
                   >
                     Your history
                   </Link>
                   {g.isDeactivated && (
                     <Link
                       href={`/roster/${g.id}`}
-                      className="text-xs font-medium text-neutral-500 underline"
+                      className="text-sm font-medium text-neutral-500 underline"
                     >
                       Roster
                     </Link>

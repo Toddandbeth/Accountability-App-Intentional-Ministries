@@ -13,6 +13,7 @@ export interface Profile {
   email: string | null;
   cell_phone: string | null;
   profile_image_url: string | null;
+  initials_circle_color: string | null;
   active_group_id: string | null;
   platform_admin: boolean;
   created_at: string;
@@ -106,4 +107,5 @@ export interface GroupRosterMember {
   first_name: string | null;
   last_name: string | null;
   profile_image_url: string | null;
+  initials_circle_color: string | null;
 }
