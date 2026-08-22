@@ -59,7 +59,7 @@ export function ActiveGroupSwitcher({
           return (
             <div
               key={g.id}
-              className="rounded-lg border border-brand-navy bg-neutral-50 p-3 text-sm"
+              className="rounded-lg border border-brand-periwinkle bg-brand-periwinkle/20 p-3 text-sm"
             >
               <RenameGroupInput
                 groupId={g.id}
@@ -74,7 +74,7 @@ export function ActiveGroupSwitcher({
           <div
             key={g.id}
             className={`flex items-center gap-2 rounded-lg border p-3 text-sm ${
-              isActive ? "border-brand-navy bg-neutral-50" : "border-neutral-200 bg-white"
+              isActive ? "border-brand-periwinkle bg-brand-periwinkle/20" : "border-neutral-200 bg-white"
             }`}
           >
             <button
@@ -85,7 +85,7 @@ export function ActiveGroupSwitcher({
             >
               <span className={isActive ? "font-semibold text-brand-navy" : ""}>{g.name}</span>
               {isActive && (
-                <span className="text-sm font-semibold text-brand-periwinkle">Active</span>
+                <span className="text-sm font-semibold text-brand-navy">Active</span>
               )}
             </button>
             {isActive && canRenameActive && (

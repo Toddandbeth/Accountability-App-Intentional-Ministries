@@ -46,7 +46,7 @@ export default function SignupPage() {
   if (pendingConfirmation) {
     return (
       <div className="text-center">
-        <h1 className="text-lg font-semibold">Check your email</h1>
+        <h1 className="text-2xl font-bold text-brand-navy">Check your email</h1>
         <p className="mt-2 text-sm text-neutral-600">
           We sent a confirmation link to {email}. Follow it to finish creating your account.
         </p>
@@ -56,7 +56,7 @@ export default function SignupPage() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="text-lg font-semibold">Create your account</h1>
+      <h1 className="text-2xl font-bold text-brand-navy">Create your account</h1>
 
       <div className="grid grid-cols-2 gap-3">
         <input

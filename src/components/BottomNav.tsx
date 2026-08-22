@@ -16,11 +16,11 @@ function HomeIcon(props: SVGProps<SVGSVGElement>) {
 function DashboardIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      <path d="M4 17a8 8 0 0 1 16 0" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M12 17 16 11" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12" cy="17" r="1.3" fill="currentColor" stroke="none" />
+      <path d="M3 19a9 9 0 0 1 18 0" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 19 17 10.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none" />
       <path
-        d="M4.5 17h1.2M18.3 17h1.2M6.6 11.3l.85.85M17.4 11.3l-.85.85M12 6.5v1.3"
+        d="M3.8 19h1.4M18.8 19h1.4M6.2 12.2l1 1M17.8 12.2l-1 1M12 4.5v1.6"
         strokeLinecap="round"
       />
     </svg>

@@ -132,7 +132,7 @@ export function CheckInForm({
 
       {questions.map((q) => (
         <div key={q.id} className="rounded-xl border border-neutral-200 bg-white p-4">
-          <h3 className="text-sm font-semibold">{q.label_short}</h3>
+          <h3 className="text-base font-semibold text-brand-navy">{q.label_short}</h3>
           {showDescriptions && (
             <p className="mt-1 text-sm text-neutral-500">{q.label_description}</p>
           )}
@@ -147,7 +147,7 @@ export function CheckInForm({
       ))}
 
       <div className="rounded-xl border border-neutral-200 bg-white p-4">
-        <h3 className="text-sm font-semibold">Prayer &amp; Life Update (optional)</h3>
+        <h3 className="text-base font-semibold text-brand-navy">Prayer &amp; Life Update (optional)</h3>
         <textarea
           value={prayerRequest}
           onChange={(e) => {

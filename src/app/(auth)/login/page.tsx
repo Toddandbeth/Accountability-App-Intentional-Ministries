@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="text-lg font-semibold">Log in</h1>
+      <h1 className="text-2xl font-bold text-brand-navy">Log in</h1>
 
       <input
         type="email"

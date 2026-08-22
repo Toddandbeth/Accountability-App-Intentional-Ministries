@@ -64,7 +64,7 @@ export default function ResetPasswordPage() {
   if (done) {
     return (
       <div className="text-center">
-        <h1 className="text-lg font-semibold">Password updated</h1>
+        <h1 className="text-2xl font-bold text-brand-navy">Password updated</h1>
         <p className="mt-2 text-sm text-neutral-600">Taking you back to the app…</p>
       </div>
     );
@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
   if (!ready) {
     return (
       <div className="text-center">
-        <h1 className="text-lg font-semibold">Reset link needed</h1>
+        <h1 className="text-2xl font-bold text-brand-navy">Reset link needed</h1>
         <p className="mt-2 text-sm text-neutral-600">
           Open this page from the reset link in your email, or request a new one.
         </p>
@@ -86,7 +86,7 @@ export default function ResetPasswordPage() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="text-lg font-semibold">Set a new password</h1>
+      <h1 className="text-2xl font-bold text-brand-navy">Set a new password</h1>
 
       <input
         type="password"

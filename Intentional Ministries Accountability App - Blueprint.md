@@ -278,9 +278,10 @@ Completed and sent to Claude Code:
 - Round 9 — Settings reorganization and goals relocated to check-in screen; deployed live
 - Round 10 — typography scale, brand colors, visual polish, dashboard row redesign, active-group logic, group renaming, Round 9 group-list bug fix
 - Login/signup screen now shows the actual IM_-_Main.png brand logo (vertical lockup) above the form — the real brand asset files arrived and were placed in public/brand/, superseding the earlier placeholder plan
+- Round 11 — fixed the real bottom-nav-unresponsive bug (a leftover full-screen overlay from the Weekly Questions slide-over was intercepting taps even while closed/off-screen), evened up the dashboard gauge icon's size against the other two nav icons, fixed several places where the Round 10 type scale hadn't actually been applied (all four auth screens were still on the old smaller title size, several section headers were missing the brand color), and switched the active group's Settings highlight to the periwinkle accent so it actually stands out
 
 Pending, not yet sent:
-- Round 11 — follow-up from Round 10 live testing: unresponsive bottom nav icons (real bug), inconsistent icon sizing, font scale not fully verified as applied, and active/inactive contrast fix in Your Groups
+- None
 
 ## Round 2: Fixes and Additions from Real Testing
 

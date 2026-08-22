@@ -34,7 +34,7 @@ export function JoinGroupForm() {
   if (submitted) {
     return (
       <div className="rounded-xl border border-neutral-200 bg-white p-4">
-        <h2 className="text-base font-semibold">Request sent</h2>
+        <h2 className="text-base font-semibold text-brand-navy">Request sent</h2>
         <p className="mt-1 text-sm text-neutral-600">
           Waiting on the group leader to approve you. You&apos;ll see the group here as soon as
           they do.
@@ -45,7 +45,7 @@ export function JoinGroupForm() {
 
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-4">
-      <h2 className="text-base font-semibold">Join a group</h2>
+      <h2 className="text-base font-semibold text-brand-navy">Join a group</h2>
       <p className="mt-1 text-sm text-neutral-600">
         Enter the code your group leader shared with you.
       </p>

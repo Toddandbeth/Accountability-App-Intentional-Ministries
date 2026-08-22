@@ -38,7 +38,7 @@ export function CreateGroupForm() {
 
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-4">
-      <h2 className="text-base font-semibold">Create a group</h2>
+      <h2 className="text-base font-semibold text-brand-navy">Create a group</h2>
       <p className="mt-1 text-sm text-neutral-600">
         You&apos;ll be the group&apos;s admin. Share the group code with the men you want in it.
       </p>

@@ -24,7 +24,7 @@ export function SlideOverPanel({ label, title, children }: SlideOverPanelProps) 
 
       <div
         className={`fixed inset-0 z-30 bg-neutral-50 transition-transform duration-300 ease-out ${
-          open ? "translate-x-0" : "translate-x-full"
+          open ? "translate-x-0 pointer-events-auto" : "translate-x-full pointer-events-none"
         }`}
         aria-hidden={!open}
       >
