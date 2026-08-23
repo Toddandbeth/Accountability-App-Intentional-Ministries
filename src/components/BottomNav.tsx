@@ -127,11 +127,11 @@ export function BottomNav() {
               key={href}
               href={href}
               style={linkStyle}
-              className={`flex flex-col items-center gap-1 py-2.5 text-[17px] font-medium ${
+              className={`flex flex-col items-center gap-0.5 py-1.5 text-xs font-medium ${
                 active ? "text-brand-navy" : "text-brand-light"
               }`}
             >
-              <Icon filled={active} className="h-6 w-6" />
+              <Icon filled={active} className="h-5 w-5" />
               {label}
             </Link>
           );
