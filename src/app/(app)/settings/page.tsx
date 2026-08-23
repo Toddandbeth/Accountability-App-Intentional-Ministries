@@ -147,7 +147,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-brand-navy">Settings</h1>
+      <h1 className="text-3xl font-extrabold text-brand-navy">Settings</h1>
 
       {profile && <ProfileForm profile={profile} />}
 

@@ -8,38 +8,61 @@ interface IconProps extends SVGProps<SVGSVGElement> {
   filled: boolean;
 }
 
-function HomeIcon({ filled, ...props }: IconProps) {
+// Document + checkmark badge, shape/style based on the provided reference
+// (design-references/checkin-icon-reference.png), recolored to the app's
+// own brand tokens rather than dropped in as a literal asset.
+function CheckInIcon({ filled, ...props }: IconProps) {
   if (filled) {
     return (
       <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-        <path d="M12 3.3 3 11h2v8a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-8h2L12 3.3Z" />
+        <rect x="5" y="4" width="11" height="16" rx="2" />
+        <path d="M8.5 9h4M8.5 12.5h4M8.5 16h2" stroke="white" strokeWidth={1.8} strokeLinecap="round" />
+        <circle cx="17" cy="17" r="4.3" stroke="white" strokeWidth={1} />
+        <path
+          d="M15.2 17.1 16.4 18.3 18.7 16"
+          stroke="white"
+          strokeWidth={1.6}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
       </svg>
     );
   }
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      <path d="M3 11.5 12 4l9 7.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="5" y="4" width="11" height="16" rx="2" strokeLinejoin="round" />
+      <path d="M8.5 9h4M8.5 12.5h4M8.5 16h2" strokeLinecap="round" />
+      <circle cx="17" cy="17" r="4" />
+      <path d="M15.2 17.1 16.4 18.3 18.7 16" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
+// Gauge/speedometer, redesigned per Round 16 against the provided
+// reference (design-references/dashboard-gauge-reference.png): a fuller
+// ~270-degree sweep (vs. the previous smaller arc), a thicker needle, and
+// tick marks at each end and top-center.
 function DashboardIcon({ filled, ...props }: IconProps) {
+  if (filled) {
+    return (
+      <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" {...props}>
+        <path d="M6.34 19.66A8 8 0 0 1 12 6a8 8 0 0 1 5.66 13.66l-1.42-1.42A6 6 0 0 0 12 8a6 6 0 0 0-4.24 10.24Z" />
+        <circle cx="12" cy="14" r="2.1" />
+        <path d="M12 14 16.8 17.7" stroke="currentColor" strokeWidth={3} strokeLinecap="round" />
+      </svg>
+    );
+  }
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
-      {filled ? (
-        <path d="M3 19a9 9 0 0 1 18 0h-2.2a6.8 6.8 0 0 0-13.6 0H3Z" fill="currentColor" stroke="none" />
-      ) : (
-        <path d="M3 19a9 9 0 0 1 18 0" strokeLinecap="round" strokeLinejoin="round" />
-      )}
-      <path d="M12 19 17 10.5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none" />
-      {!filled && (
-        <path
-          d="M3.8 19h1.4M18.8 19h1.4M6.2 12.2l1 1M17.8 12.2l-1 1M12 4.5v1.6"
-          strokeLinecap="round"
-        />
-      )}
+      <path
+        d="M6.34 19.66A8 8 0 0 1 12 6a8 8 0 0 1 5.66 13.66"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M6.34 19.66 5.28 20.72M12 6 12 4.5M17.66 19.66 18.72 20.72" strokeLinecap="round" />
+      <circle cx="12" cy="14" r="1.6" fill="currentColor" stroke="none" />
+      <path d="M12 14 16.8 17.7" strokeWidth={3} strokeLinecap="round" />
     </svg>
   );
 }
@@ -66,7 +89,7 @@ function SettingsIcon({ filled, ...props }: IconProps) {
 }
 
 const ITEMS = [
-  { href: "/checkin", label: "Home", Icon: HomeIcon },
+  { href: "/checkin", label: "Check-in", Icon: CheckInIcon },
   { href: "/dashboard", label: "Dashboard", Icon: DashboardIcon },
   { href: "/settings", label: "Settings", Icon: SettingsIcon },
 ];

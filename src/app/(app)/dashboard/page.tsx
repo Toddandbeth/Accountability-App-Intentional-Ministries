@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   if (!profile?.active_group_id) {
     return (
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-brand-navy">Dashboard</h1>
+        <h1 className="text-3xl font-extrabold text-brand-navy">Dashboard</h1>
         <p className="text-[17px] text-neutral-600">
           You&apos;re not part of a group yet.{" "}
           <Link href="/checkin" className="underline">
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
     <div className="space-y-4">
       <div>
         <p className="text-[17px] text-neutral-500">{group.name}</p>
-        <h1 className="text-2xl font-bold text-brand-navy">Dashboard</h1>
+        <h1 className="text-3xl font-extrabold text-brand-navy">Dashboard</h1>
         {meetingDate && (
           <p className="text-[17px] text-neutral-500">Meeting: {formatMeetingDate(meetingDate)}</p>
         )}
@@ -126,6 +126,7 @@ export default async function DashboardPage() {
         isAdmin={isAdmin}
         initialFlag={group.group_update_flag}
         groupLinkUrl={group.group_update_link_url}
+        groupLinkLabel={group.group_update_link_label}
         groupText={group.group_update_text}
         platformLinkUrl={platformSettings?.resource_link_url ?? null}
         platformLinkLabel={platformSettings?.resource_link_label ?? null}

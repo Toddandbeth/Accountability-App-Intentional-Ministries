@@ -92,6 +92,7 @@ Group
 - Active/inactive flag
 - Slug (for a clean URL)
 - group_update_link_url (text, optional — the leader-editable link inside Group Update)
+- group_update_link_label (text, optional — the leader-editable clickable label for that link, e.g. "Check out this video on 2 Peter" — see Round 16. This is what actually displays and is underlined; the raw URL itself is never shown to the group.)
 - group_update_text (text, optional, length-capped — the leader-editable message inside Group Update)
 - group_update_flag (true/false — set to true when the leader posts an update, cleared to false the first time anyone on the group opens the Group Update box)
 
@@ -283,7 +284,8 @@ Completed and sent to Claude Code:
 - Font sizing — final exact pixel values (24/20/17/12px) applied app-wide and deployed live, including confirming the 12px utility tier fits real content
 - Round 13 — rating button size fix, auto-shrink question titles, Help & Tips structural fix, editable category labels; deployed live
 - Round 14 — question editor label rename, confirmation email redirect fix, theme consistency on the check-email screen, auto-shrink max-size cap, Weekly Questions repositioning/color fix; Resend email provider set up and connected (app@mail.intentionalministries.com — Resend required a subdomain, not the root domain), fixing confirmation/reset email branding and unlocking the welcome email feature; deployed live
-- Round 15 — meeting date now shown instead of week-start date on dashboard and check-in (new current_meeting_date RPC, migration 0015); personal history moved from a standalone check-in link to the dashboard row-tap pattern — tapping your own row now shows full uncapped history (the old 10-week cap on /history is gone entirely), other members stay capped at 6 weeks as before; check-in header simplified to group name, "This Week's Check-In" in proper title case, the meeting date, and the descriptions toggle, all in one row (logic lifted into CheckInForm so the toggle and the question cards share one state); email moved out of the Settings page header into Profile, next to the rest of the profile info; bottom nav icons now show a filled version on the active tab and an outline version otherwise; sign-up screen brought into the same navy theme as login/check-your-email; full Help & Tips content uploaded for all 6 topics. The welcome email button turned out to already read its label from the platform admin's resource field correctly — what looked like a hardcoded "This month's challenge" was actually a hardcoded value in Claude Code's own one-off test script sent to verify deliverability, not a bug in the app itself; no code change was needed there. Also fixed in passing: the nav tap/long-press bug — root-caused to iOS Safari's default long-press link callout and tap-delay ambiguity (not a hit-target or z-index issue), closed with touch-action: manipulation and -webkit-touch-callout: none on the nav links. Deployed live; needs migration 0015 applied.
+- Round 15 — meeting date display, personal history moved to dashboard (layout since superseded by Round 16), email moved out of Settings header, nav icon states, nav bug diagnostic, sign-up screen theme fix, welcome email button label fix (turned out to already be correct — see Round 16 note), full Help & Tips content; deployed live
+- Round 16 — check-in header restructured to a stacked vertical layout (supersedes Round 15's row layout); "Home" tab renamed to "Check-in"; page titles on all three tabs bumped to text-3xl/extrabold for real visual weight; two new tab icons (a document-with-checkmark for Check-in, a redesigned fuller-sweep gauge for Dashboard with a thicker needle and tick marks) built from provided style references and recolored to brand navy/periwinkle — outline when inactive, filled when active, same pattern as Settings; Manage Your Goals button changed from periwinkle to navy and now scrolls its content into view on open (verified: scrollY jumped from 0 to 1628px on click); Group Update's leader-content now sits in its own visually distinct box beneath the ministry-wide button, and a new group_update_link_label field (migration 0016) means only a short label displays and is clickable — never the raw URL, and only when both a label and a URL are set. Deployed live; needs migration 0016 applied.
 
 ## Round 2: Fixes and Additions from Real Testing
 
@@ -797,7 +799,7 @@ Remove the standalone "Your History" link from the top of the check-in screen en
 
 ### Check-in screen header cleanup
 
-With the "Your History" link removed per above, the check-in header simplifies to four elements in a row: group name, "This Week's Check-In" as the page title (proper title case, consistent with the Page Title tier of the type scale), the meeting date (see above), and the "Hide Descriptions" toggle — position at the top is fine, no strong preference beyond that. No branding/logo repeated here — keep it clean, consistent with the login screen being the one strong branding moment in the app.
+SUPERSEDED — see Round 16 for the actual final layout. With the "Your History" link removed per above, the check-in header simplifies to four elements: group name, "This Week's Check-In" as the page title (proper title case, consistent with the Page Title tier of the type scale), the meeting date, and the "Hide Descriptions" toggle. The original description here (a horizontal row layout) was replaced in Round 16 with a stacked vertical layout instead — see Round 16 for the current, correct spec. No branding/logo repeated here — keep it clean, consistent with the login screen being the one strong branding moment in the app.
 
 ### Settings — move email out of the page header
 
@@ -814,5 +816,44 @@ A new, more specific symptom beyond the earlier "needs multiple taps" report: so
 
 
 This document is the spec. The database design (Data Model section) should be treated as fixed — build the screens, workflows, and permissions on top of it rather than changing its shape. Round 4 is urgent and should be sent and completed first. Round 5 and Round 6 can follow in either order, but Round 5 is the smaller, more self-contained of the two.
+
+## Round 16: Check-in Header Restructure, Tab Rename, New Icons, Goals Button Fix
+
+### Check-in screen header — full restructure
+
+Revising the layout described in Round 15 — this supersedes it. Stack, top to bottom: group name, then "This Week's Check-In" as a large title spanning the width of the screen, then "Hide Descriptions" as a proper underlined link beneath that, then the meeting date at the bottom of this stack. All four elements stacked vertically, not split across a line with wasted space to the side.
+
+### Rename "Home" tab to "Check-in"
+
+The bottom nav tab currently labeled "Home" has always functionally been the check-in screen — rename the label to "Check-in" so the three tabs read as Check-in, Dashboard, Settings, matching how this screen has already been referred to throughout this document.
+
+### Page titles across all three tabs need real visual weight
+
+"This Week's Check-In," "Dashboard," and "Settings" should all render large and bold at the top of their respective screens — left-aligned for now, but with much more visual weight than currently, so each screen clearly announces what it is at a glance.
+
+### New tab icons
+
+Two style references were provided (generic stock icons, not final branded assets) — use these for shape and style only, then apply the app's actual brand colors (navy/periwinkle) to match everything else, not as literal pixel-perfect assets to drop in directly:
+
+- Check-in tab: a document/checklist shape with a checkmark accent, matching the style of the reference image provided
+- Dashboard tab: a gauge/speedometer shape, redesigned from the current version — a fuller sweep (roughly 75% of a circle, not the current smaller arc), a thicker/beefier dial needle, and tick marks along the gauge, matching the style of the reference image provided
+
+### Manage Your Goals button — color and scroll fix
+
+- Change the button's color from periwinkle to the main navy blue (#253551). It's currently the only element on the check-in screen using periwinkle, which reads as inconsistent rather than intentional.
+- Fix the scroll behavior: currently, tapping the button (which sits near the bottom of the page) expands the goals content below the visible screen area, with no visual indication anything happened except the button's own label changing to "Hide Your Goals." Fix: when tapped, automatically scroll the page down just enough to bring the newly revealed goals content into view, so the action is immediately visible rather than requiring the user to notice the button change and manually scroll. This is a targeted scroll-into-view fix, not a change to the underlying interaction — it remains an inline expand (not a separate slide-over screen), and continues to close automatically when navigating away and back, exactly as it does now. Deliberately keeping it inline (not converting to its own screen) preserves the ability to scroll back and forth between the question descriptions above and the goals below while deciding what to write.
+
+### Group Update expanded view — visual separation and link label
+
+Real testing surfaced two separate problems in the expanded Group Update box, currently both crammed into one shared white area. Note: there is no line-break/text-formatting bug — text entry works correctly as-is; testing with different text simply made the visual separation problem below more obvious.
+
+1. **Visual separation:** the ministry-wide resource button (e.g. "Discipleship Resources") and the leader's own group-specific content currently render in the same undifferentiated box, making the leader's content look like an unstructured extension of the button above it rather than its own distinct section. Fix: give the leader's content its own visually separate section (a distinct box, or at minimum clear spacing/a divider) beneath the ministry button.
+
+2. **Raw URL display:** the leader's link currently displays as the literal full URL (e.g. "https://bibleproject.com/videos/..."), which is long, ugly, and overflows the screen. Fix: add a new field, group_update_link_label (see Data Model above), so the leader enters both a short clickable label ("Check out this video on 2 Peter") and the URL separately. Only the label displays, underlined and clickable — the raw URL is never shown directly to the group. If no URL is entered, no link displays at all — don't fall back to showing a raw URL if a label exists without one, or vice versa; both fields should be filled together or neither shows.
+
+
+
+Discussed and settled: no additional branding is being added inside the app beyond the login/sign-up flow. A bare icon alone (without the full "INTENTIONAL MINISTRIES" wordmark) doesn't actually communicate anything meaningful on its own, and the existing discovery points (the Group Update resource link, the welcome email, Help & Tips) already serve the goal of driving traffic to the broader ministry resources. This is a final decision, not an open item.
+
 
 

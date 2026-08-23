@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { RatingButtonRow } from "@/components/RatingButtonRow";
 import { GoalsForm } from "@/components/GoalsForm";
@@ -52,6 +52,17 @@ export function CheckInForm({
   // collapsed every time this screen mounts, even if it was open moments
   // ago, since goals change far less often than the weekly rating/update.
   const [goalsOpen, setGoalsOpen] = useState(false);
+  const goalsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Runs after the newly-revealed content has actually rendered (this
+    // effect depends on goalsOpen, not the click handler itself), so the
+    // target exists to scroll to. Only fires on open, not close — there's
+    // nothing useful to scroll to when collapsing.
+    if (goalsOpen) {
+      goalsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [goalsOpen]);
 
   useEffect(() => {
     // Reads localStorage (unavailable during SSR) after mount, so this
@@ -119,21 +130,19 @@ export function CheckInForm({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="text-[17px] text-neutral-500">{groupName}</p>
-          <h1 className="text-2xl font-bold text-brand-navy">This Week&apos;s Check-In</h1>
-          {meetingDate && (
-            <p className="text-[17px] text-neutral-500">Meeting: {meetingDate}</p>
-          )}
-        </div>
+      <div className="space-y-1">
+        <p className="text-[17px] text-neutral-500">{groupName}</p>
+        <h1 className="text-3xl font-extrabold text-brand-navy">This Week&apos;s Check-In</h1>
         <button
           type="button"
           onClick={toggleDescriptions}
-          className="mt-1 shrink-0 text-[17px] text-neutral-500 underline"
+          className="block text-[17px] text-neutral-500 underline"
         >
-          {showDescriptions ? "Hide descriptions" : "Show descriptions"}
+          {showDescriptions ? "Hide Descriptions" : "Show Descriptions"}
         </button>
+        {meetingDate && (
+          <p className="text-[17px] text-neutral-500">Meeting: {meetingDate}</p>
+        )}
       </div>
 
       {!editable && (
@@ -193,17 +202,19 @@ export function CheckInForm({
       <button
         type="button"
         onClick={() => setGoalsOpen((v) => !v)}
-        className="w-full rounded-xl bg-brand-periwinkle p-4 text-left text-[17px] font-bold text-white"
+        className="w-full rounded-xl bg-brand-navy p-4 text-left text-[17px] font-bold text-white"
       >
         {goalsOpen ? "Hide Your Goals" : "Manage Your Goals"}
       </button>
       {goalsOpen && (
-        <GoalsForm
-          userId={userId}
-          groupId={groupId}
-          questions={goalsQuestions}
-          initialGoals={initialGoals}
-        />
+        <div ref={goalsRef}>
+          <GoalsForm
+            userId={userId}
+            groupId={groupId}
+            questions={goalsQuestions}
+            initialGoals={initialGoals}
+          />
+        </div>
       )}
 
       {saveError && <p className="text-[17px] text-red-600">{saveError}</p>}
