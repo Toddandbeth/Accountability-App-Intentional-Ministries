@@ -30,7 +30,7 @@ function CheckInIcon({ filled, ...props }: IconProps) {
     );
   }
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.25} {...props}>
       <rect x="5" y="4" width="11" height="16" rx="2" strokeLinejoin="round" />
       <path d="M8.5 9h4M8.5 12.5h4M8.5 16h2" strokeLinecap="round" />
       <circle cx="17" cy="17" r="4" />
@@ -45,16 +45,22 @@ function CheckInIcon({ filled, ...props }: IconProps) {
 // tick marks at each end and top-center.
 function DashboardIcon({ filled, ...props }: IconProps) {
   if (filled) {
+    // A solid pie wedge (center to each arc end, around the 270° sweep),
+    // not just a thin filled band — the earlier band version had roughly
+    // the same ink coverage as the outline's 2px stroke, so "active" only
+    // read as a color change rather than a genuinely bolder/filled glyph
+    // like its Check-in/Settings siblings. Needle and pivot render in
+    // white to stay visible against the now-solid fill.
     return (
       <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" {...props}>
-        <path d="M6.34 19.66A8 8 0 0 1 12 6a8 8 0 0 1 5.66 13.66l-1.42-1.42A6 6 0 0 0 12 8a6 6 0 0 0-4.24 10.24Z" />
-        <circle cx="12" cy="14" r="2.1" />
-        <path d="M12 14 16.8 17.7" stroke="currentColor" strokeWidth={3} strokeLinecap="round" />
+        <path d="M12 14 6.34 19.66A8 8 0 0 1 12 6a8 8 0 0 1 5.66 13.66Z" />
+        <path d="M12 14 16.8 17.7" stroke="white" strokeWidth={2.6} strokeLinecap="round" />
+        <circle cx="12" cy="14" r="2.1" fill="white" />
       </svg>
     );
   }
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.25} {...props}>
       <path
         d="M6.34 19.66A8 8 0 0 1 12 6a8 8 0 0 1 5.66 13.66"
         strokeLinecap="round"
@@ -62,7 +68,7 @@ function DashboardIcon({ filled, ...props }: IconProps) {
       />
       <path d="M6.34 19.66 5.28 20.72M12 6 12 4.5M17.66 19.66 18.72 20.72" strokeLinecap="round" />
       <circle cx="12" cy="14" r="1.6" fill="currentColor" stroke="none" />
-      <path d="M12 14 16.8 17.7" strokeWidth={3} strokeLinecap="round" />
+      <path d="M12 14 16.8 17.7" strokeWidth={3.25} strokeLinecap="round" />
     </svg>
   );
 }
@@ -77,7 +83,7 @@ function SettingsIcon({ filled, ...props }: IconProps) {
     );
   }
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} {...props}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.25} {...props}>
       <circle cx="12" cy="12" r="3" />
       <path
         d="M19.4 13a7.6 7.6 0 0 0 .1-2l2-1.6-2-3.4-2.4 1a7.5 7.5 0 0 0-1.7-1L15 3h-6l-.4 2.5a7.5 7.5 0 0 0-1.7 1l-2.4-1-2 3.4L4.5 11a7.6 7.6 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.5 7.5 0 0 0 1.7 1L9 21h6l.4-2.5a7.5 7.5 0 0 0 1.7-1l2.4 1 2-3.4-2.1-1.1Z"
@@ -127,11 +133,11 @@ export function BottomNav() {
               key={href}
               href={href}
               style={linkStyle}
-              className={`flex flex-col items-center gap-0.5 py-1.5 text-xs font-medium ${
+              className={`flex flex-col items-center gap-0.5 py-1 text-xs font-medium ${
                 active ? "text-brand-navy" : "text-brand-light"
               }`}
             >
-              <Icon filled={active} className="h-5 w-5" />
+              <Icon filled={active} className="h-6 w-6" />
               {label}
             </Link>
           );

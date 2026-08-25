@@ -54,8 +54,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4">
       <h2 className="text-xl font-semibold text-brand-navy">Your profile</h2>
 
-      <p className="text-[17px] text-neutral-500">{profile.email}</p>
-
       <AvatarUpload
         userId={profile.id}
         name={displayName}
@@ -92,6 +90,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           onChange={(e) => setCellPhone(e.target.value)}
           className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
         />
+
+        <p className="text-[17px] text-neutral-500">{profile.email}</p>
 
         {error && <p className="text-[17px] text-red-600">{error}</p>}
         {saved && !error && <p className="text-[17px] text-neutral-500">Saved.</p>}

@@ -81,21 +81,21 @@ export function GroupUpdateBar({
   const hasGroupLink = Boolean(groupLinkUrl && groupLinkLabel);
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white">
+    <div className="space-y-2">
       <button
         type="button"
         onClick={handleExpand}
-        className="flex w-full items-center gap-2 p-3 text-left"
+        className="flex w-full items-center gap-2 rounded-xl bg-brand-navy p-3 text-left"
       >
-        <span className="flex-1 text-[17px] font-semibold text-brand-navy">Group Update</span>
+        <span className="flex-1 text-[17px] font-semibold text-white">Group Update</span>
         {flag && (
           <span className="h-2 w-2 shrink-0 rounded-full bg-brand-periwinkle" title="New update" />
         )}
-        <span className="text-[17px] text-neutral-400">{expanded ? "Hide" : "View"}</span>
+        <span className="text-[17px] text-brand-light">{expanded ? "Hide" : "View"}</span>
       </button>
 
       {expanded && (
-        <div className="space-y-3 border-t border-neutral-100 p-3 text-[17px]">
+        <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-3 text-[17px]">
           {platformLinkUrl && (
             <a
               href={platformLinkUrl}

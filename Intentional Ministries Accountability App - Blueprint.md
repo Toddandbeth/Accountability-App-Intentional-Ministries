@@ -199,6 +199,7 @@ Dashboard row, expanded (tap to open)
 - Below that header, a visually distinct divider or band, separating the contact info from the content below it
 - Below the divider: "Prayer & Life Update" as a bolded label, then the actual text the member submitted that week, or empty space if they didn't submit one
 - Below the update text: the 4 reaction icons (heart, prayer hands, thumbs up, raised hands), each tappable, each showing its current count
+- Add a section divider between the reaction icons and the buttons below (matching the style of the existing divider between the History and Goals buttons) — this is a real fix, not cosmetic: real use found the "6-Week History" button sits too close to the reaction icons with insufficient touch-target spacing, making it hard to hit reliably (roughly half of attempts miss). The Goals button, which already has its own visually separated section, doesn't have this problem — apply the same spacing/divider treatment above History to fix it.
 - Below the reactions, two buttons, both available to any group member (not leader-restricted — see Round 5):
   - "6-Week History" — opens that member's ratings and Prayer & Life Updates for roughly the last 6 weeks. Reactions are not shown in this history view, only in the current week's live expanded row.
   - "See [Name]'s Goals" — opens a further drop-down showing all 5 categories with that member's current goal text under each (blank if he hasn't set one for that category). Separate from the history button above, since goals are persistent and not tied to any specific week.
@@ -284,8 +285,12 @@ Completed and sent to Claude Code:
 - Font sizing — final exact pixel values (24/20/17/12px) applied app-wide and deployed live, including confirming the 12px utility tier fits real content
 - Round 13 — rating button size fix, auto-shrink question titles, Help & Tips structural fix, editable category labels; deployed live
 - Round 14 — question editor label rename, confirmation email redirect fix, theme consistency on the check-email screen, auto-shrink max-size cap, Weekly Questions repositioning/color fix; Resend email provider set up and connected (app@mail.intentionalministries.com — Resend required a subdomain, not the root domain), fixing confirmation/reset email branding and unlocking the welcome email feature; deployed live
-- Round 15 — meeting date display, personal history moved to dashboard (layout since superseded by Round 16), email moved out of Settings header, nav icon states, nav bug diagnostic, sign-up screen theme fix, welcome email button label fix (turned out to already be correct — see Round 16 note), full Help & Tips content; deployed live
-- Round 16 — check-in header restructured to a stacked vertical layout (supersedes Round 15's row layout); "Home" tab renamed to "Check-in"; page titles on all three tabs bumped to text-3xl/extrabold for real visual weight; two new tab icons (a document-with-checkmark for Check-in, a redesigned fuller-sweep gauge for Dashboard with a thicker needle and tick marks) built from provided style references and recolored to brand navy/periwinkle — outline when inactive, filled when active, same pattern as Settings; Manage Your Goals button changed from periwinkle to navy and now scrolls its content into view on open (verified: scrollY jumped from 0 to 1628px on click); Group Update's leader-content now sits in its own visually distinct box beneath the ministry-wide button, and a new group_update_link_label field (migration 0016) means only a short label displays and is clickable — never the raw URL, and only when both a label and a URL are set. Deployed live; needs migration 0016 applied.
+- Round 15 — meeting date display, personal history moved to dashboard (layout since superseded by Round 16), email moved out of Settings header, nav icon states, nav bug diagnostic, sign-up screen theme fix, welcome email button label fix (turned out to already be correct), full Help & Tips content; deployed live
+- Round 16 — check-in header restructured to a stacked vertical layout, "Home" tab renamed to "Check-in", bolder page titles on all three tabs, two new tab icons (document-with-checkmark, redesigned fuller-sweep gauge) built from provided style references, Manage Your Goals button changed to navy with scroll-into-view, Group Update visual separation plus a new group_update_link_label field so only a short label displays (never the raw URL); deployed live
+- Bottom nav height fix — measured at 74.5px (well above Apple's 49pt standard), shrunk to 51px via smaller labels/icons/padding; deployed live
+- Round 17 — login screen made genuinely responsive on smaller iPhones (added overflow-y-auto plus a shorter-viewport logo size, verified scrollable as a fallback down to 480px tall); Dashboard gauge's filled/active state redesigned as a true solid pie wedge instead of a thin band that read as barely different from the outline; email in Profile moved to after phone number; Dashboard page title renamed to "Group Dashboard" (nav tab stays "Dashboard"); Group Update button changed to navy with the notification dot confirmed clearly visible (verified: navy #253551 button, periwinkle #7993c2 dot); bottom nav icons made bigger and bolder (20px→24px, thicker strokes) while holding the bar at exactly 51px (verified via live measurement); check-in page title now auto-shrinks on smaller screens using the same technique as the question titles, generalized to accept a custom max/min size per call site. Deployed live.
+
+Pending, not yet sent: none currently.
 
 ## Round 2: Fixes and Additions from Real Testing
 
@@ -854,6 +859,42 @@ Real testing surfaced two separate problems in the expanded Group Update box, cu
 
 
 Discussed and settled: no additional branding is being added inside the app beyond the login/sign-up flow. A bare icon alone (without the full "INTENTIONAL MINISTRIES" wordmark) doesn't actually communicate anything meaningful on its own, and the existing discovery points (the Group Update resource link, the welcome email, Help & Tips) already serve the goal of driving traffic to the broader ministry resources. This is a final decision, not an open item.
+
+## Round 17: Post-Round-16 Fixes (in progress — being built up as items come in)
+
+### Login screen doesn't fully fit on smaller iPhones
+
+Real testing on a smaller iPhone (standard size, vs. the Max used for most testing) showed the login screen's bottom input area gets cut off — not everything fits within the visible viewport. Fix: the login screen needs to be genuinely responsive across iPhone screen sizes, not just tested on one large model.
+
+### Dashboard gauge icon needs a proper filled/active state
+
+Unlike the Check-in and Settings tab icons, which have both an outline (inactive) and a distinct solid/filled (active) version per the Round 15 nav icon spec, the Dashboard gauge icon only shifts color when active rather than actually becoming bold/filled like its siblings. Needs an actual filled variant built to match the pattern already working correctly on the other two tabs.
+
+### Settings — move email further down in Profile
+
+Round 15 moved the user's email out of the Settings page header and into the Profile section, but it landed at the very top of Profile. Move it further down, specifically after the phone number field, so it reads Name → Phone → Email rather than Email → Name → Phone.
+
+### Dashboard page title — confirmed, rename to "Group Dashboard"
+
+The page title at the top of the Dashboard screen changes from "Dashboard" to "Group Dashboard," since the screen is entirely about the group, not a generic personal dashboard. This applies to the page title only, not the bottom nav tab label — the tab itself stays "Dashboard" to avoid crowding next to "Check-in" and "Settings." Confirmed, final.
+
+### Group Update button color
+
+The Group Update button currently renders white, while other major buttons/links in the app use navy. Change it to navy blue (#253551) to match. When this changes, confirm the notification indicator dot (the "something new" signal) still reads clearly against the new navy background — periwinkle (#7993c2) is likely a better fit for the dot against navy than whatever it currently uses against white, but have Claude Code confirm visually rather than assuming.
+
+### Bottom nav icons — bigger, but the bar's overall height must not increase
+
+Based on comparison with other apps: the icon glyphs themselves should be bigger and bolder/more prominent — this is specifically about the icon images, not the text labels beneath them (those can stay their current size). Position and margins are fine as-is.
+
+Hard constraint: the overall height of the bottom nav bar itself must not increase at all — it should stay exactly where it currently sits (51px, per the recent fix below). Only the icon glyphs within that existing space should grow; nothing about the bar's outer boundary should move or expand to accommodate them. There is confirmed room within the current bar to make the icons bigger without growing the bar itself — labels, padding, or icon proportions can be adjusted as needed to make that fit, but the bar's total height is fixed and non-negotiable.
+
+### Check-in page title needs auto-shrink-to-fit on smaller screens
+
+On a smaller iPhone, "This Week's Check-In" is too large to fit on one line and wraps to a second line. The current size is correct and should stay as-is on larger screens (it looks right on the Max) — this needs the same auto-shrink-to-fit technique already built for the 5 question titles in Round 13: render at full size when it fits, shrink only as much as needed to stay on one line when it doesn't.
+
+### Bottom nav height — resolved directly, no action needed
+
+For reference: the bottom nav bar was found to be 74.5px, well above Apple's 49pt standard. This was already fixed directly (shrunk labels and icons, tightened padding) and deployed — now measuring 51px, within 2px of standard. No further action needed on this item.
 
 
 

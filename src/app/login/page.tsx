@@ -71,14 +71,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-brand-navy px-4 py-8">
+    <div className="flex min-h-dvh flex-col items-center justify-center overflow-y-auto bg-brand-navy px-4 py-8">
       <Image
         src="/brand/IM_-_Main_-_white.png"
         alt="Intentional Ministries"
         width={1076}
         height={917}
         priority
-        className="mb-8 h-auto w-64"
+        className="mb-8 h-auto w-64 [@media(max-height:700px)]:mb-4 [@media(max-height:700px)]:w-44"
       />
 
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 rounded-xl bg-white p-6">

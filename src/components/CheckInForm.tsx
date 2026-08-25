@@ -132,7 +132,13 @@ export function CheckInForm({
     <div className="space-y-4">
       <div className="space-y-1">
         <p className="text-[17px] text-neutral-500">{groupName}</p>
-        <h1 className="text-3xl font-extrabold text-brand-navy">This Week&apos;s Check-In</h1>
+        <AutoShrinkTitle
+          as="h1"
+          text="This Week's Check-In"
+          className="font-extrabold text-brand-navy"
+          maxFontSize={30}
+          minFontSize={20}
+        />
         <button
           type="button"
           onClick={toggleDescriptions}
