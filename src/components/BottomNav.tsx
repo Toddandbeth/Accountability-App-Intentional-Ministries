@@ -39,36 +39,34 @@ function CheckInIcon({ filled, ...props }: IconProps) {
   );
 }
 
-// Gauge/speedometer, redesigned per Round 16 against the provided
-// reference (design-references/dashboard-gauge-reference.png): a fuller
-// ~270-degree sweep (vs. the previous smaller arc), a thicker needle, and
-// tick marks at each end and top-center.
+// Round 18: replaces the gauge, whose filled state didn't read as a gauge
+// at all once solid — just an unrecognizable blob. A two-person "group"
+// glyph instead, since this tab is the group Dashboard. The white stroke
+// around the front figure in the filled version is what keeps it visually
+// separated from the back figure once both are solid, the same seam trick
+// used for Check-in's checkmark badge.
 function DashboardIcon({ filled, ...props }: IconProps) {
   if (filled) {
-    // A solid pie wedge (center to each arc end, around the 270° sweep),
-    // not just a thin filled band — the earlier band version had roughly
-    // the same ink coverage as the outline's 2px stroke, so "active" only
-    // read as a color change rather than a genuinely bolder/filled glyph
-    // like its Check-in/Settings siblings. Needle and pivot render in
-    // white to stay visible against the now-solid fill.
     return (
       <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" {...props}>
-        <path d="M12 14 6.34 19.66A8 8 0 0 1 12 6a8 8 0 0 1 5.66 13.66Z" />
-        <path d="M12 14 16.8 17.7" stroke="white" strokeWidth={2.6} strokeLinecap="round" />
-        <circle cx="12" cy="14" r="2.1" fill="white" />
+        <circle cx="16" cy="8.5" r="2.5" />
+        <path d="M14.2 14.5c.9-.6 1.9-.9 2.8-.9 2.3 0 4 2 4 5.4v1h-8v-1c0-2.1.5-3.7 1.2-4.5Z" />
+        <circle cx="8.5" cy="8" r="3.2" stroke="white" strokeWidth={1.3} />
+        <path
+          d="M2.7 20.3v-.3c0-3.5 2.3-6 5.8-6s5.8 2.5 5.8 6v.3"
+          stroke="white"
+          strokeWidth={1.3}
+          strokeLinejoin="round"
+        />
       </svg>
     );
   }
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.25} {...props}>
-      <path
-        d="M6.34 19.66A8 8 0 0 1 12 6a8 8 0 0 1 5.66 13.66"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M6.34 19.66 5.28 20.72M12 6 12 4.5M17.66 19.66 18.72 20.72" strokeLinecap="round" />
-      <circle cx="12" cy="14" r="1.6" fill="currentColor" stroke="none" />
-      <path d="M12 14 16.8 17.7" strokeWidth={3.25} strokeLinecap="round" />
+      <circle cx="16" cy="8.5" r="2.5" />
+      <path d="M14.2 14.5c.9-.6 1.9-.9 2.8-.9 2.3 0 4 2 4 5.4" strokeLinecap="round" />
+      <circle cx="8.5" cy="8" r="3.2" />
+      <path d="M2.7 20c0-3.5 2.3-6 5.8-6s5.8 2.5 5.8 6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -133,11 +131,11 @@ export function BottomNav() {
               key={href}
               href={href}
               style={linkStyle}
-              className={`flex flex-col items-center gap-0.5 py-1 text-xs font-medium ${
+              className={`flex flex-col items-center gap-0.5 py-0.5 text-xs font-medium ${
                 active ? "text-brand-navy" : "text-brand-light"
               }`}
             >
-              <Icon filled={active} className="h-6 w-6" />
+              <Icon filled={active} className="h-7 w-7" />
               {label}
             </Link>
           );

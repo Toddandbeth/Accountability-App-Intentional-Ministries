@@ -286,9 +286,10 @@ Completed and sent to Claude Code:
 - Round 13 — rating button size fix, auto-shrink question titles, Help & Tips structural fix, editable category labels; deployed live
 - Round 14 — question editor label rename, confirmation email redirect fix, theme consistency on the check-email screen, auto-shrink max-size cap, Weekly Questions repositioning/color fix; Resend email provider set up and connected (app@mail.intentionalministries.com — Resend required a subdomain, not the root domain), fixing confirmation/reset email branding and unlocking the welcome email feature; deployed live
 - Round 15 — meeting date display, personal history moved to dashboard (layout since superseded by Round 16), email moved out of Settings header, nav icon states, nav bug diagnostic, sign-up screen theme fix, welcome email button label fix (turned out to already be correct), full Help & Tips content; deployed live
-- Round 16 — check-in header restructured to a stacked vertical layout, "Home" tab renamed to "Check-in", bolder page titles on all three tabs, two new tab icons (document-with-checkmark, redesigned fuller-sweep gauge) built from provided style references, Manage Your Goals button changed to navy with scroll-into-view, Group Update visual separation plus a new group_update_link_label field so only a short label displays (never the raw URL); deployed live
-- Bottom nav height fix — measured at 74.5px (well above Apple's 49pt standard), shrunk to 51px via smaller labels/icons/padding; deployed live
-- Round 17 — login screen made genuinely responsive on smaller iPhones (added overflow-y-auto plus a shorter-viewport logo size, verified scrollable as a fallback down to 480px tall); Dashboard gauge's filled/active state redesigned as a true solid pie wedge instead of a thin band that read as barely different from the outline; email in Profile moved to after phone number; Dashboard page title renamed to "Group Dashboard" (nav tab stays "Dashboard"); Group Update button changed to navy with the notification dot confirmed clearly visible (verified: navy #253551 button, periwinkle #7993c2 dot); bottom nav icons made bigger and bolder (20px→24px, thicker strokes) while holding the bar at exactly 51px (verified via live measurement); check-in page title now auto-shrinks on smaller screens using the same technique as the question titles, generalized to accept a custom max/min size per call site. Deployed live.
+- Round 16 — check-in header restructured to a stacked vertical layout, "Home" tab renamed to "Check-in", bolder page titles on all three tabs, two new tab icons built from provided style references, Manage Your Goals button changed to navy with scroll-into-view, Group Update visual separation plus a new group_update_link_label field; deployed live
+- Bottom nav height fix — 74.5px shrunk to 51px (Apple's standard is 49pt); deployed live
+- Round 17 — login screen responsiveness on smaller iPhones, Dashboard gauge's filled state redesigned as a solid pie wedge, email moved to after phone in Profile, page title renamed to "Group Dashboard" (nav tab stays "Dashboard"), Group Update button changed to navy with dot contrast confirmed, bigger/bolder nav icons at the same 51px bar height, check-in title auto-shrink; deployed live
+- Round 18 — the dashboard-row divider between reactions and "6-Week History" that Round 16 was supposed to build (confirmed missed, now added); email is now editable in Profile with a confirm-the-new-address-first flow (Supabase's own updateUser({email}), no data model change needed); a copyable app link (app.intentionalministries.com — confirmed live and working) added to Settings with a Copy button; a second, more frequent keep-warm ping added via a GitHub Actions workflow (every 10 minutes, hitting a new no-DB /api/cron/warmup route) since Vercel's own Cron Jobs are limited to once a day on the Hobby plan and couldn't do this directly; Open Graph metadata added (title, description, and a purpose-built 1200x630 navy/white preview image) so sharing the app's link produces a real branded card instead of stale/default content — also caught and fixed the browser theme-color meta tag, which was a stray green (#1b7a3d) left over from the project template, unrelated to the OG issue but clearly wrong once noticed; the Dashboard tab's gauge icon (whose filled state read as an unrecognizable blob) replaced with a two-person group icon with genuine outline and filled states; all three nav icons enlarged again (24px → 28px) while holding the bar at exactly 51px; and a full Help & Tips rewrite — six topics (Add App to Home Screen, Check-in, Dashboard, Settings, Leader Guide, Questions & Answers), with Dashboard's and Leader Guide's subsections as individually collapsible accordion items. Deployed live.
 
 Pending, not yet sent: none currently.
 
@@ -433,6 +434,8 @@ Two explicit rules to prevent this:
 ### Deactivated groups become shared memory, not a dead end
 
 A group that's deliberately deactivated (as opposed to one just left open and going stale with no activity) is different from a group someone was individually removed from. Removal is about protecting a currently-active group's privacy from someone no longer part of it — that stays exactly as defined above (own history only, no roster, no dashboard). Deactivation means the group itself is over, equally, for everyone who was ever part of it.
+
+Confirmed rule: deactivation is permanent. There is no reactivation. Once a group is deactivated, it stays deactivated — the confirmation dialog before deactivating exists specifically because this decision cannot be undone. This is a deliberate choice, not an oversight: if deactivation could be reversed, the roster feature below would lose its meaning as a genuine, settled marker that a group's story is complete.
 
 Rule: once a group is deactivated, anyone who was ever a member of it — currently active, previously removed, doesn't matter — can view a simple roster: the names and photos of everyone who was part of that group. This does not include anyone's private weekly content (ratings, Prayer & Life Updates, goals) beyond the viewer's own — the roster is "who was here," not "what everyone said." Each person's own historical data remains visible to them per the retention rules above, same as always.
 
@@ -895,6 +898,426 @@ On a smaller iPhone, "This Week's Check-In" is too large to fit on one line and 
 ### Bottom nav height — resolved directly, no action needed
 
 For reference: the bottom nav bar was found to be 74.5px, well above Apple's 49pt standard. This was already fixed directly (shrunk labels and icons, tightened padding) and deployed — now measuring 51px, within 2px of standard. No further action needed on this item.
+
+## Round 18: Missed Fix From Earlier, Plus New Items
+
+### Help & Tips content, full rewrite ready to upload
+
+This replaces the Help & Tips content previously embedded in Round 15. New structure: six top-level topics matching the app's own sections, in this order: Add App to Home Screen, Check-in, Dashboard, Settings, Leader Guide, Questions & Answers. Full content below, ready to use as-is.
+
+Structural instruction: Dashboard and Leader Guide are noticeably longer than the other topics (multiple subsections each). Rather than splitting them into additional top-level topics, make each subsection within these two specific topic pages its own collapsible caption, reusing the same accordion pattern already built elsewhere in the app (Prayer & Life Update, Goals) — tap a subsection heading like "Reactions" or "Removing a Member" to expand just that piece, with the rest staying collapsed. The other four topics (Add App to Home Screen, Check-in, Settings, Questions & Answers) can render as normal scrollable pages without needing this treatment, since they're shorter.
+
+---
+
+# Add App to Home Screen
+
+Why do this? This app lives on the web, not in the App Store, but you can still make it act like a normal app on your phone, with its own icon on your home screen and no browser bar cluttering the screen. It only takes a minute.
+
+On iPhone (Safari):
+- Open the app link in Safari (this only works in Safari, not Chrome or another browser, on iPhone).
+- Tap the Share button, the square with an arrow pointing up, usually at the bottom of the screen.
+- Scroll down and tap "Add to Home Screen."
+- You can rename it if you want, then tap "Add" in the top right.
+- The app icon now appears on your home screen. Tap it any time to open the app full-screen, just like a downloaded app.
+
+On Android (Chrome):
+- Open the app link in Chrome.
+- Tap the three-dot menu in the top right corner.
+- Tap "Add to Home screen," then confirm.
+- The app icon now appears on your home screen.
+
+One-time only. You won't need to do this again, the icon stays on your home screen like any other app.
+
+# Check-in
+
+The Check-in tab is where you complete your weekly personal check-in.
+
+## Your Weekly Check-in
+
+Each week you will rate yourself in five categories.
+
+For each category, choose the response that best describes where you are that week:
+- Strong
+- Good
+- Okay
+- Weak
+- Help
+
+Choose the answer that is most accurate, not the answer you think you should give. The purpose is to give your group an honest picture of how you are doing so you can encourage and help one another.
+
+You can change any of your answers until the week's deadline.
+
+## Category Descriptions
+
+Each category includes a description to help you think through what you are actually rating.
+
+Tap Hide Descriptions if you already know the questions and want a cleaner screen.
+
+You can show them again whenever you need them.
+
+## Meeting Date
+
+Near the top of the Check-in screen you will see your group's upcoming meeting date.
+
+Your check-in remains open through 11:59 PM on that meeting day. After the deadline, that week's answers are locked and a new week begins.
+
+If you miss a week, nothing carries forward from the previous week. The new week simply begins blank.
+
+## Prayer & Life Update
+
+Below your five ratings is an optional Prayer & Life Update.
+
+Use this to share something your group should know about this week. It could be:
+- A prayer request
+- A struggle
+- Something you are celebrating
+- An answered prayer
+- An important life update
+- Something connected to one of your five ratings
+
+You do not have to submit an update every week.
+
+Your Prayer & Life Update can be seen by the members of your group.
+
+## Manage Your Goals
+
+Tap Manage Your Goals near the bottom of the Check-in screen to view or edit your goals.
+
+You can set one goal for each of your five categories.
+
+Unlike your weekly ratings, goals do not reset each week. They remain in place until you decide to change them.
+
+Examples might include:
+- Spend time in Scripture five days each week
+- Schedule a date night twice a month
+- Exercise three times each week
+- Pay off a specific debt
+- Establish stronger boundaries with my phone
+
+Goals are optional. They are simply a way to identify an intentional next step in an area where you want to grow.
+
+# Dashboard
+
+The Dashboard gives your group a quick picture of how everyone is doing this week.
+
+## Reading the Dashboard
+
+Each person has one row showing his five weekly ratings.
+
+The columns correspond to your group's five categories.
+
+The colors and labels make it easy to see where someone is doing well and where he may need encouragement, prayer, or a conversation.
+
+The purpose is not to compare scores. The Dashboard is designed to help your group quickly know where to follow up with one another.
+
+## Opening a Member's Information
+
+Tap any member's row to see more information.
+
+The expanded section shows:
+- His name
+- His phone number, if provided
+- His Prayer & Life Update
+- Reactions to his update
+- His recent history
+- His current goals
+
+If a phone number is available, you can tap it to contact him.
+
+## Prayer & Life Updates
+
+If someone submitted a Prayer & Life Update, an indicator appears beside his profile picture or initials.
+
+Tap his row to read the update.
+
+This lets the main Dashboard stay simple while still making more information available when you need it.
+
+## Reactions
+
+When someone shares a Prayer & Life Update, you can respond using one of four reactions:
+- Heart
+- Prayer
+- Thumbs up
+- Praise or celebration
+
+Reactions are simple counters. They are not connected to your name, so the person can see that someone responded without seeing exactly who tapped the reaction.
+
+Reactions remain available even after that week's check-in has locked.
+
+## Viewing Someone's History
+
+Tap a member's row and choose 6-Week History to look back at his recent check-ins.
+
+This can help you recognize patterns and remember things that were shared in previous weeks.
+
+For example, you may notice that someone has rated the same area Weak for several weeks or remember a prayer request you want to follow up on.
+
+## Viewing Your Own History
+
+Tap your own row on the Dashboard to access your history.
+
+Your personal history is not limited to six weeks. You can look back through your previous check-ins to identify patterns in your own life over time.
+
+## Viewing Goals
+
+Tap a member's row and choose the option to view his goals.
+
+You can see the goals he has set for each category.
+
+Goals are current goals, not weekly records. They remain until that person changes them.
+
+## Group Update
+
+At the top of the Dashboard is the Group Update section.
+
+This may include:
+- A link to discipleship resources from Intentional Ministries
+- A message from your group leader
+- A link your leader wants the group to see
+
+Tap the Group Update section to expand it.
+
+An indicator light appears next to Group Update whenever your leader has posted something new that you haven't seen yet. It clears automatically the first time you open the section.
+
+# Settings
+
+The Settings tab is where you manage your profile, groups, and app preferences.
+
+## Profile
+
+Your Profile contains your personal information, including:
+- Name
+- Email
+- Phone number
+- Profile photo
+
+If you do not use a profile photo, your initials will appear instead.
+
+You can also choose the color used behind your initials.
+
+Keeping your phone number current allows group members to contact you directly from the Dashboard.
+
+You can update your email address anytime from your Profile. Since your email is also what you use to log in, a confirmation link is sent to the new address, and the change takes effect once you confirm it, this keeps your account secure and makes sure a typo can't accidentally lock you out. Your password stays exactly the same; only the email itself changes.
+
+## Your Groups
+
+You can belong to more than one accountability group.
+
+Your Groups shows the groups connected to your account.
+
+The group you are currently viewing is your active group. Your Check-in and Dashboard always display information for that group.
+
+Tap another group to switch to it.
+
+## Joining a Group
+
+To join an existing group:
+- Get the group code from the leader.
+- Choose Join a Group.
+- Enter the code.
+- Submit your request.
+
+Your request must be approved by the group leader before you can access the group.
+
+Once approved, the group becomes available in Your Groups.
+
+## Creating a Group
+
+Choose Create a Group if you want to start and lead your own accountability group.
+
+A unique group code will be created automatically.
+
+Share that code with the people you want to invite. Each person will request to join, and you will approve them before they receive access.
+
+## Hidden Groups
+
+If your list of groups becomes crowded over time, you can hide groups you no longer need to see regularly.
+
+Hiding a group does not delete it or erase your history.
+
+You can view your hidden groups later and restore one to your regular group list.
+
+Your currently active group cannot be hidden. Switch to another group first if you want to hide it.
+
+## Weekly Questions
+
+Group leaders can customize the five questions used by their group.
+
+If you are not a leader, the questions you see were selected by your group's leader.
+
+## Finding the App's Link
+
+Your Settings page includes a copy of the app's web address, with a Copy button right beside it so you can copy it in one tap instead of trying to select and copy the text yourself. Use this if you ever need to open the app on a new device, or if you want to share the exact link alongside a group code when inviting someone to join.
+
+# Leader Guide
+
+If you create a group, you become the leader for that group and receive additional tools for managing it.
+
+## Creating Your Group
+
+Choose Create a Group from Settings.
+
+Enter your group information and the app will create a unique group code.
+
+Share that code with the people you want to invite.
+
+Members cannot enter the group simply by knowing the code. Each request must still be approved by a leader.
+
+## Approving Members
+
+New join requests appear with your group's member information in Settings.
+
+Pending requests appear first so they are easy to see.
+
+Approve a request to give that person access to the group.
+
+Until you approve the request, that person cannot see the group's Dashboard or submit a check-in for the group.
+
+Tip: After creating your group, text your group members the link and code. Ask them to text you once they've completed the process, so you know to go approve them.
+
+## Removing a Member
+
+You can remove an active member from the group in Settings.
+
+Removing someone immediately ends his access to the active group.
+
+His previous personal check-in history is not deleted.
+
+If he later enters the group code again, he must submit a new request and be approved again.
+
+When a removed member logs back into his account, he'll find himself in a group by himself, with access only to his own personal history. He's free to start a new group of his own, or request to join another group, even the same group he was removed from, but any request will need to be approved again before he regains access.
+
+## Group Code
+
+Your group code is displayed with your group information in Settings.
+
+Share this code with anyone you want to invite into the group.
+
+There is no need to change the code when someone leaves or is removed.
+
+## Renaming Your Group
+
+Use the edit option next to your active group's name to rename the group.
+
+Changing the name does not affect the group's members, history, or group code.
+
+You'll find this as a small pencil icon right next to your active group's name, under Your Groups in Settings.
+
+## Meeting Day
+
+Your group's meeting day determines the weekly rhythm and deadline.
+
+Members can edit their check-ins through 11:59 PM on the group's meeting day.
+
+You can change the regular meeting day in Settings.
+
+Changing the meeting day is intended for a lasting schedule change, not simply moving one individual meeting.
+
+When you change it, the app will show you the resulting meeting and lock date. The app will not create a shortened week. Members will always receive at least a full weekly cycle before the new deadline.
+
+## Managing Weekly Questions
+
+Your group begins with five default accountability questions.
+
+You can edit:
+- The short category name
+- The category title
+- The description
+
+Changes apply only to your group.
+
+Use Reset to Defaults if you want to return all five questions to the original Intentional Ministries questions.
+
+## Group Update
+
+The Group Update section appears at the top of your group's Dashboard.
+
+Use it to communicate something you want your group to see.
+
+You can add:
+- A short written update
+- A link
+- A short label describing the link
+
+For example: Watch this week's 2 Peter video
+
+The group sees the label as the clickable text rather than seeing a long web address.
+
+The Intentional Ministries resource shown in this same area is managed separately and cannot be edited by the group leader.
+
+## Deactivating a Group
+
+When a group has permanently finished, you can deactivate it.
+
+Deactivation is different from simply having a group that has not met recently. Use this when the group is truly over.
+
+The group's historical information is preserved.
+
+Members continue to have access to their own previous check-ins, and the people who were part of the completed group can still see a basic roster of who participated.
+
+Deactivation does not give former members access to one another's private historical ratings, updates, or goals.
+
+This action is permanent. Once a group is deactivated, it cannot be reactivated.
+
+# Questions & Answers
+
+Eight starter questions, chosen to cover the things people are most likely to search for first. Meant to grow over time as real questions come in from actual use, add, replace, or cut freely.
+
+**What happens if I miss a week?**
+Nothing carries over. The new week simply starts blank, and you can check in normally next time.
+
+**Can I change my answers after I submit them?**
+Yes, anytime before your group's weekly deadline (11:59 PM on your meeting day). After that, your answers lock.
+
+**Who can see my Prayer & Life Update?**
+Everyone in your group, not just the leader.
+
+**Can other members see who reacted to my update?**
+No. Reactions are anonymous counters, your group can see that someone responded, not who.
+
+**What's the difference between my weekly ratings and my goals?**
+Ratings reset every week. Goals don't, they stay exactly as you set them until you change them yourself.
+
+**Can I be part of more than one group?**
+Yes. In Settings, you can start a new group or join another one yourself anytime, and switch your active group whenever you want. Each group you're part of is independent.
+
+**I was removed from a group, can I rejoin?**
+Yes, but you'll need to be approved again, just like any new member.
+
+**If I'm in two groups, do I need to answer the questions twice?**
+Yes. Your ratings, prayer requests, and goals don't carry over between groups, each group is completely separate, so you'll check in for each one on its own.
+
+**What happens to my history if my leader deactivates the group?**
+Your own personal history stays fully accessible to you. You'll also be able to see a simple list of who was in the group, though not anyone else's private answers.
+
+---
+
+### Dashboard row divider between reactions and History button — this was already specified but appears to have been missed
+
+This exact fix was written into the Screens section of this document before Round 16 was sent, but real testing confirms it was never actually built — the expanded dashboard row still shows the Prayer & Life Update, reactions, then immediately the "6-Week History" link with no separation, then a divider, then "See [Name]'s Goals." Likely missed because it wasn't called out explicitly in the Round 16 handoff message, only sitting inside the detailed row spec. Flagging directly this time: add a section divider between the reaction icons and the "6-Week History" button, matching the same style as the existing divider that already correctly separates History from Goals. This is a real touch-target fix, not cosmetic — the History button currently sits too close to the reaction icons, making it hard to tap reliably.
+
+### Make email editable in Profile
+
+The email field in Profile (recently moved below phone number) is currently display-only, not editable. Add the ability to change it, with a verification step: sending a confirmation link to the new address before the change actually takes effect, so a mistyped address can't accidentally lock someone out or misdirect someone else's account. Note: this only needs to be a preference-change UI — the underlying account and all its history (check-ins, updates, goals) are already tied to the account itself, not the email address, so changing it doesn't require any deeper structural work. No data model change needed.
+
+### Add a copyable app link in Settings
+
+There's currently no place within the app that displays its own web address (app.intentionalministries.com) for reference — a real gap if someone loses a bookmark, switches devices, or is trying to log in from a computer without the link handy. Add the app's own URL somewhere reasonable in Settings, with a Copy button right beside it so it can be copied in one tap rather than manually selected and copied. This also gives leaders an easy way to grab the exact address when inviting someone, alongside the group code they already share.
+
+### More frequent warm-up ping to reduce cold-start delay
+
+A weekly ping already exists to prevent the Supabase database from fully pausing during long idle stretches. Separately, users are experiencing a noticeable delay when reopening the app after several hours of inactivity (e.g. using it at home, then again later at work) — this is normal free-tier "cold start" behavior on the hosting side, not something a paid tier would automatically fix. Add a more frequent ping (e.g. every few minutes during hours the app is likely to be in active use) specifically to keep the app itself warm, not just the database, directly targeting this delay. This should be free and doesn't require any tier upgrade.
+
+### Fix the link preview shown when the app's URL is shared
+
+When the app's link is shared via text message (confirmed via iMessage), the automatic preview card that appears is only partially branded — it appears to be picking up incidental, unintentional content (possibly a stale screenshot or leftover default from earlier testing) rather than deliberate branding. This is controlled by the page's Open Graph metadata (title, description, and preview image), which is separate from the PWA home screen icon and all other in-app branding work done so far — it appears this was simply never set. Fix: set proper Open Graph metadata — title "Intentional Ministries" (or similar), a short accurate description, and a real branded preview image (the Main logo or a purpose-built preview graphic) — so sharing the link anywhere produces a clean, correctly branded card instead of default or stale content.
+
+### Replace Dashboard tab icon with a group icon, and increase all nav icon sizes further
+
+The current gauge/speedometer icon for the Dashboard tab has a real problem: it's recognizable in its outline (inactive) state, but its filled/active version doesn't read as a gauge at all — it just looks like an unrecognizable solid blob. Replace it entirely with a standard "group" icon (e.g. two-person or people silhouette shape) instead — keep the tab's label as "Dashboard," only the icon itself changes. This new icon must have both a proper outline state and a genuinely recognizable filled/active state, matching how the Check-in and Settings icons already correctly work.
+
+Separately, all three nav icons should be made larger than their current size (post-Round-17 increase) — the Round 17 size bump wasn't sufficient. Same constraint as before still applies: the bar's overall height must not increase, only the icons within it grow.
+
 
 
 

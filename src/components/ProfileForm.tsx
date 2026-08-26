@@ -22,6 +22,16 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
+  // Separate from the name/phone form above: changing email goes through
+  // Supabase's own confirm-before-it-takes-effect flow (a link sent to the
+  // new address), not a plain profiles table update, so it needs its own
+  // submit action rather than sharing "Save profile"'s.
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [email, setEmail] = useState(profile.email ?? "");
+  const [emailSaving, setEmailSaving] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailRequested, setEmailRequested] = useState(false);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -46,6 +56,31 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
     setSaved(true);
     router.refresh();
+  }
+
+  async function handleEmailSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setEmailSaving(true);
+    setEmailError(null);
+    setEmailRequested(false);
+
+    const { error: updateError } = await supabase.auth.updateUser({ email });
+
+    setEmailSaving(false);
+
+    if (updateError) {
+      setEmailError(updateError.message);
+      return;
+    }
+
+    setEmailRequested(true);
+  }
+
+  function cancelEmailEdit() {
+    setEditingEmail(false);
+    setEmail(profile.email ?? "");
+    setEmailError(null);
+    setEmailRequested(false);
   }
 
   const displayName = `${profile.first_name ?? ""} ${profile.last_name ?? ""}`.trim();
@@ -91,8 +126,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
         />
 
-        <p className="text-[17px] text-neutral-500">{profile.email}</p>
-
         {error && <p className="text-[17px] text-red-600">{error}</p>}
         {saved && !error && <p className="text-[17px] text-neutral-500">Saved.</p>}
 
@@ -104,6 +137,55 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           {saving ? "Saving…" : "Save profile"}
         </button>
       </form>
+
+      {editingEmail ? (
+        <form onSubmit={handleEmailSubmit} className="space-y-2 border-t border-neutral-100 pt-3">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setEmailRequested(false);
+            }}
+            required
+            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-[17px]"
+          />
+          {emailError && <p className="text-[17px] text-red-600">{emailError}</p>}
+          {emailRequested && (
+            <p className="text-[17px] text-neutral-500">
+              Confirmation link sent to {email}. Your email won&apos;t change until you confirm
+              it from that link — your password stays the same either way.
+            </p>
+          )}
+          <div className="flex items-center gap-3">
+            <button
+              type="submit"
+              disabled={emailSaving || email === profile.email}
+              className="rounded-md bg-brand-navy px-4 py-2 text-[17px] font-semibold text-white disabled:opacity-50"
+            >
+              {emailSaving ? "Sending…" : "Send confirmation link"}
+            </button>
+            <button
+              type="button"
+              onClick={cancelEmailEdit}
+              className="text-[17px] text-neutral-500 underline"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="flex items-center justify-between gap-2 border-t border-neutral-100 pt-3">
+          <p className="text-[17px] text-neutral-500">{profile.email}</p>
+          <button
+            type="button"
+            onClick={() => setEditingEmail(true)}
+            className="shrink-0 text-[17px] font-medium text-brand-periwinkle underline"
+          >
+            Change
+          </button>
+        </div>
+      )}
     </div>
   );
 }

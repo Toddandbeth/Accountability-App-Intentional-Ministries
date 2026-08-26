@@ -12,19 +12,41 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const APP_URL = "https://app.intentionalministries.com";
+const DESCRIPTION = "Weekly accountability check-ins for small groups, from Intentional Ministries.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: "Intentional Ministries Accountability",
-  description: "Weekly accountability check-ins for small groups.",
+  description: DESCRIPTION,
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Accountability",
   },
+  // Previously unset, so link previews (e.g. sharing the app's URL in
+  // iMessage) fell back to whatever a scraper happened to pick up off the
+  // page rather than deliberate branding. og-image.png is a purpose-built
+  // 1200x630 card (navy background, white logo), not a repurposed app icon.
+  openGraph: {
+    title: "Intentional Ministries Accountability",
+    description: DESCRIPTION,
+    url: APP_URL,
+    siteName: "Intentional Ministries Accountability",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Intentional Ministries Accountability",
+    description: DESCRIPTION,
+    images: ["/og-image.png"],
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1b7a3d",
+  themeColor: "#253551",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

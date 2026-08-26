@@ -12,6 +12,7 @@ import { GroupMembersSection } from "@/components/GroupMembersSection";
 import { PlatformAdminSection } from "@/components/PlatformAdminSection";
 import { SlideOverPanel } from "@/components/SlideOverPanel";
 import { HelpAndTipsSection } from "@/components/HelpAndTipsSection";
+import { CopyAppLink } from "@/components/CopyAppLink";
 import { DeactivateGroupButton } from "@/components/DeactivateGroupButton";
 import type { GroupBasicInfo, GroupQuestion } from "@/lib/supabase/types";
 
@@ -150,6 +151,8 @@ export default async function SettingsPage() {
       <h1 className="text-3xl font-extrabold text-brand-navy">Settings</h1>
 
       {profile && <ProfileForm profile={profile} />}
+
+      <CopyAppLink />
 
       <HelpAndTipsSection />
 
