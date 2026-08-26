@@ -152,8 +152,6 @@ export default async function SettingsPage() {
 
       {profile && <ProfileForm profile={profile} />}
 
-      <CopyAppLink />
-
       <HelpAndTipsSection />
 
       <div className="space-y-2">
@@ -227,6 +225,8 @@ export default async function SettingsPage() {
           </div>
         </div>
       )}
+
+      <CopyAppLink />
 
       <div className="space-y-3">
         <JoinGroupForm />
