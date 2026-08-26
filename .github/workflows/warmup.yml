@@ -1,0 +1,13 @@
+name: Warm up app
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping warmup endpoint
+        run: curl -fsS --max-time 20 https://app.intentionalministries.com/api/cron/warmup
