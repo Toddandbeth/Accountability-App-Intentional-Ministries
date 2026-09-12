@@ -91,7 +91,7 @@ export default async function CheckInPage() {
         />
         <h1 className="text-2xl font-bold text-brand-navy">Welcome</h1>
         <p className="text-[17px] text-neutral-600">
-          You&apos;re not part of a group yet. Create one, or join one with a code.
+          You&apos;re not part of a group yet. You can create a new group or join an existing one.
         </p>
         <OnboardingExplainer />
         <CreateGroupForm />

@@ -1,21 +1,19 @@
 import Link from "next/link";
 
+// Round 21: exact, finalized wording — see the blueprint's "Create/Join
+// landing screen wording" spec. Not paraphrased.
 const POINTS = [
   {
-    title: "The weekly rhythm",
-    body: "Each week, everyone in your group privately rates 5 areas of life — takes about 20 seconds. On meeting day, everyone in the group can see everyone's answers at a glance.",
+    title: "How It Works",
+    body: "This app is a simple weekly self-evaluation designed to help your group encourage and hold one another accountable. Each week, everyone rates themselves in five areas of life, and the group's responses are shared on the Dashboard so you can quickly see how everyone is doing.",
   },
   {
-    title: "Weekly Reset",
-    body: "Answers lock at 11:59pm on meeting day itself, so results stay visible through the whole meeting. A brand new week starts the day after.",
+    title: "Create a Group",
+    body: "Starting a new group? Choose Create a Group below. You'll become the group leader and receive a unique group code. Share the code and the app link with the people you want to invite. They'll use the code to request to join your group, and you'll approve each person before they have access.",
   },
   {
-    title: "What the group code is for",
-    body: "Every group is assigned a unique code. If you're joining a group, get the code from your leader — you'll then wait for approval from Settings before you can see the group. If you're starting a group, you're instantly placed in it as leader, with your own code generated automatically. You will need to share this code with your group members.",
-  },
-  {
-    title: "What happens once you're approved",
-    body: "Your leader has to approve your request before you can see or submit anything. Once they do, you'll land right here automatically.",
+    title: "Join a Group",
+    body: "Already been invited to a group? Choose Join a Group below and enter the group code your leader gave you. Your leader will approve your request before you can access the group. Once you're approved, you're ready to begin.",
   },
 ] as const;
 
@@ -28,13 +26,16 @@ export function OnboardingExplainer() {
           <p className="text-[17px] text-neutral-500">{point.body}</p>
         </div>
       ))}
-      <p className="text-[17px] text-neutral-500">
-        This is the short version — the full explanation of every feature is always available in{" "}
-        <Link href="/settings" className="underline">
-          Settings
-        </Link>
-        .
-      </p>
+      <div>
+        <p className="text-[17px] font-semibold">Need Help?</p>
+        <p className="text-[17px] text-neutral-500">
+          Once you&apos;re inside the app, visit Help &amp; Tips in{" "}
+          <Link href="/settings" className="underline">
+            Settings
+          </Link>{" "}
+          for instructions on using the Check-in, Dashboard, Settings, and leader tools.
+        </p>
+      </div>
     </div>
   );
 }

@@ -103,6 +103,7 @@ Membership (connects a User to a Group)
 - role: admin or member
 - status: active, inactive, pending, removed
 - joined date
+- status_changed_at (timestamp — when status last changed, e.g. approved or removed; needed for platform stats tracking signups vs. removals over time, see Round 20)
 - hidden_by_user (true/false, default false — a personal declutter preference, see Round 5)
 
 Exactly one Membership per user per group. This table is the only source of truth for who belongs to a group and who its admins are.
@@ -286,11 +287,13 @@ Completed and sent to Claude Code:
 - Round 13 — rating button size fix, auto-shrink question titles, Help & Tips structural fix, editable category labels; deployed live
 - Round 14 — question editor label rename, confirmation email redirect fix, theme consistency on the check-email screen, auto-shrink max-size cap, Weekly Questions repositioning/color fix; Resend email provider set up and connected (app@mail.intentionalministries.com — Resend required a subdomain, not the root domain), fixing confirmation/reset email branding and unlocking the welcome email feature; deployed live
 - Round 15 — meeting date display, personal history moved to dashboard (layout since superseded by Round 16), email moved out of Settings header, nav icon states, nav bug diagnostic, sign-up screen theme fix, welcome email button label fix (turned out to already be correct), full Help & Tips content; deployed live
-- Round 16 — check-in header restructured to a stacked vertical layout, "Home" tab renamed to "Check-in", bolder page titles on all three tabs, two new tab icons, Manage Your Goals button changed to navy with scroll-into-view, Group Update visual separation plus a new group_update_link_label field; deployed live
+- Round 16 — check-in header restructured to a stacked vertical layout, "Home" tab renamed to "Check-in", bolder page titles, two new tab icons, Manage Your Goals button changed to navy with scroll-into-view, Group Update visual separation plus a new group_update_link_label field; deployed live
 - Bottom nav height fix — 74.5px shrunk to 51px (Apple's standard is 49pt); deployed live
-- Round 17 — login screen responsiveness on smaller iPhones, Dashboard gauge's filled state redesigned as a solid pie wedge, email moved to after phone in Profile, page title renamed to "Group Dashboard" (nav tab stays "Dashboard"), Group Update button changed to navy with dot contrast confirmed, bigger/bolder nav icons at the same 51px bar height, check-in title auto-shrink; deployed live
-- Round 18 — the missed dashboard-row divider between reactions and history now added, email is editable in Profile with a confirm-first flow, a copyable app link (app.intentionalministries.com) added to Settings, a more frequent warm-up ping via GitHub Actions (Vercel Cron is capped at once/day on the Hobby plan), Open Graph metadata + a purpose-built preview image so link sharing looks right, the Dashboard tab's gauge replaced with a two-person group icon, and a full Help & Tips content rewrite (six topics, Dashboard/Leader Guide using accordion subsections); deployed live
-- Round 19 — the app link repositioned to sit between Your Groups and the Join/Create/Deactivate cluster; the group icon changed from two people to the standard three-person composition (one forward, two behind — confirmed genuinely recognizable in both outline and filled states); a full Help & Tips visual redesign applied uniformly across all six topics — a small leading icon per topic (reusing the Check-in/Dashboard/Settings nav icons plus a new flag icon for Leader Guide and a question-mark-in-circle for Q&A, extracted into a shared src/components/NavIcons.tsx so both the nav bar and Help & Tips use the same icon definitions), subsections grouped into rounded-rectangle cards with divider lines (replacing plain scrolling text on every topic, not just the two longer ones), and every subsection — including each FAQ question — now expands inline in place instead of behind another slide-over; plus a short cross-reference note on Dashboard's Group Update explaining that the Leader Guide has the fuller how-to-edit version. Deployed live.
+- Round 17 — login screen responsiveness on smaller iPhones, Dashboard gauge's filled state redesigned, email moved to after phone in Profile, page title renamed to "Group Dashboard" (nav tab stays "Dashboard"), Group Update button changed to navy with dot contrast confirmed, bigger/bolder nav icons at the same 51px bar height, check-in title auto-shrink; deployed live
+- Round 18 — the missed dashboard-row divider between reactions and history, editable email with confirm-first flow, a copyable app link in Settings, a more frequent warm-up ping via GitHub Actions, Open Graph metadata + a purpose-built preview image, the Dashboard tab's gauge replaced with a two-person group icon, and a full Help & Tips content rewrite; deployed live
+- Round 19 — app link repositioned between Your Groups and the Join/Create/Deactivate cluster, group icon changed from two people to three (confirmed genuinely recognizable in both states), and a full Help & Tips visual redesign (leading icons per topic reusing shared nav-icon definitions, card+divider grouping applied to all six topics, every subsection — including FAQ questions — now expands inline instead of a further slide-over), plus a cross-reference note from Dashboard's Group Update to the Leader Guide; deployed live
+- Round 20 — System-Wide Stats fully redefined: precise unique-users-vs-memberships definitions, reach/engagement/health/depth-of-use metrics, and a trend view with three time buckets (Last 8 Weeks / Last 12 Months / All Time by year) sharing one underlying weekly dataset. New status_changed_at column on memberships (migration 0017, with a trigger so it updates automatically on any status change) supports the new-approved-vs-removed health signal. Code deployed live; needs migration 0017 applied, and the live stats view still needs a real platform-admin eyeball check against production data (I can't grant myself platform_admin to test it myself — asked the user to verify).
+- Round 21 (in progress) — create/join landing screen replaced with the exact finalized wording (Welcome, How It Works, Create a Group, Join a Group, Need Help?); welcome email body copy replaced with the finalized wording, same branded template; confirmation email branding still pending — needs the same navy/logo/boxed template applied in Supabase's own "Confirm signup" email template (a dashboard-only setting Claude Code can't edit directly), HTML handed to the user to paste in.
 
 Pending, not yet sent: none currently.
 
@@ -353,7 +356,7 @@ Everything built so far has two roles, both scoped to a single group: leader and
 No separate login or account is needed. The admin signs in exactly like everyone else, with their normal email and password — the app simply recognizes their account has platform_admin set to true and reveals an extra section that no other user sees at all, likely as its own tab or a section inside Settings that only renders when this flag is present.
 
 What the platform admin can do:
-- View general, non-identifying statistics inside a collapsible "System-Wide Stats" box: number of active groups, total participants, and recent check-in activity rate. Confirmed rule: absolutely no visibility into individual answers, ratings, or Prayer & Life Update content at the platform admin level — the boundary is aggregate counts only, never individual content, no exceptions.
+- View general, non-identifying statistics inside a collapsible "System-Wide Stats" box (see Round 20 for the full, precisely defined set of metrics and a trend view — this was originally specified only vaguely). Confirmed rule: absolutely no visibility into individual answers, ratings, or Prayer & Life Update content at the platform admin level — the boundary is aggregate counts only, never individual content, no exceptions.
 - Set and update one permanent ministry-wide resource link, visible to every user across every group, pointing to a page the admin fully controls outside the app (their own website). The app only stores and displays this one URL — it does not manage or render any content behind that link. Changing what's behind the link happens entirely outside the app, so the admin never needs to touch the app itself to update what people see when they click it.
 
 ### Group Update — replaces the earlier standalone "resource link" idea
@@ -459,6 +462,25 @@ UI specifics:
 ### Welcome email
 
 Fires once, automatically, after a person's first successful signup — same content for a leader and a participant (a participant benefits from knowing what's available to leaders, for future reference, in case he leads a group himself later). Short and scannable, not a full manual. Covers the basics of how the weekly rhythm works, then closes by introducing Intentional Ministries and linking to the platform admin's ministry-wide link (the same field described under Platform Admin above) — so if that link's destination ever changes, the email automatically stays current without needing its own separate update.
+
+Wording finalized (see Round 21) — replace the current body copy with this exact text, keeping the existing navy/branded template, logo, and layout as-is:
+
+Welcome, [first name]
+
+You're all set and ready to get started.
+
+Each week, take a few moments to complete your Check-in by rating yourself in five areas of life. Your group's Dashboard gives everyone a quick picture of how the group is doing and helps you know where to encourage, pray for, and follow up with one another.
+
+You can also add a Prayer & Life Update or set personal goals to help your group know how to support you.
+
+Your Check-in stays editable until 11:59 PM on your group's meeting day.
+
+Need help? You'll find simple instructions for the Check-in, Dashboard, Settings, and leader tools under Settings → Help & Tips.
+
+[Discipleship Resources button, pulling its label and link from the platform admin's resource field, exactly as already built]
+
+Intentional Ministries
+Helping men live intentionally and grow stronger together.
 
 ### Goals — persistent, not weekly
 
@@ -1342,6 +1364,70 @@ Three changes, all applied uniformly to every topic (not just the longer ones), 
 ### Cross-reference note: Dashboard's Group Update topic should point to Leader Guide for more detail
 
 Group Update is explained in two places in Help & Tips: a narrower view under Dashboard (what it is, how to read it) and a fuller view under Leader Guide (how to actually change it). Someone who lands on the Dashboard version first, wanting to edit their Group Update, has no way of knowing a complete guide exists elsewhere. Add a short note at the end of the Dashboard topic's Group Update section: something like "Leaders: see the Leader Guide section for how to edit your Group Update." Small addition, prevents a real dead end.
+
+## Round 20: System-Wide Stats, Properly Defined, Plus a Trend View
+
+The "System-Wide Stats" box (platform admin only, see earlier Platform Admin section) has only ever been specified vaguely — "active groups, total participants, recent check-in activity rate." This round replaces that vague version with precise definitions, a fuller set of metrics, and a real trend view. Reporting only — no schema changes needed except one small addition noted below. Everything here reads existing data; none of it requires collecting anything new going forward beyond that one field. Confirmed rule still applies without exception: aggregate counts and percentages only, never any individual's actual answers, ratings, or Prayer & Life Update content.
+
+### Core definitions (the participants-vs-memberships distinction)
+
+- **Unique active users**: a count of distinct people with at least one active Membership somewhere, counted once regardless of how many groups they belong to. Answers "how many real people are using this."
+- **Total active memberships**: a count of all active Membership records, which can exceed unique active users since one person in two groups counts as two memberships. Answers "how much total group participation is happening."
+
+### Reach metrics
+
+- Unique active users (defined above)
+- Total active memberships (defined above)
+- Number of active groups
+- Number of deactivated groups (a separate, positive metric over time, not just a decline signal — reflects groups that completed their full lifecycle)
+- Average group size (active memberships ÷ active groups)
+
+### Engagement metrics
+
+- **Check-in completion rate**: of all active memberships in a group, what percentage submitted a check-in for the most recently locked week. Shown as a current snapshot.
+- **Trend view**: the same completion rate, viewable across three time buckets via a simple toggle: Last 8 Weeks, Last 12 Months, and All Time (grouped by year). Same underlying weekly data powers all three views — this is a display/grouping choice, not three separate calculations. A simple line or bar chart is sufficient; no custom date range picker needed for this audience.
+
+### Health signals
+
+- New approved members vs. removed members, within a selected period — requires status_changed_at on Membership (added to Data Model above) to know when a removal actually happened, not just that it happened at some point.
+- Number of pending join requests currently awaiting approval across all groups — surfaces a real, actionable signal (a leader who's slow to approve people) that would otherwise be invisible at the platform level.
+
+### Depth-of-use metrics
+
+- Percentage of submitted check-ins that include a Prayer & Life Update (not just the 5 ratings) — signals whether people are engaging with the relational core of the app, not just mechanically completing it
+- Percentage of active members who have set at least one goal
+
+## Round 21: Confirmation Email Branding, Screen Wording, Welcome Email Wording (in progress, more items pending)
+
+### Confirmation email needs the same visual branding as the welcome email
+
+The account confirmation email (sent when someone first signs up) already comes from the correct app@intentionalministries.com address, but appears to still use a generic, unstyled default template rather than real branding. This is a real trust and security concern, not just a cosmetic one: an unstyled email with just a link looks exactly like the kind of thing people are trained to be suspicious of, which works directly against getting new users to actually confirm their accounts.
+
+Fix: apply the same visual treatment already built for the welcome email, navy background, logo, boxed styling, to the confirmation email too. Also add explicit wording naming the app clearly, e.g. "for your Intentional Ministries Accountability App account," so there's no ambiguity about what someone is confirming or why. Both emails should feel like they come from the same, obviously legitimate source.
+
+### Create/Join landing screen wording, finalized
+
+This is the screen a user lands on after confirming their email, before they belong to any group, with the Create a Group and Join a Group options. Replace whatever text currently appears above those two buttons with this exact, final wording:
+
+Welcome
+
+You're not part of a group yet. You can create a new group or join an existing one.
+
+How It Works
+This app is a simple weekly self-evaluation designed to help your group encourage and hold one another accountable. Each week, everyone rates themselves in five areas of life, and the group's responses are shared on the Dashboard so you can quickly see how everyone is doing.
+
+Create a Group
+Starting a new group? Choose Create a Group below. You'll become the group leader and receive a unique group code. Share the code and the app link with the people you want to invite. They'll use the code to request to join your group, and you'll approve each person before they have access.
+
+Join a Group
+Already been invited to a group? Choose Join a Group below and enter the group code your leader gave you. Your leader will approve your request before you can access the group. Once you're approved, you're ready to begin.
+
+Need Help?
+Once you're inside the app, visit Help & Tips in Settings for instructions on using the Check-in, Dashboard, Settings, and leader tools.
+
+### Welcome email wording, finalized
+
+New final wording for the branded welcome email, see the "Welcome email" spec in the earlier section for the exact text (kept there so it sits alongside the rest of the welcome email's technical spec rather than duplicated here).
 
 
 

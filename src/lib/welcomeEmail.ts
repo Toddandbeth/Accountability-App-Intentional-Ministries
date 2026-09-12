@@ -46,19 +46,30 @@ function buildHtml({ firstName, ministryLinkUrl, ministryLinkLabel }: WelcomeEma
     <div style="padding:24px;">
       <h1 style="margin:0 0 12px;color:#253551;font-size:20px;font-weight:700;">Welcome, ${safeName}</h1>
       <p style="margin:0 0 16px;color:#374151;font-size:15px;line-height:1.5;">
-        You're set up. Here's how the weekly rhythm works:
+        You're all set and ready to get started.
       </p>
-      <ul style="margin:0 0 16px;padding-left:20px;color:#374151;font-size:15px;line-height:1.6;">
-        <li>Each week, you privately rate yourself in 5 areas — takes about 20 seconds.</li>
-        <li>On your group's meeting day, everyone's ratings become visible so your group has something real to talk about.</li>
-        <li>Answers lock at the end of meeting day, then a new week starts.</li>
-      </ul>
+      <p style="margin:0 0 16px;color:#374151;font-size:15px;line-height:1.5;">
+        Each week, take a few moments to complete your Check-in by rating yourself in five areas
+        of life. Your group's Dashboard gives everyone a quick picture of how the group is doing
+        and helps you know where to encourage, pray for, and follow up with one another.
+      </p>
+      <p style="margin:0 0 16px;color:#374151;font-size:15px;line-height:1.5;">
+        You can also add a Prayer &amp; Life Update or set personal goals to help your group know
+        how to support you.
+      </p>
       <p style="margin:0 0 20px;color:#374151;font-size:15px;line-height:1.5;">
-        Everything else — goals, prayer requests, group codes, and more — is explained right in the app, under Settings → Help &amp; Tips.
+        Your Check-in stays editable until 11:59 PM on your group's meeting day.
+      </p>
+      <p style="margin:0 0 20px;color:#374151;font-size:15px;line-height:1.5;">
+        Need help? You'll find simple instructions for the Check-in, Dashboard, Settings, and
+        leader tools under Settings → Help &amp; Tips.
       </p>
       ${linkButton}
-      <p style="margin:24px 0 0;color:#9ca3af;font-size:13px;line-height:1.5;">
-        Intentional Ministries — helping men live with purpose, together.
+      <p style="margin:24px 0 0;color:#374151;font-size:13px;font-weight:700;line-height:1.5;">
+        Intentional Ministries
+      </p>
+      <p style="margin:2px 0 0;color:#9ca3af;font-size:13px;line-height:1.5;">
+        Helping men live intentionally and grow stronger together.
       </p>
     </div>
   </div>
