@@ -51,6 +51,8 @@ const BUCKET_WINDOW_MS: Record<Bucket, number | null> = {
 interface ChartPoint {
   label: string;
   rate: number | null;
+  submitted: number;
+  possible: number;
 }
 
 // Same underlying weekly series for all three buckets — this groups/sums
@@ -67,6 +69,8 @@ function bucketWeeklyTrend(weekly: WeeklyTrendPoint[], bucket: Bucket): ChartPoi
           day: "numeric",
         }),
         rate: w.possible > 0 ? Math.round((1000 * w.submitted) / w.possible) / 10 : null,
+        submitted: w.submitted,
+        possible: w.possible,
       }));
   }
 
@@ -99,6 +103,8 @@ function bucketWeeklyTrend(weekly: WeeklyTrendPoint[], bucket: Bucket): ChartPoi
     .map(([key, g]) => ({
       label: labelFor(key),
       rate: g.possible > 0 ? Math.round((1000 * g.submitted) / g.possible) / 10 : null,
+      submitted: g.submitted,
+      possible: g.possible,
     }));
 
   return bucket === "12months" ? points.slice(-12) : points;
@@ -122,14 +128,20 @@ function BarChart({ points }: { points: ChartPoint[] }) {
     return <p className="text-[17px] text-neutral-500">Not enough data yet.</p>;
   }
   return (
-    <div className="flex items-end gap-1.5" style={{ height: 120 }}>
+    <div className="flex items-end gap-1.5" style={{ height: 168 }}>
       {points.map((p, i) => (
         <div key={i} className="flex flex-1 flex-col items-center gap-1">
+          <span className="text-center text-[10px] font-semibold leading-tight text-brand-navy">
+            {p.submitted}/{p.possible}
+          </span>
+          <span className="text-[10px] leading-tight text-neutral-500">
+            {p.rate === null ? "–" : `${p.rate}%`}
+          </span>
           <div className="flex h-24 w-full items-end">
             <div
               className="w-full rounded-t bg-brand-periwinkle"
               style={{ height: `${p.rate ?? 0}%` }}
-              title={p.rate === null ? "No data" : `${p.rate}%`}
+              title={p.rate === null ? "No data" : `${p.submitted} of ${p.possible} (${p.rate}%)`}
             />
           </div>
           <span className="text-[10px] text-neutral-500">{p.label}</span>
