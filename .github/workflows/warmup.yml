@@ -9,5 +9,7 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping warmup endpoint
-        run: curl -fsS --max-time 20 https://app.intentionalministries.com/api/cron/warmup
+      - name: Warm the Proxy lambda (hit a real page)
+        run: curl -fsS --max-time 20 -o /dev/null https://app.intentionalministries.com/login
+      - name: Keep Supabase warm
+        run: curl -fsS --max-time 20 -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" https://app.intentionalministries.com/api/cron/keepalive
