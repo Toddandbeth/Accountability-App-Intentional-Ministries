@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { Avatar } from "@/components/Avatar";
 import type { GroupBasicInfo, GroupRosterMember } from "@/lib/supabase/types";
 
@@ -11,9 +11,7 @@ export default async function GroupRosterPage({
   const { groupId } = await params;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser(supabase);
   if (!user) return null;
 
   const { data: groupInfoData } = await supabase

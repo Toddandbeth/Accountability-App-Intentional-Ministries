@@ -36,12 +36,13 @@ export async function updateSession(request: NextRequest) {
 
   // Refreshes the session cookie if needed — do not remove.
   // Fails closed (treated as logged out) if Supabase is unreachable.
+  // getClaims() verifies the session JWT locally (cached signing keys) and
+  // only calls Supabase when the token has expired and must be refreshed —
+  // saving a cross-region round trip on nearly every request.
   let user = null;
   try {
-    const {
-      data: { user: fetchedUser },
-    } = await supabase.auth.getUser();
-    user = fetchedUser;
+    const { data } = await supabase.auth.getClaims();
+    user = data?.claims?.sub ? data.claims : null;
   } catch {
     user = null;
   }

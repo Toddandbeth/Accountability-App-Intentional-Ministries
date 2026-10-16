@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ActiveGroupSwitcher } from "@/components/ActiveGroupSwitcher";
 import { HiddenGroupsSection } from "@/components/HiddenGroupsSection";
@@ -18,9 +18,7 @@ import type { GroupBasicInfo, GroupQuestion } from "@/lib/supabase/types";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser(supabase);
   if (!user) return null;
 
   const { data: profile } = await supabase
@@ -29,32 +27,77 @@ export default async function SettingsPage() {
     .eq("id", user.id)
     .single();
 
-  // Any status, not just active — this drives the visible/hidden active
-  // list below plus the "past groups" section for removed/inactive
-  // memberships, which retain access to their own history but not the
-  // live group. platformSettings doesn't depend on anything above it, so
-  // it's fetched here too rather than waiting until the end of the page.
-  const [{ data: myMemberships }, { data: platformSettings }] = await Promise.all([
+  const activeGroupId = profile?.active_group_id ?? null;
+
+  // One parallel batch. Memberships list: any status, not just active —
+  // it drives the visible/hidden active list below plus the "past groups"
+  // section for removed/inactive memberships, which retain access to their
+  // own history but not the live group. The rest only need
+  // activeGroupId/user.id, so they don't wait on it. Questions and the
+  // member list are fetched speculatively and kept only if the user turns
+  // out to be an admin (RLS limits them anyway) — one fewer round trip.
+  const [
+    { data: myMemberships },
+    { data: platformSettings },
+    { data: g },
+    { data: myMembership },
+    { data: qs },
+    { data: ms },
+  ] = await Promise.all([
     supabase.from("memberships").select("id, group_id, status, hidden_by_user").eq("user_id", user.id),
     profile?.platform_admin
       ? supabase.from("platform_settings").select("resource_link_url, resource_link_label").single()
       : { data: null },
+    activeGroupId
+      ? supabase.from("groups").select("*").eq("id", activeGroupId).single()
+      : { data: null },
+    activeGroupId
+      ? supabase
+          .from("memberships")
+          .select("role, status")
+          .eq("group_id", activeGroupId)
+          .eq("user_id", user.id)
+          .single()
+      : { data: null },
+    activeGroupId
+      ? supabase.from("group_questions").select("*").eq("group_id", activeGroupId).order("slot_number")
+      : { data: null },
+    activeGroupId
+      ? supabase
+          .from("memberships")
+          .select("id, user_id, role, status, joined_at")
+          .eq("group_id", activeGroupId)
+          .order("joined_at")
+      : { data: null },
   ]);
 
   const myMembershipList = myMemberships ?? [];
+  const activeGroup = g ?? null;
+  const isAdminOfActiveGroup = myMembership?.role === "admin";
+  const questions: GroupQuestion[] = isAdminOfActiveGroup ? (qs ?? []) : [];
+  const allMemberships: { id: string; user_id: string; role: string; status: string; joined_at: string }[] =
+    isAdminOfActiveGroup ? (ms ?? []) : [];
 
   // groups RLS only allows reading active-membership groups directly, so
   // basic info (name, is_active) for every group — including past ones —
-  // comes from this narrow RPC instead.
+  // comes from this narrow RPC instead. Member names are independent of
+  // that, so they load in the same batch.
   const groupInfoById = new Map<string, GroupBasicInfo>();
-  await Promise.all(
-    myMembershipList.map(async (m) => {
-      const { data: info } = await supabase
-        .rpc("get_group_basic_info", { p_group_id: m.group_id })
-        .single();
-      if (info) groupInfoById.set(m.group_id, info as GroupBasicInfo);
-    })
-  );
+  const memberUserIds = allMemberships.map((m) => m.user_id);
+  const [, { data: memberProfiles }] = await Promise.all([
+    Promise.all(
+      myMembershipList.map(async (m) => {
+        const { data: info } = await supabase
+          .rpc("get_group_basic_info", { p_group_id: m.group_id })
+          .single();
+        if (info) groupInfoById.set(m.group_id, info as GroupBasicInfo);
+      })
+    ),
+    memberUserIds.length
+      ? supabase.from("profiles").select("id, first_name, last_name").in("id", memberUserIds)
+      : { data: [] as { id: string; first_name: string | null; last_name: string | null }[] },
+  ]);
+  const profileById = new Map((memberProfiles ?? []).map((p) => [p.id, p]));
 
   const activeGroupIdForSort = profile?.active_group_id ?? null;
 
@@ -85,55 +128,6 @@ export default async function SettingsPage() {
       name: groupInfoById.get(m.group_id)?.name ?? "Unnamed group",
       isDeactivated: groupInfoById.get(m.group_id)?.is_active === false,
     }));
-
-  const activeGroupId = profile?.active_group_id ?? null;
-
-  // Group Settings (meeting day/timezone, questions, members) is specific
-  // to whichever group is currently active, and only relevant if the user
-  // administers that group.
-  let activeGroup = null;
-  let isAdminOfActiveGroup = false;
-  let questions: GroupQuestion[] = [];
-  let allMemberships: { id: string; user_id: string; role: string; status: string; joined_at: string }[] = [];
-  let profileById = new Map<string, { first_name: string | null; last_name: string | null }>();
-
-  if (activeGroupId) {
-    // Independent of each other — both only need activeGroupId/user.id.
-    const [{ data: g }, { data: myMembership }] = await Promise.all([
-      supabase.from("groups").select("*").eq("id", activeGroupId).single(),
-      supabase
-        .from("memberships")
-        .select("role, status")
-        .eq("group_id", activeGroupId)
-        .eq("user_id", user.id)
-        .single(),
-    ]);
-    activeGroup = g;
-    isAdminOfActiveGroup = myMembership?.role === "admin";
-
-    if (isAdminOfActiveGroup) {
-      const [{ data: qs }, { data: ms }] = await Promise.all([
-        supabase
-          .from("group_questions")
-          .select("*")
-          .eq("group_id", activeGroupId)
-          .order("slot_number"),
-        supabase
-          .from("memberships")
-          .select("id, user_id, role, status, joined_at")
-          .eq("group_id", activeGroupId)
-          .order("joined_at"),
-      ]);
-      questions = qs ?? [];
-      allMemberships = ms ?? [];
-
-      const memberUserIds = allMemberships.map((m) => m.user_id);
-      const { data: memberProfiles } = memberUserIds.length
-        ? await supabase.from("profiles").select("id, first_name, last_name").in("id", memberUserIds)
-        : { data: [] };
-      profileById = new Map((memberProfiles ?? []).map((p) => [p.id, p]));
-    }
-  }
 
   function nameFor(userId: string) {
     const p = profileById.get(userId);

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { WeekHistoryRow } from "@/components/WeekHistoryRow";
 import type { GroupBasicInfo } from "@/lib/supabase/types";
 
@@ -11,9 +11,7 @@ export default async function HistoryPage({
   const { group: groupParam } = await searchParams;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser(supabase);
   if (!user) return null;
 
   const { data: profile } = await supabase

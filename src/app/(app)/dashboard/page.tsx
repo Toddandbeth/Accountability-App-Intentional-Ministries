@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { DashboardRow } from "@/components/DashboardRow";
 import { DashboardColumnHeaders } from "@/components/DashboardColumnHeaders";
 import { GroupUpdateBar } from "@/components/GroupUpdateBar";
@@ -8,9 +8,7 @@ import { formatMeetingDate } from "@/lib/dates";
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser(supabase);
   if (!user) return null;
 
   const { data: profile } = await supabase
@@ -36,26 +34,11 @@ export default async function DashboardPage() {
 
   const groupId = profile.active_group_id;
 
-  const { data: group } = await supabase.from("groups").select("*").eq("id", groupId).single();
-
-  if (!group) {
-    return (
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-brand-navy">No longer a member</h1>
-        <p className="text-[17px] text-neutral-600">
-          You&apos;re no longer an active member of that group.{" "}
-          <Link href="/settings" className="underline">
-            Switch groups or join another
-          </Link>
-          .
-        </p>
-      </div>
-    );
-  }
-
-  // These five only depend on groupId/user.id (already known), not on each
-  // other, so they run as one batch of round-trips instead of five in a row.
+  // These only depend on groupId/user.id (already known), not on each
+  // other, so they run as one batch of round-trips instead of one after
+  // another.
   const [
+    { data: group },
     { data: weekStart },
     { data: meetingDate },
     { data: questions },
@@ -63,6 +46,7 @@ export default async function DashboardPage() {
     { data: myMembership },
     { data: memberships },
   ] = await Promise.all([
+    supabase.from("groups").select("*").eq("id", groupId).single(),
     supabase.rpc("current_week_start", { p_group_id: groupId }),
     supabase.rpc("current_meeting_date", { p_group_id: groupId }),
     supabase
@@ -79,6 +63,22 @@ export default async function DashboardPage() {
       .eq("status", "active")
       .order("joined_at"),
   ]);
+
+  if (!group) {
+    return (
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold text-brand-navy">No longer a member</h1>
+        <p className="text-[17px] text-neutral-600">
+          You&apos;re no longer an active member of that group.{" "}
+          <Link href="/settings" className="underline">
+            Switch groups or join another
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
+
   const isAdmin = myMembership?.role === "admin";
   const userIds = memberships?.map((m) => m.user_id) ?? [];
 

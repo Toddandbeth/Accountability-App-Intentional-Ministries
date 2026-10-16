@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { CreateGroupForm } from "@/components/CreateGroupForm";
 import { JoinGroupForm } from "@/components/JoinGroupForm";
 import { CheckInForm } from "@/components/CheckInForm";
@@ -13,9 +13,7 @@ import type { GroupBasicInfo } from "@/lib/supabase/types";
 export default async function CheckInPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser(supabase);
   if (!user) return null; // middleware guarantees this won't happen
 
   const { data: profile } = await supabase
@@ -102,7 +100,26 @@ export default async function CheckInPage() {
 
   const groupId = profile.active_group_id;
 
-  const { data: group } = await supabase.from("groups").select("*").eq("id", groupId).single();
+  // All independent of each other (they only need groupId/user.id), so one
+  // parallel batch instead of group-then-the-rest. Only editable/checkIn
+  // further down actually need weekStart's value.
+  const [
+    { data: group },
+    { data: questions },
+    { data: weekStart },
+    { data: meetingDate },
+    { data: myGoals },
+  ] = await Promise.all([
+    supabase.from("groups").select("*").eq("id", groupId).single(),
+    supabase.from("group_questions").select("*").eq("group_id", groupId).order("slot_number"),
+    supabase.rpc("current_week_start", { p_group_id: groupId }),
+    supabase.rpc("current_meeting_date", { p_group_id: groupId }),
+    supabase
+      .from("goals")
+      .select("question_slot, goal_text")
+      .eq("group_id", groupId)
+      .eq("user_id", user.id),
+  ]);
 
   if (!group) {
     // active_group_id points at a group RLS no longer lets us read —
@@ -120,20 +137,6 @@ export default async function CheckInPage() {
       </div>
     );
   }
-
-  // Independent of each other — only editable/checkIn below actually need
-  // weekStart's value.
-  const [{ data: questions }, { data: weekStart }, { data: meetingDate }, { data: myGoals }] =
-    await Promise.all([
-      supabase.from("group_questions").select("*").eq("group_id", groupId).order("slot_number"),
-      supabase.rpc("current_week_start", { p_group_id: groupId }),
-      supabase.rpc("current_meeting_date", { p_group_id: groupId }),
-      supabase
-        .from("goals")
-        .select("question_slot, goal_text")
-        .eq("group_id", groupId)
-        .eq("user_id", user.id),
-    ]);
 
   const [{ data: editable }, { data: checkIn }] = await Promise.all([
     supabase.rpc("is_week_editable", { p_group_id: groupId, p_week_start: weekStart! }),

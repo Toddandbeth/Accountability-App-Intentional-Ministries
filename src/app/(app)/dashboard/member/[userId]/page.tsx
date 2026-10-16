@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentUser } from "@/lib/supabase/server";
 import { WeekHistoryRow } from "@/components/WeekHistoryRow";
 
 const HISTORY_WEEKS = 6;
@@ -12,9 +12,7 @@ export default async function MemberHistoryPage({
   const { userId } = await params;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser(supabase);
   if (!user) return null;
 
   const { data: profile } = await supabase
